@@ -1,0 +1,19 @@
+{
+  "name": "api-core",
+  "version": "0.0.1",
+  "description": "Core classes for the api-provider package.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ajuhos/api-core.git"
+  },
+  "author": "We Are Break <ajuhos@we-are-break.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ajuhos/api-core/issues"
+  },
+  "homepage": "https://github.com/ajuhos/api-core#readme"
+}
