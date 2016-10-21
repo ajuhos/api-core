@@ -13,5 +13,6 @@ export interface ApiEdgeDefinition {
     updateEntries: (filters: any[], entryFields: any) => Promise<any>;
     removeEntry: (id: string) => Promise<any>;
     removeEntries: (filters: any[]) => Promise<any[]>;
+    exists: (id: string) => Promise<boolean>;
 
 }
