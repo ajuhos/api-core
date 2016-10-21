@@ -6,13 +6,14 @@ export interface ApiEdgeDefinition {
 
     name: string;
     methods: Object;
+    relations: ApiEdgeRelation[];
 
-    getEntry: (id: string) => any;
-    listEntries: (filters: any[]) => any[];
-    createEntry: (entry: any) => any;
-    updateEntry: (id: string, entryFields: any) => any;
-    updateEntries: (filters: any[], entryFields: any) => any;
-    removeEntry: (id: string) => any;
-    removeEntries: (filters: any[]) => any[];
+    getEntry: (id: string) => Promise<any>;
+    listEntries: (filters: any[]) => Promise<any[]>;
+    createEntry: (entry: any) => Promise<any>;
+    updateEntry: (id: string, entryFields: any) => Promise<any>;
+    updateEntries: (filters: any[], entryFields: any) => Promise<any>;
+    removeEntry: (id: string) => Promise<any>;
+    removeEntries: (filters: any[]) => Promise<any[]>;
 
 }
