@@ -1,4 +1,4 @@
-import {ApiEdgeRelation} from "./ApiEdgeRelation";
+import {ApiEdgeRelation} from "./relations/ApiEdgeRelation";
 
 export interface ApiEdgeDefinition {
 

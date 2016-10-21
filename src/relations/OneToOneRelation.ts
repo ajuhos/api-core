@@ -1,8 +1,9 @@
 import {ApiEdgeDefinition} from "../ApiEdgeDefinition";
 import {ApiEdgeQuery} from "../ApiEdgeQuery";
 import {ApiEdgeQueryType} from "../ApiEdgeQueryType";
+import {ApiEdgeRelation} from "./ApiEdgeRelation";
 
-export class OneToOneRelation {
+export class OneToOneRelation implements ApiEdgeRelation {
 
     name: string;
     relationId: string;
@@ -17,11 +18,11 @@ export class OneToOneRelation {
     }
 
     private createExistsQuery = (relatedId: string): ApiEdgeQuery => {
-        return new ApiEdgeQuery(this.to, ApiEdgeQueryType.Exists, { where: { id: relatedId } });
+        return new ApiEdgeQuery(this.to, ApiEdgeQueryType.Exists, { id: relatedId });
     };
 
     private createGetQuery = (relatedId: string): ApiEdgeQuery => {
-        return new ApiEdgeQuery(this.to, ApiEdgeQueryType.Get, { where: { id: relatedId } });
+        return new ApiEdgeQuery(this.to, ApiEdgeQueryType.Get, { id: relatedId });
     };
 
     query = (relatedId: string, queryItems: string[]): ApiEdgeQuery => {

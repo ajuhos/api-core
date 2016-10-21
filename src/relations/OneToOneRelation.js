@@ -6,10 +6,10 @@ var OneToOneRelation = (function () {
         var _this = this;
         if (relationId === void 0) { relationId = null; }
         this.createExistsQuery = function (relatedId) {
-            return new ApiEdgeQuery_1.ApiEdgeQuery(_this.to, ApiEdgeQueryType_1.ApiEdgeQueryType.Exists, { where: { id: relatedId } });
+            return new ApiEdgeQuery_1.ApiEdgeQuery(_this.to, ApiEdgeQueryType_1.ApiEdgeQueryType.Exists, { id: relatedId });
         };
         this.createGetQuery = function (relatedId) {
-            return new ApiEdgeQuery_1.ApiEdgeQuery(_this.to, ApiEdgeQueryType_1.ApiEdgeQueryType.Get, { where: { id: relatedId } });
+            return new ApiEdgeQuery_1.ApiEdgeQuery(_this.to, ApiEdgeQueryType_1.ApiEdgeQueryType.Get, { id: relatedId });
         };
         this.query = function (relatedId, queryItems) {
             if (queryItems[0] === _this.name)
