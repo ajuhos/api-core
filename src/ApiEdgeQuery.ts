@@ -5,6 +5,16 @@
 import {ApiEdgeDefinition} from './ApiEdgeDefinition';
 import {ApiEdgeQueryType} from './ApiEdgeQueryType';
 
+class QueryContext {
+    id: string;
+
+    constructor(parameters: any[]) {
+        parameters.forEach(param => {
+            if(param.id) this.id = param.id;
+        })
+    }
+}
+
 export class ApiEdgeQuery {
 
     /**
@@ -36,4 +46,28 @@ export class ApiEdgeQuery {
         this.parameters = parameters;
     }
 
+    execute = () => {
+        const context = new QueryContext(this.parameters);
+        switch (this.type) {
+            case ApiEdgeQueryType.Get:
+                return this.edge.getEntry(context.id);
+            case ApiEdgeQueryType.Exists:
+                return this.edge.exists(context.id);
+            case ApiEdgeQueryType.Create:
+                //TODO
+                break;
+            case ApiEdgeQueryType.Delete:
+                //TODO
+                break;
+            case ApiEdgeQueryType.Update:
+                //TODO
+                break;
+            case ApiEdgeQueryType.List:
+                //TODO
+                break;
+            case ApiEdgeQueryType.Call:
+                //TODO
+                break;
+        }
+    }
 }
