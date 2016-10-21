@@ -24,9 +24,13 @@
      */
     ApiEdgeQueryType[ApiEdgeQueryType["Delete"] = 4] = "Delete";
     /**
+     * Check whether an entity from the source model exists.
+     */
+    ApiEdgeQueryType[ApiEdgeQueryType["Exists"] = 5] = "Exists";
+    /**
      * Call a method in the provider.
      */
-    ApiEdgeQueryType[ApiEdgeQueryType["Call"] = 5] = "Call";
+    ApiEdgeQueryType[ApiEdgeQueryType["Call"] = 6] = "Call";
 })(exports.ApiEdgeQueryType || (exports.ApiEdgeQueryType = {}));
 var ApiEdgeQueryType = exports.ApiEdgeQueryType;
 //# sourceMappingURL=ApiEdgeQueryType.js.map

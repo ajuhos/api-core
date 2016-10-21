@@ -10,7 +10,7 @@ class ApiEdgeQuery {
      * @param {ApiEdgeQueryType} type
      * @param {Array} parameters
      */
-    constructor(edge, type = ApiEdgeQueryType_1.ApiEdgeQueryType.Get, parameters = []) {
+    constructor(edge, type = ApiEdgeQueryType_1.ApiEdgeQueryType.Get, ...parameters = []) {
         this.edge = edge;
         this.type = type;
         this.parameters = parameters;

@@ -29,6 +29,11 @@ export enum ApiEdgeQueryType {
     Delete,
 
     /**
+     * Check whether an entity from the source model exists.
+     */
+    Exists,
+
+    /**
      * Call a method in the provider.
      */
     Call
