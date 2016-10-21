@@ -1,29 +1,36 @@
 /**
- * Created by ajuhos on 2016. 10. 20..
+ * Possible types for API Edge Queries.
  */
-
-import {ApiEdgeDefinition} from './ApiEdgeDefinition';
-
-export class ApiEdgeQuery {
+export enum ApiEdgeQueryType {
 
     /**
-     * The API edge to execute the query on.
+     * List several entities of the source model.
      */
-    edge: ApiEdgeDefinition;
+    List,
 
     /**
-     * The list of parameters to use during execution.
+     * Get an entity of the source model.
      */
-    parameters: any[];
+    Get,
 
     /**
-     * Create a new API Edge Query for the specified API Edge with the specified parameters.
-     * @param {ApiEdgeDefinition} edge
-     * @param {Array} parameters
+     * Create a new entity in the source model.
      */
-    constructor(type: ApiEdgeQueryType, edge: ApiEdgeDefinition, parameters: any[] = []) {
-        this.edge = edge;
-        this.parameters = parameters;
-    }
+    Create,
+
+    /**
+     * Edit an entity in the source model.
+     */
+    Update,
+
+    /**
+     * Delete an entity from the source model.
+     */
+    Delete,
+
+    /**
+     * Call a method in the provider.
+     */
+    Call
 
 }
