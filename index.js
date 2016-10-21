@@ -7,3 +7,5 @@ var ApiEdgeError_1 = require("./src/ApiEdgeError");
 exports.ApiEdgeError = ApiEdgeError_1.ApiEdgeError;
 var OneToOneRelation_1 = require("./src/relations/OneToOneRelation");
 exports.OneToOneRelation = OneToOneRelation_1.OneToOneRelation;
+var OneToManyRelation_1 = require("./src/relations/OneToManyRelation");
+exports.OneToManyRelation = OneToManyRelation_1.OneToManyRelation;
