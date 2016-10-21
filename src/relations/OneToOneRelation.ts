@@ -10,11 +10,14 @@ export class OneToOneRelation implements ApiEdgeRelation {
     from: ApiEdgeDefinition;
     to: ApiEdgeDefinition;
 
-    constructor(name: string, from: ApiEdgeDefinition, to: ApiEdgeDefinition, relationId: string = null) {
-        this.name = name;
+    constructor(from: ApiEdgeDefinition,
+                to: ApiEdgeDefinition,
+                options: { relationId: string, name: string } = { relationId: null, name: null }) {
+
         this.from = from;
         this.to = to;
-        this.relationId = relationId || this.to.name + "Id";
+        this.name = options.name || to.name;
+        this.relationId = options.relationId || to.name + "Id";
     }
 
     private createExistsQuery = (relatedId: string): ApiEdgeQuery => {

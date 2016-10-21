@@ -1,14 +1,14 @@
 "use strict";
 var OneToManyRelation = (function () {
-    function OneToManyRelation(name, from, to, relationId) {
-        if (relationId === void 0) { relationId = null; }
+    function OneToManyRelation(from, to, options) {
+        if (options === void 0) { options = { relationId: null, name: null }; }
         this.query = function (relatedId, queryItems) {
             throw "Not Implemented";
         };
-        this.name = name;
         this.from = from;
         this.to = to;
-        this.relationId = relationId || this.to.name + "Id";
+        this.name = options.name || to.name;
+        this.relationId = options.relationId || to.name + "Id";
     }
     return OneToManyRelation;
 }());

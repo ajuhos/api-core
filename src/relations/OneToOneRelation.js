@@ -2,9 +2,9 @@
 var ApiEdgeQuery_1 = require("../ApiEdgeQuery");
 var ApiEdgeQueryType_1 = require("../ApiEdgeQueryType");
 var OneToOneRelation = (function () {
-    function OneToOneRelation(name, from, to, relationId) {
+    function OneToOneRelation(from, to, options) {
         var _this = this;
-        if (relationId === void 0) { relationId = null; }
+        if (options === void 0) { options = { relationId: null, name: null }; }
         this.createExistsQuery = function (relatedId) {
             return new ApiEdgeQuery_1.ApiEdgeQuery(_this.to, ApiEdgeQueryType_1.ApiEdgeQueryType.Exists, { id: relatedId });
         };
@@ -23,10 +23,10 @@ var OneToOneRelation = (function () {
                 return _this.createGetQuery(relatedId);
             }
         };
-        this.name = name;
         this.from = from;
         this.to = to;
-        this.relationId = relationId || this.to.name + "Id";
+        this.name = options.name || to.name;
+        this.relationId = options.relationId || to.name + "Id";
     }
     return OneToOneRelation;
 }());
