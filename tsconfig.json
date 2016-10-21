@@ -1,8 +1,15 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
     "target": "es6",
-    "sourceMap": true
+    "outDir": "dist",
+    "module": "commonjs",
+    "declaration": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "removeComments": true,
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "inlineSources": true
   },
   "exclude": [
     "node_modules"
