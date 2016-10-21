@@ -30,7 +30,7 @@ export class ApiEdgeQuery {
      */
     constructor(edge: ApiEdgeDefinition,
                 type: ApiEdgeQueryType = ApiEdgeQueryType.Get,
-                ...parameters: any[] = []) {
+                ...parameters: any[]) {
         this.edge = edge;
         this.type = type;
         this.parameters = parameters;

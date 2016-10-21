@@ -7,4 +7,3 @@ var ApiEdgeError_1 = require("./src/ApiEdgeError");
 exports.ApiEdgeError = ApiEdgeError_1.ApiEdgeError;
 var OneToOneRelation_1 = require("./src/relations/OneToOneRelation");
 exports.OneToOneRelation = OneToOneRelation_1.OneToOneRelation;
-//# sourceMappingURL=index.js.map
