@@ -3,3 +3,4 @@ export {ApiEdgeRelation} from "./src/ApiEdgeRelation";
 export {ApiEdgeQueryType} from "./src/ApiEdgeQueryType";
 export {ApiEdgeQuery} from "./src/ApiEdgeQuery";
 export {ApiEdgeError} from "./src/ApiEdgeError";
+export {OneToOneRelation} from "./src/relations/OneToOneRelation";
