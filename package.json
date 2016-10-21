@@ -1,6 +1,6 @@
 {
   "name": "api-core",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Core classes for the api-provider package.",
   "main": "index.js",
   "scripts": {
