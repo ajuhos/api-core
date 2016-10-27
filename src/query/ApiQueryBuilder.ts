@@ -319,7 +319,7 @@ export class ApiQueryBuilder {
         query.unshift(new QueryEdgeQueryStep(baseQuery));
 
         //STEP 2: Provide context for the base query.
-        if(request.type === ApiRequestType.Update) query.unshift(new SetBodyQueryStep(request.body));
+        if(request.body) query.unshift(new SetBodyQueryStep(request.body));
         query.unshift(new ExtendContextQueryStep(request.context));
 
         //STEP 3: Provide ID for the base query.

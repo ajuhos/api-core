@@ -213,7 +213,7 @@ var ApiQueryBuilder = (function () {
                 }
             }
             query.unshift(new QueryEdgeQueryStep(baseQuery));
-            if (request.type === ApiRequest_1.ApiRequestType.Update)
+            if (request.body)
                 query.unshift(new SetBodyQueryStep(request.body));
             query.unshift(new ExtendContextQueryStep(request.context));
             if (lastSegment instanceof ApiRequest_1.EntryPathSegment) {
