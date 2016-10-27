@@ -303,20 +303,18 @@ export class ApiQueryBuilder {
 
         //STEP 1: Create the base query which will provide the final data.
         let baseQuery: ApiEdgeQuery;
-        if(lastSegment instanceof EdgePathSegment) {
+        if(lastSegment instanceof RelatedFieldPathSegment) {
+            throw new ApiEdgeError(500, "Not Implemented"); //TODO
+            //baseQuery = new ApiEdgeQuery(lastSegment.relation.to, ApiEdgeQueryType.Get);
+        }
+        //TODO: Add support for method calls
+        else {
             if(request.type === ApiRequestType.Update) {
                 baseQuery = new ApiEdgeQuery(lastSegment.edge, ApiEdgeQueryType.Update);
             }
             else {
                 baseQuery = new ApiEdgeQuery(lastSegment.edge, ApiEdgeQueryType.Delete);
             }
-        }
-        else if(lastSegment instanceof RelatedFieldPathSegment) {
-            baseQuery = new ApiEdgeQuery(lastSegment.relation.to, ApiEdgeQueryType.Get);
-        }
-        //TODO: Add support for method calls
-        else {
-            baseQuery = new ApiEdgeQuery(lastSegment.edge, ApiEdgeQueryType.Get);
         }
         query.unshift(new QueryEdgeQueryStep(baseQuery));
 

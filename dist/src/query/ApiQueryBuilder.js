@@ -201,19 +201,16 @@ var ApiQueryBuilder = (function () {
             var query = new ApiQuery_1.ApiQuery();
             var segments = request.path.segments, lastSegment = segments[segments.length - 1];
             var baseQuery;
-            if (lastSegment instanceof ApiRequest_1.EdgePathSegment) {
+            if (lastSegment instanceof ApiRequest_1.RelatedFieldPathSegment) {
+                throw new ApiEdgeError_1.ApiEdgeError(500, "Not Implemented");
+            }
+            else {
                 if (request.type === ApiRequest_1.ApiRequestType.Update) {
                     baseQuery = new ApiEdgeQuery_1.ApiEdgeQuery(lastSegment.edge, ApiEdgeQueryType_1.ApiEdgeQueryType.Update);
                 }
                 else {
                     baseQuery = new ApiEdgeQuery_1.ApiEdgeQuery(lastSegment.edge, ApiEdgeQueryType_1.ApiEdgeQueryType.Delete);
                 }
-            }
-            else if (lastSegment instanceof ApiRequest_1.RelatedFieldPathSegment) {
-                baseQuery = new ApiEdgeQuery_1.ApiEdgeQuery(lastSegment.relation.to, ApiEdgeQueryType_1.ApiEdgeQueryType.Get);
-            }
-            else {
-                baseQuery = new ApiEdgeQuery_1.ApiEdgeQuery(lastSegment.edge, ApiEdgeQueryType_1.ApiEdgeQueryType.Get);
             }
             query.unshift(new QueryEdgeQueryStep(baseQuery));
             if (request.type === ApiRequest_1.ApiRequestType.Update)
