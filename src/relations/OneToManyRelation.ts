@@ -7,17 +7,19 @@ export class OneToManyRelation implements ApiEdgeRelation {
 
     name: string;
     relationId: string;
+    relatedId: string;
     from: ApiEdgeDefinition;
     to: ApiEdgeDefinition;
 
     constructor(from: ApiEdgeDefinition,
                 to: ApiEdgeDefinition,
-                options: { relationId: string, name: string } = { relationId: null, name: null }) {
+                options: { relationId: string, relatedId: string, name: string } = { relationId: null, relatedId: null, name: null }) {
 
         this.from = from;
         this.to = to;
         this.name = options.name || to.pluralName;
-        this.relationId = options.relationId || to.name + "Id";
+        this.relatedId = options.relatedId || to.name + "Id";
+        this.relationId = options.relationId || from.name + "Id";
     }
 
     query = (relatedId: string, queryItems: string[]): ApiEdgeQuery => {
