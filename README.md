@@ -5,6 +5,7 @@ Core classes for building dynamic model based multi-level APIs for any provider 
 First beta and documentation coming soon...
 
 **SNEAK PEAK**
+Working Demo: [api-demo on GitHub](https://github.com/ajuhos/api-demo)
 ```javascript
 const Express = require('express'),
       app = new Express;
