@@ -6,6 +6,7 @@ var ApiEdgeQueryContext = (function () {
         if (id === void 0) { id = null; }
         if (fields === void 0) { fields = []; }
         this.fields = [];
+        this.populatedFields = [];
         this.filters = [];
         this.clone = function () {
             var temp = new ApiEdgeQueryContext();

@@ -3,7 +3,7 @@ import {ApiEdgeQueryFilter, ApiEdgeQueryFilterType} from "./ApiEdgeQueryFilter";
 export class ApiEdgeQueryContext {
     id: string;
     fields: string[] = [];
-    populatedFields: string[];
+    populatedFields: string[] = [];
     pagination: {
         skip: number,
         limit: number
