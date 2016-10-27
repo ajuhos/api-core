@@ -1,4 +1,5 @@
 import {ApiEdgeRelation} from "./relations/ApiEdgeRelation";
+import {ApiEdgeQueryContext} from "./ApiEdgeQueryContext";
 
 export interface ApiEdgeDefinition {
 
@@ -6,13 +7,14 @@ export interface ApiEdgeDefinition {
     methods: Object;
     relations: ApiEdgeRelation[];
 
-    getEntry: (id: string) => Promise<any>;
-    listEntries: (filters: any[]) => Promise<any[]>;
-    createEntry: (entry: any) => Promise<any>;
-    updateEntry: (id: string, entryFields: any) => Promise<any>;
-    updateEntries: (filters: any[], entryFields: any) => Promise<any>;
-    removeEntry: (id: string) => Promise<any>;
-    removeEntries: (filters: any[]) => Promise<any[]>;
-    exists: (id: string) => Promise<boolean>;
+    getEntry: (context: ApiEdgeQueryContext) => Promise<ApiEdgeQueryResponse>;
+    listEntries: (context: ApiEdgeQueryContext) => Promise<ApiEdgeQueryResponse>;
+    createEntry: (context: ApiEdgeQueryContext, entryFields: any) => Promise<ApiEdgeQueryResponse>;
+    updateEntry: (context: ApiEdgeQueryContext, entryFields: any) => Promise<ApiEdgeQueryResponse>;
+    updateEntries: (context: ApiEdgeQueryContext, entryFields: any) => Promise<ApiEdgeQueryResponse>;
+    removeEntry: (context: ApiEdgeQueryContext) => Promise<ApiEdgeQueryResponse>;
+    removeEntries: (context: ApiEdgeQueryContext) => Promise<ApiEdgeQueryResponse[]>;
+    exists: (context: ApiEdgeQueryContext) => Promise<ApiEdgeQueryResponse>;
+    callMethod: (context: ApiEdgeQueryContext, entryFields: any) => Promise<ApiEdgeQueryResponse>;
 
 }

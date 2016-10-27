@@ -1,5 +1,7 @@
 export {ApiEdgeDefinition} from "./src/ApiEdgeDefinition";
 export {ApiEdgeQueryType} from "./src/ApiEdgeQueryType";
+export {ApiEdgeQueryContext} from "./src/ApiEdgeQueryContext";
+export {ApiEdgeQueryResponse} from "./src/ApiEdgeQueryResponse";
 export {ApiEdgeQuery} from "./src/ApiEdgeQuery";
 export {ApiEdgeError} from "./src/ApiEdgeError";
 export {ApiEdgeRelation} from "./src/relations/ApiEdgeRelation";

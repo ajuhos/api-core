@@ -1,19 +1,6 @@
-/**
- * Created by ajuhos on 2016. 10. 20..
- */
-
 import {ApiEdgeDefinition} from './ApiEdgeDefinition';
 import {ApiEdgeQueryType} from './ApiEdgeQueryType';
-
-class QueryContext {
-    id: string;
-
-    constructor(parameters: any[]) {
-        parameters.forEach(param => {
-            if(param.id) this.id = param.id;
-        })
-    }
-}
+import {ApiEdgeQueryContext} from "./ApiEdgeQueryContext";
 
 export class ApiEdgeQuery {
 
@@ -30,44 +17,46 @@ export class ApiEdgeQuery {
     /**
      * The list of parameters to use during execution.
      */
-    parameters: any[];
+    context: ApiEdgeQueryContext;
+
+    /**
+     * The list of parameters to use during execution.
+     */
+    body: any;
 
     /**
      * Create a new API Edge Query for the specified API Edge with the specified parameters.
      * @param {ApiEdgeDefinition} edge
      * @param {ApiEdgeQueryType} type
-     * @param {Array} parameters
+     * @param {ApiEdgeQueryContext} context
+     * @param {object} body
      */
     constructor(edge: ApiEdgeDefinition,
                 type: ApiEdgeQueryType = ApiEdgeQueryType.Get,
-                ...parameters: any[]) {
+                context: ApiEdgeQueryContext = new ApiEdgeQueryContext(),
+                body: any = null) {
         this.edge = edge;
         this.type = type;
-        this.parameters = parameters;
+        this.context = context;
+        this.body = body;
     }
 
     execute = () => {
-        const context = new QueryContext(this.parameters);
         switch (this.type) {
             case ApiEdgeQueryType.Get:
-                return this.edge.getEntry(context.id);
+                return this.edge.getEntry(this.context);
             case ApiEdgeQueryType.Exists:
-                return this.edge.exists(context.id);
+                return this.edge.exists(this.context);
             case ApiEdgeQueryType.Create:
-                //TODO
-                break;
+                return this.edge.createEntry(this.context, this.body);
             case ApiEdgeQueryType.Delete:
-                //TODO
-                break;
+                return this.edge.removeEntry(this.context);
             case ApiEdgeQueryType.Update:
-                //TODO
-                break;
+                return this.edge.updateEntry(this.context, this.body);
             case ApiEdgeQueryType.List:
-                //TODO
-                break;
+                return this.edge.listEntries(this.context); //TODO
             case ApiEdgeQueryType.Call:
-                //TODO
-                break;
+                return this.edge.callMethod(this.context, this.body);
         }
     }
 }
