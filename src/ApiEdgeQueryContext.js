@@ -1,4 +1,5 @@
 "use strict";
+var ApiEdgeQueryFilter_1 = require("./ApiEdgeQueryFilter");
 var ApiEdgeQueryContext = (function () {
     function ApiEdgeQueryContext(id, fields) {
         var _this = this;
@@ -23,8 +24,8 @@ var ApiEdgeQueryContext = (function () {
         this.fields.push(field);
         return this;
     };
-    ApiEdgeQueryContext.prototype.filter = function (filter) {
-        this.filters.push(filter);
+    ApiEdgeQueryContext.prototype.filter = function (field, type, value) {
+        this.filters.push(new ApiEdgeQueryFilter_1.ApiEdgeQueryFilter(field, type, value));
         return this;
     };
     return ApiEdgeQueryContext;

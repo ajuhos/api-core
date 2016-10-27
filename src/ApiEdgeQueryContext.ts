@@ -1,3 +1,5 @@
+import {ApiEdgeQueryFilter, ApiEdgeQueryFilterType} from "./ApiEdgeQueryFilter";
+
 export class ApiEdgeQueryContext {
     id: string;
     fields: string[] = [];
@@ -6,7 +8,7 @@ export class ApiEdgeQueryContext {
         skip: number,
         limit: number
     };
-    filters: any[] = [];
+    filters: ApiEdgeQueryFilter[] = [];
 
     constructor(id: string = null, fields: string[] = []) {
         this.id = id;
@@ -30,8 +32,8 @@ export class ApiEdgeQueryContext {
         return this
     }
 
-    filter(filter: string) {
-        this.filters.push(filter);
+    filter(field: string, type: ApiEdgeQueryFilterType, value: any) {
+        this.filters.push(new ApiEdgeQueryFilter(field, type, value));
         return this
     }
 }
