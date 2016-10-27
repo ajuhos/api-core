@@ -8,6 +8,7 @@ export declare class ApiQueryBuilder {
     private buildCheckStep(query, currentSegment);
     private buildReadStep(query, currentSegment);
     private buildReadQuery;
+    private buildChangeQuery;
     private buildCreateQuery;
     build: (request: ApiRequest) => ApiQuery;
 }

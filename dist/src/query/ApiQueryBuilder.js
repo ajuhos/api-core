@@ -172,7 +172,51 @@ var ApiQueryBuilder = (function () {
                 baseQuery = new ApiEdgeQuery_1.ApiEdgeQuery(lastSegment.edge, ApiEdgeQueryType_1.ApiEdgeQueryType.Get);
             }
             query.unshift(new QueryEdgeQueryStep(baseQuery));
-            if (request.body)
+            query.unshift(new ExtendContextQueryStep(request.context));
+            if (lastSegment instanceof ApiRequest_1.EntryPathSegment) {
+                query.unshift(new ExtendContextQueryStep(new ApiEdgeQueryContext_1.ApiEdgeQueryContext(lastSegment.id)));
+            }
+            else if (lastSegment instanceof ApiRequest_1.RelatedFieldPathSegment) {
+                query.unshift(new ProvideIdQueryStep(lastSegment.relation.relationId));
+            }
+            else {
+            }
+            var readMode = true;
+            for (var i = segments.length - 2; i >= 0; i--) {
+                var currentSegment = segments[i];
+                var relation = segments[i + 1].relation;
+                if (relation && !(relation instanceof OneToOneRelation_1.OneToOneRelation)) {
+                    query.unshift(new RelateQueryStep(relation));
+                }
+                if (readMode) {
+                    readMode = _this.buildReadStep(query, currentSegment);
+                }
+                else {
+                    readMode = _this.buildCheckStep(query, currentSegment);
+                }
+            }
+            return query;
+        };
+        this.buildChangeQuery = function (request) {
+            var query = new ApiQuery_1.ApiQuery();
+            var segments = request.path.segments, lastSegment = segments[segments.length - 1];
+            var baseQuery;
+            if (lastSegment instanceof ApiRequest_1.EdgePathSegment) {
+                if (request.type === ApiRequest_1.ApiRequestType.Update) {
+                    baseQuery = new ApiEdgeQuery_1.ApiEdgeQuery(lastSegment.edge, ApiEdgeQueryType_1.ApiEdgeQueryType.Update);
+                }
+                else {
+                    baseQuery = new ApiEdgeQuery_1.ApiEdgeQuery(lastSegment.edge, ApiEdgeQueryType_1.ApiEdgeQueryType.Delete);
+                }
+            }
+            else if (lastSegment instanceof ApiRequest_1.RelatedFieldPathSegment) {
+                baseQuery = new ApiEdgeQuery_1.ApiEdgeQuery(lastSegment.relation.to, ApiEdgeQueryType_1.ApiEdgeQueryType.Get);
+            }
+            else {
+                baseQuery = new ApiEdgeQuery_1.ApiEdgeQuery(lastSegment.edge, ApiEdgeQueryType_1.ApiEdgeQueryType.Get);
+            }
+            query.unshift(new QueryEdgeQueryStep(baseQuery));
+            if (request.type === ApiRequest_1.ApiRequestType.Update)
                 query.unshift(new SetBodyQueryStep(request.body));
             query.unshift(new ExtendContextQueryStep(request.context));
             if (lastSegment instanceof ApiRequest_1.EntryPathSegment) {
@@ -212,9 +256,10 @@ var ApiQueryBuilder = (function () {
         this.build = function (request) {
             switch (request.type) {
                 case ApiRequest_1.ApiRequestType.Read:
+                    return _this.buildReadQuery(request);
                 case ApiRequest_1.ApiRequestType.Update:
                 case ApiRequest_1.ApiRequestType.Delete:
-                    return _this.buildReadQuery(request);
+                    return _this.buildChangeQuery(request);
                 case ApiRequest_1.ApiRequestType.Create:
                     return _this.buildCreateQuery(request);
                 default:

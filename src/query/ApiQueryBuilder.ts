@@ -258,7 +258,70 @@ export class ApiQueryBuilder {
         query.unshift(new QueryEdgeQueryStep(baseQuery));
 
         //STEP 2: Provide context for the base query.
-        if(request.body) query.unshift(new SetBodyQueryStep(request.body));
+        query.unshift(new ExtendContextQueryStep(request.context));
+
+        //STEP 3: Provide ID for the base query.
+        if(lastSegment instanceof EntryPathSegment) {
+            query.unshift(new ExtendContextQueryStep(new ApiEdgeQueryContext(lastSegment.id)))
+        }
+        else if(lastSegment instanceof RelatedFieldPathSegment) {
+            query.unshift(new ProvideIdQueryStep(lastSegment.relation.relationId))
+        }
+        else {
+            //TODO: Add support for method calls
+        }
+
+        //STEP 4: Provide filters and validation for the base query.
+        let readMode = true;
+        for(let i = segments.length-2; i >= 0; i--) {
+            let currentSegment = segments[i];
+
+            //STEP 1: Relate to the current query.
+            let relation = segments[i+1].relation;
+            if(relation && !(relation instanceof OneToOneRelation)) {
+                query.unshift(new RelateQueryStep(relation));
+            }
+
+            //STEP 2: Read or Check
+            if(readMode) {
+                readMode = this.buildReadStep(query, currentSegment)
+            }
+            else {
+                readMode = this.buildCheckStep(query, currentSegment)
+            }
+        }
+
+        //STEP 5: Return the completed query.
+        return query
+    };
+
+    private buildChangeQuery = (request: ApiRequest): ApiQuery => {
+        let query = new ApiQuery();
+
+        let segments = request.path.segments,
+            lastSegment = segments[segments.length-1];
+
+        //STEP 1: Create the base query which will provide the final data.
+        let baseQuery: ApiEdgeQuery;
+        if(lastSegment instanceof EdgePathSegment) {
+            if(request.type === ApiRequestType.Update) {
+                baseQuery = new ApiEdgeQuery(lastSegment.edge, ApiEdgeQueryType.Update);
+            }
+            else {
+                baseQuery = new ApiEdgeQuery(lastSegment.edge, ApiEdgeQueryType.Delete);
+            }
+        }
+        else if(lastSegment instanceof RelatedFieldPathSegment) {
+            baseQuery = new ApiEdgeQuery(lastSegment.relation.to, ApiEdgeQueryType.Get);
+        }
+        //TODO: Add support for method calls
+        else {
+            baseQuery = new ApiEdgeQuery(lastSegment.edge, ApiEdgeQueryType.Get);
+        }
+        query.unshift(new QueryEdgeQueryStep(baseQuery));
+
+        //STEP 2: Provide context for the base query.
+        if(request.type === ApiRequestType.Update) query.unshift(new SetBodyQueryStep(request.body));
         query.unshift(new ExtendContextQueryStep(request.context));
 
         //STEP 3: Provide ID for the base query.
@@ -321,9 +384,10 @@ export class ApiQueryBuilder {
     build = (request: ApiRequest): ApiQuery => {
         switch(request.type) {
             case ApiRequestType.Read:
+                return this.buildReadQuery(request);
             case ApiRequestType.Update:
             case ApiRequestType.Delete:
-                return this.buildReadQuery(request);
+                return this.buildChangeQuery(request);
             case ApiRequestType.Create:
                 return this.buildCreateQuery(request);
             default:
