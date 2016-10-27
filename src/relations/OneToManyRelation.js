@@ -7,7 +7,7 @@ var OneToManyRelation = (function () {
         };
         this.from = from;
         this.to = to;
-        this.name = options.name || to.name;
+        this.name = options.name || to.pluralName;
         this.relationId = options.relationId || to.name + "Id";
     }
     return OneToManyRelation;
