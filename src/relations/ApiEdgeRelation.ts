@@ -1,7 +1,9 @@
-import {ApiEdgeQuery} from "../ApiEdgeQuery";
+import {ApiEdgeDefinition} from "../edge/ApiEdgeDefinition";
 
 export interface ApiEdgeRelation {
     name: string;
     relationId: string;
-    query: (relatedId: string, queryItems: string[]) => ApiEdgeQuery;
+    relatedId: string;
+    from: ApiEdgeDefinition;
+    to: ApiEdgeDefinition;
 }
