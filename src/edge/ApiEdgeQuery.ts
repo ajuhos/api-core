@@ -53,7 +53,7 @@ export class ApiEdgeQuery {
             case ApiEdgeQueryType.Create:
                 return this.edge.createEntry(this.context, this.body);
             case ApiEdgeQueryType.Delete:
-                return this.edge.removeEntry(this.context);
+                return this.edge.removeEntry(this.context, this.body);
             case ApiEdgeQueryType.Update:
                 return this.edge.updateEntry(this.context, this.body);
             case ApiEdgeQueryType.List:

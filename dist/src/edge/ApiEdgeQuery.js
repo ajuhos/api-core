@@ -16,7 +16,7 @@ var ApiEdgeQuery = (function () {
                 case ApiEdgeQueryType_1.ApiEdgeQueryType.Create:
                     return _this.edge.createEntry(_this.context, _this.body);
                 case ApiEdgeQueryType_1.ApiEdgeQueryType.Delete:
-                    return _this.edge.removeEntry(_this.context);
+                    return _this.edge.removeEntry(_this.context, _this.body);
                 case ApiEdgeQueryType_1.ApiEdgeQueryType.Update:
                     return _this.edge.updateEntry(_this.context, _this.body);
                 case ApiEdgeQueryType_1.ApiEdgeQueryType.List:
