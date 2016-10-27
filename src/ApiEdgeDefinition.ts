@@ -4,6 +4,8 @@ import {ApiEdgeQueryContext} from "./ApiEdgeQueryContext";
 export interface ApiEdgeDefinition {
 
     name: string;
+    pluralName: string;
+
     methods: Object;
     relations: ApiEdgeRelation[];
 
