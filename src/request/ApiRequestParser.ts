@@ -51,7 +51,7 @@ export class ApiRequestPathParser {
                     }
                 }
                 else if(!wasEntry) {
-                    requestPath.add(new EntryPathSegment(lastEdge, segment, lastRelation));
+                    requestPath.add(new EntryPathSegment(lastEdge, ""+segment, lastRelation));
                     wasEntry = true;
                 }
                 else {
@@ -71,7 +71,7 @@ export class ApiRequestPathParser {
             }
         }
 
-        if(lastEdge && lastRelation && !wasEntry) {
+        if(lastEdge && !wasEntry) {
             requestPath.add(new EdgePathSegment(lastEdge, lastRelation));
             lastEdge = null;
         }

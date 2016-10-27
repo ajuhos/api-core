@@ -5,7 +5,7 @@ import {ApiEdgeQueryContext} from "../edge/ApiEdgeQueryContext";
 
 export class PathSegment {
     edge: ApiEdgeDefinition;
-    relation: OneToManyRelation;
+    relation: OneToManyRelation|null;
 
     inspect = () => {
         return '';
@@ -14,9 +14,9 @@ export class PathSegment {
 
 export class EdgePathSegment extends PathSegment {
     edge: ApiEdgeDefinition;
-    relation: OneToManyRelation;
+    relation: OneToManyRelation|null;
 
-    constructor(edge: ApiEdgeDefinition, relation: OneToManyRelation) {
+    constructor(edge: ApiEdgeDefinition, relation: OneToManyRelation|null) {
         super();
         this.edge = edge;
         this.relation = relation;
@@ -29,10 +29,10 @@ export class EdgePathSegment extends PathSegment {
 
 export class EntryPathSegment extends PathSegment {
     edge: ApiEdgeDefinition;
-    relation: OneToManyRelation;
+    relation: OneToManyRelation|null;
     id: string;
 
-    constructor(edge: ApiEdgeDefinition, id: string, relation: OneToManyRelation) {
+    constructor(edge: ApiEdgeDefinition, id: string, relation: OneToManyRelation|null) {
         super();
         this.edge = edge;
         this.relation = relation;

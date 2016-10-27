@@ -37,7 +37,7 @@ var ApiRequestPathParser = (function () {
                     }
                 }
                 else if (!wasEntry) {
-                    requestPath.add(new ApiRequest_1.EntryPathSegment(lastEdge, segment, lastRelation));
+                    requestPath.add(new ApiRequest_1.EntryPathSegment(lastEdge, "" + segment, lastRelation));
                     wasEntry = true;
                 }
                 else {
@@ -55,7 +55,7 @@ var ApiRequestPathParser = (function () {
                 }
             }
         }
-        if (lastEdge && lastRelation && !wasEntry) {
+        if (lastEdge && !wasEntry) {
             requestPath.add(new ApiRequest_1.EdgePathSegment(lastEdge, lastRelation));
             lastEdge = null;
         }

@@ -4,20 +4,20 @@ import { OneToOneRelation } from "../relations/OneToOneRelation";
 import { ApiEdgeQueryContext } from "../edge/ApiEdgeQueryContext";
 export declare class PathSegment {
     edge: ApiEdgeDefinition;
-    relation: OneToManyRelation;
+    relation: OneToManyRelation | null;
     inspect: () => string;
 }
 export declare class EdgePathSegment extends PathSegment {
     edge: ApiEdgeDefinition;
-    relation: OneToManyRelation;
-    constructor(edge: ApiEdgeDefinition, relation: OneToManyRelation);
+    relation: OneToManyRelation | null;
+    constructor(edge: ApiEdgeDefinition, relation: OneToManyRelation | null);
     inspect: () => string;
 }
 export declare class EntryPathSegment extends PathSegment {
     edge: ApiEdgeDefinition;
-    relation: OneToManyRelation;
+    relation: OneToManyRelation | null;
     id: string;
-    constructor(edge: ApiEdgeDefinition, id: string, relation: OneToManyRelation);
+    constructor(edge: ApiEdgeDefinition, id: string, relation: OneToManyRelation | null);
     inspect: () => string;
 }
 export declare class RelatedFieldPathSegment extends PathSegment {
