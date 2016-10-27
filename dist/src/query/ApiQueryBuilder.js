@@ -172,6 +172,8 @@ var ApiQueryBuilder = (function () {
                 baseQuery = new ApiEdgeQuery_1.ApiEdgeQuery(lastSegment.edge, ApiEdgeQueryType_1.ApiEdgeQueryType.Get);
             }
             query.unshift(new QueryEdgeQueryStep(baseQuery));
+            if (request.body)
+                query.unshift(new SetBodyQueryStep(request.body));
             query.unshift(new ExtendContextQueryStep(request.context));
             if (lastSegment instanceof ApiRequest_1.EntryPathSegment) {
                 query.unshift(new ExtendContextQueryStep(new ApiEdgeQueryContext_1.ApiEdgeQueryContext(lastSegment.id)));
@@ -210,6 +212,8 @@ var ApiQueryBuilder = (function () {
         this.build = function (request) {
             switch (request.type) {
                 case ApiRequest_1.ApiRequestType.Read:
+                case ApiRequest_1.ApiRequestType.Update:
+                case ApiRequest_1.ApiRequestType.Delete:
                     return _this.buildReadQuery(request);
                 case ApiRequest_1.ApiRequestType.Create:
                     return _this.buildCreateQuery(request);

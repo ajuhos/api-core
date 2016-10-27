@@ -258,6 +258,7 @@ export class ApiQueryBuilder {
         query.unshift(new QueryEdgeQueryStep(baseQuery));
 
         //STEP 2: Provide context for the base query.
+        if(request.body) query.unshift(new SetBodyQueryStep(request.body));
         query.unshift(new ExtendContextQueryStep(request.context));
 
         //STEP 3: Provide ID for the base query.
@@ -320,6 +321,8 @@ export class ApiQueryBuilder {
     build = (request: ApiRequest): ApiQuery => {
         switch(request.type) {
             case ApiRequestType.Read:
+            case ApiRequestType.Update:
+            case ApiRequestType.Delete:
                 return this.buildReadQuery(request);
             case ApiRequestType.Create:
                 return this.buildCreateQuery(request);
