@@ -10,6 +10,8 @@
 var ApiEdgeQueryFilterType = exports.ApiEdgeQueryFilterType;
 var ApiEdgeQueryFilter = (function () {
     function ApiEdgeQueryFilter(field, type, value) {
+        var _this = this;
+        this.clone = function () { return new ApiEdgeQueryFilter(_this.field, _this.type, _this.value); };
         this.field = field;
         this.value = value;
         this.type = type;

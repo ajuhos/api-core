@@ -17,4 +17,6 @@ export class ApiEdgeQueryFilter {
         this.value = value;
         this.type = type;
     }
+
+    clone = () => new ApiEdgeQueryFilter(this.field, this.type, this.value);
 }
