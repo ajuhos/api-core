@@ -18,6 +18,7 @@ var OneToManyRelation_1 = require("./src/relations/OneToManyRelation");
 exports.OneToManyRelation = OneToManyRelation_1.OneToManyRelation;
 var ApiRequest_1 = require("./src/request/ApiRequest");
 exports.ApiRequest = ApiRequest_1.ApiRequest;
+exports.ApiRequestType = ApiRequest_1.ApiRequestType;
 var ApiRequestParser_1 = require("./src/request/ApiRequestParser");
 exports.ApiRequestPathParser = ApiRequestParser_1.ApiRequestPathParser;
 var ApiQuery_1 = require("./src/query/ApiQuery");
