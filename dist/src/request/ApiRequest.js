@@ -81,6 +81,7 @@ exports.ApiRequestPath = ApiRequestPath;
 var ApiRequestType = exports.ApiRequestType;
 var ApiRequest = (function () {
     function ApiRequest() {
+        this.body = null;
         this.path = new ApiRequestPath();
         this.type = ApiRequestType.Read;
         this.context = new ApiEdgeQueryContext_1.ApiEdgeQueryContext();

@@ -4,6 +4,7 @@ import {ApiEdgeQueryResponse} from "../edge/ApiEdgeQueryResponse";
 
 export interface QueryScope {
     context: ApiEdgeQueryContext,
+    body: any|null,
     response: ApiEdgeQueryResponse|null
 }
 
@@ -38,7 +39,7 @@ export class ApiQuery {
                 }
             };
 
-            next({ context: new ApiEdgeQueryContext(), response: null});
+            next({ context: new ApiEdgeQueryContext(), body: null, response: null});
         })
     }
 }

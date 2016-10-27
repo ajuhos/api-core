@@ -13,6 +13,7 @@ var QueryEdgeQueryStep = (function () {
         var _this = this;
         this.execute = function (scope) {
             return new Promise(function (resolve, reject) {
+                _this.query.body = scope.body;
                 _this.query.context = scope.context;
                 _this.query.execute().then(function (response) {
                     scope.context = new ApiEdgeQueryContext_1.ApiEdgeQueryContext();
@@ -82,6 +83,20 @@ var SetResponseQueryStep = (function () {
         this.response = response;
     }
     return SetResponseQueryStep;
+}());
+var SetBodyQueryStep = (function () {
+    function SetBodyQueryStep(body) {
+        var _this = this;
+        this.execute = function (scope) {
+            return new Promise(function (resolve) {
+                scope.body = _this.body;
+                resolve(scope);
+            });
+        };
+        this.inspect = function () { return "SET BODY"; };
+        this.body = body;
+    }
+    return SetBodyQueryStep;
 }());
 var ProvideIdQueryStep = (function () {
     function ProvideIdQueryStep(fieldName) {
@@ -182,10 +197,22 @@ var ApiQueryBuilder = (function () {
             }
             return query;
         };
+        this.buildCreateQuery = function (request) {
+            var query = new ApiQuery_1.ApiQuery();
+            var segments = request.path.segments, lastSegment = segments[segments.length - 1];
+            if (segments.length != 1 || !(lastSegment instanceof ApiRequest_1.EdgePathSegment)) {
+                throw new ApiEdgeError_1.ApiEdgeError(400, "Invalid Create Query");
+            }
+            query.unshift(new QueryEdgeQueryStep(new ApiEdgeQuery_1.ApiEdgeQuery(lastSegment.edge, ApiEdgeQueryType_1.ApiEdgeQueryType.Create)));
+            query.unshift(new SetBodyQueryStep(request.body));
+            return query;
+        };
         this.build = function (request) {
             switch (request.type) {
                 case ApiRequest_1.ApiRequestType.Read:
                     return _this.buildReadQuery(request);
+                case ApiRequest_1.ApiRequestType.Create:
+                    return _this.buildCreateQuery(request);
                 default:
                     throw new ApiEdgeError_1.ApiEdgeError(400, "Unsupported Query Type");
             }

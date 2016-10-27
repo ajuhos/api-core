@@ -22,6 +22,7 @@ class QueryEdgeQueryStep implements QueryStep {
 
     execute = (scope: QueryScope) => {
         return new Promise((resolve, reject) => {
+            this.query.body = scope.body;
             this.query.context = scope.context;
             //console.log(`QUERY /${this.query.edge.pluralName}`, scope.context);
             this.query.execute().then((response) => {
@@ -96,6 +97,23 @@ class SetResponseQueryStep implements QueryStep {
     };
 
     inspect = () => `SET RESPONSE`;
+}
+
+class SetBodyQueryStep implements QueryStep {
+    body: any;
+
+    constructor(body: any) {
+        this.body = body;
+    }
+
+    execute = (scope: QueryScope) => {
+        return new Promise(resolve => {
+            scope.body = this.body;
+            resolve(scope);
+        })
+    };
+
+    inspect = () => `SET BODY`;
 }
 
 class ProvideIdQueryStep implements QueryStep {
@@ -277,10 +295,34 @@ export class ApiQueryBuilder {
         return query
     };
 
+    private buildCreateQuery = (request: ApiRequest): ApiQuery => {
+        let query = new ApiQuery();
+
+        let segments = request.path.segments,
+            lastSegment = segments[segments.length-1];
+
+        //STEP 1: Validate query
+        if(segments.length != 1 || !(lastSegment instanceof EdgePathSegment)) {
+            throw new ApiEdgeError(400, "Invalid Create Query")
+        }
+
+        //STEP 2: Create the base query which will provide the final data.
+        query.unshift(new QueryEdgeQueryStep(new ApiEdgeQuery(lastSegment.edge, ApiEdgeQueryType.Create)));
+
+        //STEP 3: Provide context for the base query.
+        query.unshift(new SetBodyQueryStep(request.body));
+
+        //STEP 4: Return the completed query.
+        return query
+    };
+
+
     build = (request: ApiRequest): ApiQuery => {
         switch(request.type) {
             case ApiRequestType.Read:
                 return this.buildReadQuery(request);
+            case ApiRequestType.Create:
+                return this.buildCreateQuery(request);
             default:
                 throw new ApiEdgeError(400, "Unsupported Query Type")
         }

@@ -26,7 +26,7 @@ var ApiQuery = (function () {
                         }
                     }
                 };
-                next({ context: new ApiEdgeQueryContext_1.ApiEdgeQueryContext(), response: null });
+                next({ context: new ApiEdgeQueryContext_1.ApiEdgeQueryContext(), body: null, response: null });
             });
         };
     }

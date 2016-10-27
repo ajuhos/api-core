@@ -2,6 +2,7 @@ import { ApiEdgeQueryContext } from "../edge/ApiEdgeQueryContext";
 import { ApiEdgeQueryResponse } from "../edge/ApiEdgeQueryResponse";
 export interface QueryScope {
     context: ApiEdgeQueryContext;
+    body: any | null;
     response: ApiEdgeQueryResponse | null;
 }
 export interface QueryStep {

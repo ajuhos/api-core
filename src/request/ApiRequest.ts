@@ -82,6 +82,7 @@ export enum ApiRequestType {
 export class ApiRequest {
     type: ApiRequestType;
     path: ApiRequestPath;
+    body: any|null = null; //Should be request context
     context: ApiEdgeQueryContext; //Should be request context
 
     constructor() {
