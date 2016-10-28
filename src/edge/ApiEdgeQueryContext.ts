@@ -8,6 +8,7 @@ export class ApiEdgeQueryContext {
         skip: number,
         limit: number
     };
+    sortBy: any[] = [];
     filters: ApiEdgeQueryFilter[] = [];
 
     clone = () => {
@@ -37,6 +38,11 @@ export class ApiEdgeQueryContext {
         this.pagination = {
             skip, limit
         };
+        return this
+    };
+
+    sort = (fieldName: string, ascending: boolean = true) => {
+        this.sortBy.push([fieldName, (ascending ? 1 : -1)]);
         return this
     };
 

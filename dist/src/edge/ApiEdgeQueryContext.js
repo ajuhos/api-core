@@ -7,6 +7,7 @@ var ApiEdgeQueryContext = (function () {
         if (fields === void 0) { fields = []; }
         this.fields = [];
         this.populatedFields = [];
+        this.sortBy = [];
         this.filters = [];
         this.clone = function () {
             var temp = new ApiEdgeQueryContext();
@@ -26,6 +27,11 @@ var ApiEdgeQueryContext = (function () {
             _this.pagination = {
                 skip: skip, limit: limit
             };
+            return _this;
+        };
+        this.sort = function (fieldName, ascending) {
+            if (ascending === void 0) { ascending = true; }
+            _this.sortBy.push([fieldName, (ascending ? 1 : -1)]);
             return _this;
         };
         this.id = id;
