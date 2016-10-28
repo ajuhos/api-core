@@ -2,6 +2,8 @@
 
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/ajuhos/api-core/master/LICENSE)
 [![GitHub issues](https://img.shields.io/github/issues/ajuhos/api-core.svg)](https://github.com/ajuhos/api-core/issues)
+[![Build Status](https://travis-ci.org/ajuhos/api-core.svg?branch=master)](https://travis-ci.org/ajuhos/api-core)
+[![Coverage Status](https://coveralls.io/repos/github/ajuhos/api-core/badge.svg?branch=master)](https://coveralls.io/github/ajuhos/api-core?branch=master)
 
 Features:
 
