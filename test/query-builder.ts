@@ -1,0 +1,290 @@
+import {ApiEdgeError} from "../src/query/ApiEdgeError";
+const tap = require('tap');
+
+import {Api} from "../src/Api";
+import * as builder from "../src/query/ApiQueryBuilder";
+import {OneToOneRelation} from "../src/relations/OneToOneRelation";
+import {OneToManyRelation} from "../src/relations/OneToManyRelation";
+
+import {StudentEdge} from "./env/edges/StudentEdge";
+import {ClassEdge} from "./env/edges/ClassEdge";
+import {CourseEdge} from "./env/edges/CourseEdge";
+import {CourseTypeEdge} from "./env/edges/CourseTypeEdge";
+import {SchoolEdge} from "./env/edges/SchoolEdge";
+import {ApiRequestType} from "../src/request/ApiRequest";
+
+const studentEdge = new StudentEdge,
+    classEdge = new ClassEdge,
+    courseEdge = new CourseEdge,
+    courseTypeEdge = new CourseTypeEdge,
+    schoolEdge = new SchoolEdge;
+
+var api: Api;
+
+tap.test('creating the API should work', (t: any) => {
+    api = new Api('1.0')
+        .edge(studentEdge)
+        .edge(classEdge)
+        .edge(courseEdge)
+        .edge(courseTypeEdge)
+        .edge(schoolEdge)
+        .relation(new OneToOneRelation(courseEdge, courseTypeEdge))
+        .relation(new OneToManyRelation(courseTypeEdge, courseEdge))
+        .relation(new OneToManyRelation(studentEdge, courseEdge))
+        .relation(new OneToOneRelation(studentEdge, classEdge))
+        .relation(new OneToOneRelation(classEdge, schoolEdge))
+        .relation(new OneToOneRelation(courseEdge, classEdge))
+        .relation(new OneToManyRelation(classEdge, studentEdge))
+        .relation(new OneToManyRelation(classEdge, courseEdge))
+        .relation(new OneToManyRelation(schoolEdge, studentEdge))
+        .relation(new OneToManyRelation(schoolEdge, classEdge));
+
+    t.end()
+});
+
+tap.test('/schools', (t: any) => {
+    const request = api.parseRequest([ 'schools' ]),
+        query = api.buildQuery(request);
+
+    t.equal(query.steps.length, 2, 'should build a 2 step query');
+    t.ok(query.steps[0] instanceof builder.ExtendContextQueryStep);
+    t.ok(query.steps[1] instanceof builder.QueryEdgeQueryStep);
+
+    query.execute()
+        .then(resp => {
+            t.same(resp.data,
+                [
+                    {
+                        address: "16, Test street, North Pole, HA23535",
+                        id: "s1",
+                        name: "First School",
+                        phone: "435234523"
+                    },
+                    {
+                        address: "12, Test street, North Pole, HA23535",
+                        id: "s2",
+                        name: "Second School",
+                        phone: "456345283"
+                    }
+                ]);
+            t.equal(resp.metadata, null);
+            t.end()
+        })
+        .catch(() => {
+            t.ok(false, "a valid query should not fail");
+            t.end()
+        });
+});
+
+tap.test('/schools/s2', (t: any) => {
+    const request = api.parseRequest([ 'schools', 's2' ]),
+        query = api.buildQuery(request);
+
+    t.equal(query.steps.length, 3, 'should build a 3 step query');
+    t.ok(query.steps[0] instanceof builder.ExtendContextQueryStep);
+    t.ok(query.steps[1] instanceof builder.ExtendContextQueryStep);
+    t.ok(query.steps[2] instanceof builder.QueryEdgeQueryStep);
+
+    query.execute()
+        .then(resp => {
+            t.same(resp.data,
+                {
+                    address: "12, Test street, North Pole, HA23535",
+                    id: "s2",
+                    name: "Second School",
+                    phone: "456345283"
+                });
+            t.equal(resp.metadata, null);
+            t.end()
+        })
+        .catch(() => {
+            t.ok(false, "a valid query should not fail");
+            t.end()
+        });
+});
+
+tap.test('/schools/s5', (t: any) => {
+    const request = api.parseRequest([ 'schools', 's5' ]),
+        query = api.buildQuery(request);
+
+    query.execute()
+        .then(() => {
+            t.ok(false, "an invalid query should not succeed");
+            t.end()
+        })
+        .catch(e => {
+            t.ok(e instanceof ApiEdgeError);
+            t.equal(e.status, 404);
+            t.equal(e.message, 'Not Found');
+            t.end()
+        });
+});
+
+tap.test('/schools/s1/classes', (t: any) => {
+    const request = api.parseRequest([ 'schools', 's1', 'classes' ]),
+        query = api.buildQuery(request);
+
+    t.equal(query.steps.length, 5, 'should build a 5 step query');
+    t.ok(query.steps[0] instanceof builder.ExtendContextQueryStep, 'EXTEND');
+    t.ok(query.steps[1] instanceof builder.QueryEdgeQueryStep, 'QUERY /schools');
+    t.ok(query.steps[2] instanceof builder.RelateQueryStep, 'RELATE schoolId');
+    t.ok(query.steps[3] instanceof builder.ExtendContextQueryStep, 'APPLY PARAMS');
+    t.ok(query.steps[4] instanceof builder.QueryEdgeQueryStep, 'QUERY /classes');
+
+    query.execute()
+        .then(resp => {
+            t.same(resp.data,
+                [
+                    {
+                        id: "c1",
+                        name: "A",
+                        semester: 1,
+                        room: "Room 1",
+                        schoolId: "s1"
+                    }
+                ]);
+            t.equal(resp.metadata, null);
+            t.end()
+        })
+        .catch(() => {
+            t.ok(false, "a valid query should not fail");
+            t.end()
+        });
+});
+
+tap.test('/schools/s1/classes/c1', (t: any) => {
+    const request = api.parseRequest([ 'schools', 's1', 'classes', 'c1' ]),
+        query = api.buildQuery(request);
+
+    t.equal(query.steps.length, 6, 'should build a 6 step query');
+    t.ok(query.steps[0] instanceof builder.ExtendContextQueryStep, 'EXTEND');
+    t.ok(query.steps[1] instanceof builder.QueryEdgeQueryStep, 'QUERY /schools');
+    t.ok(query.steps[2] instanceof builder.RelateQueryStep, 'RELATE schoolId');
+    t.ok(query.steps[3] instanceof builder.ExtendContextQueryStep, 'EXTEND');
+    t.ok(query.steps[4] instanceof builder.ExtendContextQueryStep, 'APPLY PARAMS');
+    t.ok(query.steps[5] instanceof builder.QueryEdgeQueryStep, 'QUERY /classes');
+
+    query.execute()
+        .then(resp => {
+            t.same(resp.data,
+                {
+                    id: "c1",
+                    name: "A",
+                    semester: 1,
+                    room: "Room 1",
+                    schoolId: "s1"
+                });
+            t.equal(resp.metadata, null);
+            t.end()
+        })
+        .catch(() => {
+            t.ok(false, "a valid query should not fail");
+            t.end()
+        });
+});
+
+tap.test('/schools/s1/classes/c2', (t: any) => {
+    const request = api.parseRequest([ 'schools', 's1', 'classes', 'c2' ]),
+        query = api.buildQuery(request);
+
+    query.execute()
+        .then(() => {
+            t.ok(false, "an invalid query should not succeed");
+            t.end()
+        })
+        .catch(e => {
+            t.ok(e instanceof ApiEdgeError);
+            t.equal(e.status, 404);
+            t.equal(e.message, 'Not Found');
+            t.end()
+        });
+});
+
+tap.test('POST /schools', (t: any) => {
+    const request = api.parseRequest([ 'schools' ]);
+    request.type = ApiRequestType.Create;
+    const body = request.body = {
+        address: "12, Test street, North Pole, HA23535",
+        id: "s3",
+        name: "Third School",
+        phone: "456345283"
+    };
+    const query = api.buildQuery(request);
+
+    t.equal(query.steps.length, 2, 'should build a 2 step query');
+    t.ok(query.steps[0] instanceof builder.SetBodyQueryStep);
+    t.ok(query.steps[1] instanceof builder.QueryEdgeQueryStep);
+
+    query.execute()
+        .then(resp => {
+            t.same(resp.data, body);
+            t.equal(resp.metadata, null);
+            t.end()
+        })
+        .catch(() => {
+            t.ok(false, "a valid query should not fail");
+            t.end()
+        });
+});
+
+tap.test('PATCH /schools/s2', (t: any) => {
+    const request = api.parseRequest([ 'schools', 's2' ]);
+    request.type = ApiRequestType.Patch;
+    request.body = {
+        name: "Cool School"
+    };
+    const query = api.buildQuery(request);
+
+    t.equal(query.steps.length, 4, 'should build a 4 step query');
+    t.ok(query.steps[0] instanceof builder.ExtendContextQueryStep, 'EXTEND');
+    t.ok(query.steps[1] instanceof builder.ExtendContextQueryStep, 'APPLY PARAMS');
+    t.ok(query.steps[2] instanceof builder.SetBodyQueryStep, 'SET BODY');
+    t.ok(query.steps[3] instanceof builder.QueryEdgeQueryStep, 'QUERY');
+
+    query.execute()
+        .then(resp => {
+            t.same(resp.data,
+                {
+                    address: "12, Test street, North Pole, HA23535",
+                    id: "s2",
+                    name: "Cool School",
+                    phone: "456345283"
+                });
+            t.equal(resp.metadata, null);
+            t.end()
+        })
+        .catch(() => {
+            t.ok(false, "a valid query should not fail");
+            t.end()
+        });
+});
+
+tap.test('PUT /schools/s2', (t: any) => {
+    const request = api.parseRequest([ 'schools', 's2' ]);
+    request.type = ApiRequestType.Update;
+    request.body = {
+        name: "Cool School"
+    };
+    const query = api.buildQuery(request);
+
+    t.equal(query.steps.length, 4, 'should build a 4 step query');
+    t.ok(query.steps[0] instanceof builder.ExtendContextQueryStep, 'EXTEND');
+    t.ok(query.steps[1] instanceof builder.ExtendContextQueryStep, 'APPLY PARAMS');
+    t.ok(query.steps[2] instanceof builder.SetBodyQueryStep, 'SET BODY');
+    t.ok(query.steps[3] instanceof builder.QueryEdgeQueryStep, 'QUERY');
+
+    query.execute()
+        .then(resp => {
+            t.same(resp.data,
+                {
+                    id: "s2",
+                    name: "Cool School"
+                });
+            t.equal(resp.metadata, null);
+            t.end()
+        })
+        .catch(() => {
+            t.ok(false, "a valid query should not fail");
+            t.end()
+        });
+});

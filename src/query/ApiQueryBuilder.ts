@@ -13,7 +13,7 @@ import {ApiEdgeQueryType} from "../edge/ApiEdgeQueryType";
 import {OneToOneRelation} from "../relations/OneToOneRelation";
 import {Api} from "../Api";
 
-class QueryEdgeQueryStep implements QueryStep {
+export class QueryEdgeQueryStep implements QueryStep {
     query: ApiEdgeQuery;
 
     constructor(query: ApiEdgeQuery) {
@@ -36,7 +36,7 @@ class QueryEdgeQueryStep implements QueryStep {
     inspect = () => `QUERY /${this.query.edge.pluralName}`;
 }
 
-class RelateQueryStep implements QueryStep {
+export class RelateQueryStep implements QueryStep {
     relation: ApiEdgeRelation;
 
     constructor(relation: ApiEdgeRelation) {
@@ -54,7 +54,7 @@ class RelateQueryStep implements QueryStep {
     inspect = () => `RELATE ${this.relation.relationId}`;
 }
 
-class CheckResponseQueryStep implements QueryStep {
+/*export class CheckResponseQueryStep implements QueryStep {
     execute = (scope: QueryScope) => {
         return new Promise((resolve, reject) => {
             if(!scope.response) return reject(new ApiEdgeError(404, "Missing Related Entry"));
@@ -65,7 +65,7 @@ class CheckResponseQueryStep implements QueryStep {
     inspect = () => `CHECK`;
 }
 
-class NotImplementedQueryStep implements QueryStep {
+export class NotImplementedQueryStep implements QueryStep {
     description: string;
 
     constructor(description: string) {
@@ -79,9 +79,9 @@ class NotImplementedQueryStep implements QueryStep {
     };
 
     inspect = () => `NOT IMPLEMENTED: ${this.description}`;
-}
+}*/
 
-class SetResponseQueryStep implements QueryStep {
+export class SetResponseQueryStep implements QueryStep {
     response: ApiEdgeQueryResponse;
 
     constructor(response: ApiEdgeQueryResponse) {
@@ -99,7 +99,7 @@ class SetResponseQueryStep implements QueryStep {
     inspect = () => `SET RESPONSE`;
 }
 
-class SetBodyQueryStep implements QueryStep {
+export class SetBodyQueryStep implements QueryStep {
     body: any;
 
     constructor(body: any) {
@@ -116,7 +116,7 @@ class SetBodyQueryStep implements QueryStep {
     inspect = () => `SET BODY`;
 }
 
-class ProvideIdQueryStep implements QueryStep {
+export class ProvideIdQueryStep implements QueryStep {
     fieldName: string;
 
     constructor(fieldName: string = Api.defaultIdField) {
@@ -134,7 +134,7 @@ class ProvideIdQueryStep implements QueryStep {
     inspect = () => `PROVIDE ID: ${this.fieldName}`;
 }
 
-class ExtendContextQueryStep implements QueryStep {
+export class ExtendContextQueryStep implements QueryStep {
     context: ApiEdgeQueryContext;
 
     constructor(context: ApiEdgeQueryContext) {
@@ -165,7 +165,7 @@ class ExtendContextQueryStep implements QueryStep {
     };
 }
 
-class GenericQueryStep implements QueryStep {
+/*export class GenericQueryStep implements QueryStep {
     description: string;
     step: () => Promise<QueryScope>;
     context: any;
@@ -181,7 +181,7 @@ class GenericQueryStep implements QueryStep {
     };
 
     inspect = () => this.description
-}
+}*/
 
 export class ApiQueryBuilder {
     api: Api;

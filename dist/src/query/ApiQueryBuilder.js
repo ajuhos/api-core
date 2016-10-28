@@ -28,6 +28,7 @@ var QueryEdgeQueryStep = (function () {
     }
     return QueryEdgeQueryStep;
 }());
+exports.QueryEdgeQueryStep = QueryEdgeQueryStep;
 var RelateQueryStep = (function () {
     function RelateQueryStep(relation) {
         var _this = this;
@@ -44,32 +45,7 @@ var RelateQueryStep = (function () {
     }
     return RelateQueryStep;
 }());
-var CheckResponseQueryStep = (function () {
-    function CheckResponseQueryStep() {
-        this.execute = function (scope) {
-            return new Promise(function (resolve, reject) {
-                if (!scope.response)
-                    return reject(new ApiEdgeError_1.ApiEdgeError(404, "Missing Related Entry"));
-                resolve(scope);
-            });
-        };
-        this.inspect = function () { return "CHECK"; };
-    }
-    return CheckResponseQueryStep;
-}());
-var NotImplementedQueryStep = (function () {
-    function NotImplementedQueryStep(description) {
-        var _this = this;
-        this.execute = function (scope) {
-            return new Promise(function (resolve) {
-                resolve(scope);
-            });
-        };
-        this.inspect = function () { return ("NOT IMPLEMENTED: " + _this.description); };
-        this.description = description;
-    }
-    return NotImplementedQueryStep;
-}());
+exports.RelateQueryStep = RelateQueryStep;
 var SetResponseQueryStep = (function () {
     function SetResponseQueryStep(response) {
         var _this = this;
@@ -85,6 +61,7 @@ var SetResponseQueryStep = (function () {
     }
     return SetResponseQueryStep;
 }());
+exports.SetResponseQueryStep = SetResponseQueryStep;
 var SetBodyQueryStep = (function () {
     function SetBodyQueryStep(body) {
         var _this = this;
@@ -99,6 +76,7 @@ var SetBodyQueryStep = (function () {
     }
     return SetBodyQueryStep;
 }());
+exports.SetBodyQueryStep = SetBodyQueryStep;
 var ProvideIdQueryStep = (function () {
     function ProvideIdQueryStep(fieldName) {
         var _this = this;
@@ -116,6 +94,7 @@ var ProvideIdQueryStep = (function () {
     }
     return ProvideIdQueryStep;
 }());
+exports.ProvideIdQueryStep = ProvideIdQueryStep;
 var ExtendContextQueryStep = (function () {
     function ExtendContextQueryStep(context) {
         var _this = this;
@@ -144,19 +123,7 @@ var ExtendContextQueryStep = (function () {
     }
     return ExtendContextQueryStep;
 }());
-var GenericQueryStep = (function () {
-    function GenericQueryStep(description, step, context) {
-        var _this = this;
-        this.execute = function (scope) {
-            return _this.step.apply(_this.context, [scope]);
-        };
-        this.inspect = function () { return _this.description; };
-        this.description = description;
-        this.step = step;
-        this.context = context;
-    }
-    return GenericQueryStep;
-}());
+exports.ExtendContextQueryStep = ExtendContextQueryStep;
 var ApiQueryBuilder = (function () {
     function ApiQueryBuilder(api) {
         var _this = this;
