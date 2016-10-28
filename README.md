@@ -88,8 +88,8 @@ local in-memory model and one with a Mongoose model.
 
 Working Demo: [api-demo](https://github.com/ajuhos/api-demo)
 
-Source code:
-```typescript
+**A complete API with 5 models and relations in 77 lines:**
+```ecmascript 6
 import {ApiEdgeError, OneToOneRelation, OneToManyRelation, ApiEdgeQueryResponse, Api} from "api-core";
 import {MongooseModelFactory} from "api-model-mongoose";
 import {EllipseApiRouter} from "api-provider-ellipse";
@@ -145,22 +145,22 @@ const api10
 
 const api11
     = new Api('1.1')
-    .edge(studentEdge)
-    .edge(classEdge)
-    .edge(courseEdge)
-    .edge(courseTypeEdge)
-    .edge(schoolEdge)
-    .relation(new OneToOneRelation(courseEdge, courseTypeEdge))
-    .relation(new OneToManyRelation(courseTypeEdge, courseEdge))
-    .relation(new OneToManyRelation(studentEdge, courseEdge))
-    .relation(new OneToOneRelation(studentEdge, classEdge))
-    .relation(new OneToOneRelation(studentEdge, schoolEdge))
-    .relation(new OneToOneRelation(classEdge, schoolEdge))
-    .relation(new OneToOneRelation(courseEdge, classEdge))
-    .relation(new OneToManyRelation(classEdge, studentEdge))
-    .relation(new OneToManyRelation(classEdge, courseEdge))
-    .relation(new OneToManyRelation(schoolEdge, studentEdge))
-    .relation(new OneToManyRelation(schoolEdge, classEdge));
+        .edge(studentEdge)
+        .edge(classEdge)
+        .edge(courseEdge)
+        .edge(courseTypeEdge)
+        .edge(schoolEdge)
+        .relation(new OneToOneRelation(courseEdge, courseTypeEdge))
+        .relation(new OneToManyRelation(courseTypeEdge, courseEdge))
+        .relation(new OneToManyRelation(studentEdge, courseEdge))
+        .relation(new OneToOneRelation(studentEdge, classEdge))
+        .relation(new OneToOneRelation(studentEdge, schoolEdge))
+        .relation(new OneToOneRelation(classEdge, schoolEdge))
+        .relation(new OneToOneRelation(courseEdge, classEdge))
+        .relation(new OneToManyRelation(classEdge, studentEdge))
+        .relation(new OneToManyRelation(classEdge, courseEdge))
+        .relation(new OneToManyRelation(schoolEdge, studentEdge))
+        .relation(new OneToManyRelation(schoolEdge, classEdge));
 
 app.use(require('body-parser').json());
 
