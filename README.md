@@ -1,5 +1,8 @@
 # API Core
 
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/ajuhos/api-core/master/LICENSE)
+[![GitHub issues](https://img.shields.io/github/issues/ajuhos/api-core.svg)](https://github.com/ajuhos/api-core/issues)
+
 Features:
 
  - Dynamic model-based API routes
