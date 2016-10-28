@@ -150,6 +150,31 @@ tap.test('/schools/s1/classes/c1', function (t) {
         t.end();
     });
 });
+tap.test('/students/s2/class', function (t) {
+    var request = api.parseRequest(['students', 's2', 'class']), query = api.buildQuery(request);
+    t.equal(query.steps.length, 5, 'should build a 5 step query');
+    t.ok(query.steps[0] instanceof builder.ExtendContextQueryStep, 'EXTEND');
+    t.ok(query.steps[1] instanceof builder.QueryEdgeQueryStep, 'QUERY /students');
+    t.ok(query.steps[2] instanceof builder.ProvideIdQueryStep, 'PROVIDE ID: classId');
+    t.ok(query.steps[3] instanceof builder.ExtendContextQueryStep, 'APPLY PARAMS');
+    t.ok(query.steps[4] instanceof builder.QueryEdgeQueryStep, 'QUERY /classes');
+    query.execute()
+        .then(function (resp) {
+        t.same(resp.data, {
+            id: "c1",
+            name: "A",
+            semester: 1,
+            room: "Room 1",
+            schoolId: "s1"
+        });
+        t.equal(resp.metadata, null);
+        t.end();
+    })
+        .catch(function () {
+        t.ok(false, "a valid query should not fail");
+        t.end();
+    });
+});
 tap.test('/schools/s1/classes/c2', function (t) {
     var request = api.parseRequest(['schools', 's1', 'classes', 'c2']), query = api.buildQuery(request);
     query.execute()
@@ -187,6 +212,39 @@ tap.test('POST /schools', function (t) {
         t.ok(false, "a valid query should not fail");
         t.end();
     });
+});
+tap.test('DELETE /schools/s3', function (t) {
+    var request = api.parseRequest(['schools', 's3']);
+    request.type = ApiRequest_1.ApiRequestType.Delete;
+    var query = api.buildQuery(request);
+    t.equal(query.steps.length, 3, 'should build a 3 step query');
+    t.ok(query.steps[0] instanceof builder.ExtendContextQueryStep);
+    t.ok(query.steps[1] instanceof builder.ExtendContextQueryStep);
+    t.ok(query.steps[2] instanceof builder.QueryEdgeQueryStep);
+    query.execute()
+        .then(function (resp) {
+        t.equal(resp.metadata, null);
+        t.end();
+    })
+        .catch(function () {
+        t.ok(false, "a valid query should not fail");
+        t.end();
+    });
+});
+tap.test('DELETE /students/s2/class', function (t) {
+    var request = api.parseRequest(['students', 's2', 'class']);
+    request.type = ApiRequest_1.ApiRequestType.Delete;
+    try {
+        api.buildQuery(request);
+        t.ok(false, "an invalid query should not succeed");
+        t.end();
+    }
+    catch (e) {
+        t.ok(e instanceof ApiEdgeError_1.ApiEdgeError);
+        t.equal(e.status, 400);
+        t.equal(e.message, 'Invalid Delete Query');
+        t.end();
+    }
 });
 tap.test('PATCH /schools/s2', function (t) {
     var request = api.parseRequest(['schools', 's2']);

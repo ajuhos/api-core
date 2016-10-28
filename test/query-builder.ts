@@ -183,6 +183,35 @@ tap.test('/schools/s1/classes/c1', (t: any) => {
         });
 });
 
+tap.test('/students/s2/class', (t: any) => {
+    const request = api.parseRequest([ 'students', 's2', 'class' ]),
+        query = api.buildQuery(request);
+
+    t.equal(query.steps.length, 5, 'should build a 5 step query');
+    t.ok(query.steps[0] instanceof builder.ExtendContextQueryStep, 'EXTEND');
+    t.ok(query.steps[1] instanceof builder.QueryEdgeQueryStep, 'QUERY /students');
+    t.ok(query.steps[2] instanceof builder.ProvideIdQueryStep, 'PROVIDE ID: classId');
+    t.ok(query.steps[3] instanceof builder.ExtendContextQueryStep, 'APPLY PARAMS');
+    t.ok(query.steps[4] instanceof builder.QueryEdgeQueryStep, 'QUERY /classes');
+
+    query.execute()
+        .then(resp => {
+            t.same(resp.data, {
+                id: "c1",
+                name: "A",
+                semester: 1,
+                room: "Room 1",
+                schoolId: "s1"
+            });
+            t.equal(resp.metadata, null);
+            t.end()
+        })
+        .catch(() => {
+            t.ok(false, "a valid query should not fail");
+            t.end()
+        });
+});
+
 tap.test('/schools/s1/classes/c2', (t: any) => {
     const request = api.parseRequest([ 'schools', 's1', 'classes', 'c2' ]),
         query = api.buildQuery(request);
@@ -225,6 +254,44 @@ tap.test('POST /schools', (t: any) => {
             t.ok(false, "a valid query should not fail");
             t.end()
         });
+});
+
+tap.test('DELETE /schools/s3', (t: any) => {
+    const request = api.parseRequest([ 'schools', 's3' ]);
+    request.type = ApiRequestType.Delete;
+    const query = api.buildQuery(request);
+
+    t.equal(query.steps.length, 3, 'should build a 3 step query');
+    t.ok(query.steps[0] instanceof builder.ExtendContextQueryStep);
+    t.ok(query.steps[1] instanceof builder.ExtendContextQueryStep);
+    t.ok(query.steps[2] instanceof builder.QueryEdgeQueryStep);
+
+    query.execute()
+        .then(resp => {
+            t.equal(resp.metadata, null);
+            t.end()
+        })
+        .catch(() => {
+            t.ok(false, "a valid query should not fail");
+            t.end()
+        });
+});
+
+tap.test('DELETE /students/s2/class', (t: any) => {
+    const request = api.parseRequest([ 'students', 's2', 'class' ]);
+    request.type = ApiRequestType.Delete;
+
+    try {
+        api.buildQuery(request);
+        t.ok(false, "an invalid query should not succeed");
+        t.end()
+    }
+    catch(e) {
+        t.ok(e instanceof ApiEdgeError);
+        t.equal(e.status, 400);
+        t.equal(e.message, 'Invalid Delete Query');
+        t.end()
+    }
 });
 
 tap.test('PATCH /schools/s2', (t: any) => {
