@@ -206,6 +206,9 @@ var ApiQueryBuilder = (function () {
                 if (request.type === ApiRequest_1.ApiRequestType.Update) {
                     baseQuery = new ApiEdgeQuery_1.ApiEdgeQuery(lastSegment.relation.to, ApiEdgeQueryType_1.ApiEdgeQueryType.Update);
                 }
+                else if (request.type === ApiRequest_1.ApiRequestType.Patch) {
+                    baseQuery = new ApiEdgeQuery_1.ApiEdgeQuery(lastSegment.relation.to, ApiEdgeQueryType_1.ApiEdgeQueryType.Patch);
+                }
                 else {
                     throw new ApiEdgeError_1.ApiEdgeError(400, "Invalid Delete Query");
                 }
@@ -213,6 +216,9 @@ var ApiQueryBuilder = (function () {
             else {
                 if (request.type === ApiRequest_1.ApiRequestType.Update) {
                     baseQuery = new ApiEdgeQuery_1.ApiEdgeQuery(lastSegment.edge, ApiEdgeQueryType_1.ApiEdgeQueryType.Update);
+                }
+                else if (request.type === ApiRequest_1.ApiRequestType.Patch) {
+                    baseQuery = new ApiEdgeQuery_1.ApiEdgeQuery(lastSegment.edge, ApiEdgeQueryType_1.ApiEdgeQueryType.Patch);
                 }
                 else {
                     baseQuery = new ApiEdgeQuery_1.ApiEdgeQuery(lastSegment.edge, ApiEdgeQueryType_1.ApiEdgeQueryType.Delete);
@@ -261,6 +267,7 @@ var ApiQueryBuilder = (function () {
                 case ApiRequest_1.ApiRequestType.Read:
                     return _this.buildReadQuery(request);
                 case ApiRequest_1.ApiRequestType.Update:
+                case ApiRequest_1.ApiRequestType.Patch:
                 case ApiRequest_1.ApiRequestType.Delete:
                     return _this.buildChangeQuery(request);
                 case ApiRequest_1.ApiRequestType.Create:

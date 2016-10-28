@@ -56,6 +56,8 @@ export class ApiEdgeQuery {
                 return this.edge.removeEntry(this.context, this.body);
             case ApiEdgeQueryType.Update:
                 return this.edge.updateEntry(this.context, this.body);
+            case ApiEdgeQueryType.Patch:
+                return this.edge.patchEntry(this.context, this.body);
             case ApiEdgeQueryType.List:
                 return this.edge.listEntries(this.context);
             case ApiEdgeQueryType.Call:

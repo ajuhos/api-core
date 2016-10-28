@@ -75,6 +75,7 @@ export enum ApiRequestType {
     Create,
     Read,
     Update,
+    Patch,
     Delete,
     Exists
 }

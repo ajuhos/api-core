@@ -35,8 +35,9 @@ export declare enum ApiRequestType {
     Create = 0,
     Read = 1,
     Update = 2,
-    Delete = 3,
-    Exists = 4,
+    Patch = 3,
+    Delete = 4,
+    Exists = 5,
 }
 export declare class ApiRequest {
     type: ApiRequestType;

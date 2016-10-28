@@ -14,6 +14,7 @@ export interface ApiEdgeDefinition {
     listEntries: (context: ApiEdgeQueryContext) => Promise<ApiEdgeQueryResponse>;
     createEntry: (context: ApiEdgeQueryContext, entryFields: any) => Promise<ApiEdgeQueryResponse>;
     updateEntry: (context: ApiEdgeQueryContext, entryFields: any) => Promise<ApiEdgeQueryResponse>;
+    patchEntry: (context: ApiEdgeQueryContext, entryFields: any) => Promise<ApiEdgeQueryResponse>;
     updateEntries: (context: ApiEdgeQueryContext, entryFields: any) => Promise<ApiEdgeQueryResponse>;
     removeEntry: (context: ApiEdgeQueryContext, entryFields: any) => Promise<ApiEdgeQueryResponse>;
     removeEntries: (context: ApiEdgeQueryContext) => Promise<ApiEdgeQueryResponse[]>;

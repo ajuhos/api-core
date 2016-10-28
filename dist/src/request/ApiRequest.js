@@ -75,8 +75,9 @@ exports.ApiRequestPath = ApiRequestPath;
     ApiRequestType[ApiRequestType["Create"] = 0] = "Create";
     ApiRequestType[ApiRequestType["Read"] = 1] = "Read";
     ApiRequestType[ApiRequestType["Update"] = 2] = "Update";
-    ApiRequestType[ApiRequestType["Delete"] = 3] = "Delete";
-    ApiRequestType[ApiRequestType["Exists"] = 4] = "Exists";
+    ApiRequestType[ApiRequestType["Patch"] = 3] = "Patch";
+    ApiRequestType[ApiRequestType["Delete"] = 4] = "Delete";
+    ApiRequestType[ApiRequestType["Exists"] = 5] = "Exists";
 })(exports.ApiRequestType || (exports.ApiRequestType = {}));
 var ApiRequestType = exports.ApiRequestType;
 var ApiRequest = (function () {

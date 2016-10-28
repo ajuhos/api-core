@@ -308,6 +308,9 @@ export class ApiQueryBuilder {
             if(request.type === ApiRequestType.Update) {
                 baseQuery = new ApiEdgeQuery(lastSegment.relation.to, ApiEdgeQueryType.Update);
             }
+            else if(request.type === ApiRequestType.Patch) {
+                baseQuery = new ApiEdgeQuery(lastSegment.relation.to, ApiEdgeQueryType.Patch);
+            }
             else {
                 throw new ApiEdgeError(400, "Invalid Delete Query");
             }
@@ -316,6 +319,9 @@ export class ApiQueryBuilder {
         else {
             if(request.type === ApiRequestType.Update) {
                 baseQuery = new ApiEdgeQuery(lastSegment.edge, ApiEdgeQueryType.Update);
+            }
+            else if(request.type === ApiRequestType.Patch) {
+                baseQuery = new ApiEdgeQuery(lastSegment.edge, ApiEdgeQueryType.Patch);
             }
             else {
                 baseQuery = new ApiEdgeQuery(lastSegment.edge, ApiEdgeQueryType.Delete);
@@ -389,6 +395,7 @@ export class ApiQueryBuilder {
             case ApiRequestType.Read:
                 return this.buildReadQuery(request);
             case ApiRequestType.Update:
+            case ApiRequestType.Patch:
             case ApiRequestType.Delete:
                 return this.buildChangeQuery(request);
             case ApiRequestType.Create:

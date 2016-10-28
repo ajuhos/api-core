@@ -24,6 +24,11 @@ export enum ApiEdgeQueryType {
     Update,
 
     /**
+     * Edit an entity in the source model.
+     */
+    Patch,
+
+    /**
      * Delete an entity from the source model.
      */
     Delete,

@@ -19,6 +19,8 @@ var ApiEdgeQuery = (function () {
                     return _this.edge.removeEntry(_this.context, _this.body);
                 case ApiEdgeQueryType_1.ApiEdgeQueryType.Update:
                     return _this.edge.updateEntry(_this.context, _this.body);
+                case ApiEdgeQueryType_1.ApiEdgeQueryType.Patch:
+                    return _this.edge.patchEntry(_this.context, _this.body);
                 case ApiEdgeQueryType_1.ApiEdgeQueryType.List:
                     return _this.edge.listEntries(_this.context);
                 case ApiEdgeQueryType_1.ApiEdgeQueryType.Call:
