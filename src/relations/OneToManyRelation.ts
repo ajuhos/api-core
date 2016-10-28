@@ -1,5 +1,6 @@
 import {ApiEdgeDefinition} from "../edge/ApiEdgeDefinition";
 import {ApiEdgeRelation} from "./ApiEdgeRelation";
+import {Api} from "../Api";
 
 export class OneToManyRelation implements ApiEdgeRelation {
     name: string;
@@ -15,7 +16,7 @@ export class OneToManyRelation implements ApiEdgeRelation {
         this.from = from;
         this.to = to;
         this.name = options.name || to.pluralName;
-        this.relatedId = options.relatedId || to.name + "Id";
-        this.relationId = options.relationId || from.name + "Id";
+        this.relatedId = options.relatedId || to.name + Api.defaultIdPostfix;
+        this.relationId = options.relationId || from.name + Api.defaultIdPostfix;
     }
 }

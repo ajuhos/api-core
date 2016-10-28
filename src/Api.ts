@@ -6,6 +6,8 @@ import {ApiQuery} from "./query/ApiQuery";
 import {ApiEdgeRelation} from "./relations/ApiEdgeRelation";
 
 export class Api {
+    static defaultIdPostfix: string = "Id";
+    static defaultIdField: string = "id";
 
     version: string;
     edges: ApiEdgeDefinition[] = [];

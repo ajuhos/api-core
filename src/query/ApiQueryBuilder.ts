@@ -46,7 +46,7 @@ class RelateQueryStep implements QueryStep {
     execute = (scope: QueryScope) => {
         return new Promise((resolve, reject) => {
             if(!scope.response) return reject(new ApiEdgeError(404, "Missing Related Entry"));
-            scope.context.filter(this.relation.relationId, ApiEdgeQueryFilterType.Equals, scope.response.data[this.relation.from.idField||'id']);
+            scope.context.filter(this.relation.relationId, ApiEdgeQueryFilterType.Equals, scope.response.data[this.relation.from.idField||Api.defaultIdField]);
             resolve(scope);
         })
     };
@@ -119,7 +119,7 @@ class SetBodyQueryStep implements QueryStep {
 class ProvideIdQueryStep implements QueryStep {
     fieldName: string;
 
-    constructor(fieldName: string = "id") {
+    constructor(fieldName: string = Api.defaultIdField) {
         this.fieldName = fieldName;
     }
 
@@ -210,7 +210,7 @@ export class ApiQueryBuilder {
         //query.unshift(new NotImplementedQueryStep("CHECK"));
         //TODO
         if(currentSegment instanceof EntryPathSegment) {
-            query.unshift(new SetResponseQueryStep(new ApiEdgeQueryResponse({ [currentSegment.edge.idField||'id']: currentSegment.id })));
+            query.unshift(new SetResponseQueryStep(new ApiEdgeQueryResponse({ [currentSegment.edge.idField||Api.defaultIdField]: currentSegment.id })));
             return false
         }
         else if(currentSegment instanceof RelatedFieldPathSegment) {
@@ -342,7 +342,7 @@ export class ApiQueryBuilder {
         else if(lastSegment instanceof RelatedFieldPathSegment) {
             if(request.type === ApiRequestType.Update) {
                 let previousSegment = segments[segments.length-2];
-                query.unshift(new ProvideIdQueryStep(previousSegment.edge.idField||'id'));
+                query.unshift(new ProvideIdQueryStep(previousSegment.edge.idField||Api.defaultIdField));
                 readMode = false; //Provide ID from the previous segment without querying the database.
             }
             else {

@@ -30,6 +30,8 @@ var Api = (function () {
         relation.to.relations.push(relation);
         return this;
     };
+    Api.defaultIdPostfix = "Id";
+    Api.defaultIdField = "id";
     return Api;
 }());
 exports.Api = Api;

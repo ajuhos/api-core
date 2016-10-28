@@ -3,6 +3,8 @@ import { ApiRequest } from "./request/ApiRequest";
 import { ApiQuery } from "./query/ApiQuery";
 import { ApiEdgeRelation } from "./relations/ApiEdgeRelation";
 export declare class Api {
+    static defaultIdPostfix: string;
+    static defaultIdField: string;
     version: string;
     edges: ApiEdgeDefinition[];
     private parser;

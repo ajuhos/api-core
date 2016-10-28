@@ -8,6 +8,7 @@ var ApiRequest_1 = require("../request/ApiRequest");
 var ApiEdgeQueryResponse_1 = require("../edge/ApiEdgeQueryResponse");
 var ApiEdgeQueryType_1 = require("../edge/ApiEdgeQueryType");
 var OneToOneRelation_1 = require("../relations/OneToOneRelation");
+var Api_1 = require("../Api");
 var QueryEdgeQueryStep = (function () {
     function QueryEdgeQueryStep(query) {
         var _this = this;
@@ -34,7 +35,7 @@ var RelateQueryStep = (function () {
             return new Promise(function (resolve, reject) {
                 if (!scope.response)
                     return reject(new ApiEdgeError_1.ApiEdgeError(404, "Missing Related Entry"));
-                scope.context.filter(_this.relation.relationId, ApiEdgeQueryFilter_1.ApiEdgeQueryFilterType.Equals, scope.response.data[_this.relation.from.idField || 'id']);
+                scope.context.filter(_this.relation.relationId, ApiEdgeQueryFilter_1.ApiEdgeQueryFilterType.Equals, scope.response.data[_this.relation.from.idField || Api_1.Api.defaultIdField]);
                 resolve(scope);
             });
         };
@@ -101,7 +102,7 @@ var SetBodyQueryStep = (function () {
 var ProvideIdQueryStep = (function () {
     function ProvideIdQueryStep(fieldName) {
         var _this = this;
-        if (fieldName === void 0) { fieldName = "id"; }
+        if (fieldName === void 0) { fieldName = Api_1.Api.defaultIdField; }
         this.execute = function (scope) {
             return new Promise(function (resolve, reject) {
                 if (!scope.response)
@@ -236,7 +237,7 @@ var ApiQueryBuilder = (function () {
             else if (lastSegment instanceof ApiRequest_1.RelatedFieldPathSegment) {
                 if (request.type === ApiRequest_1.ApiRequestType.Update) {
                     var previousSegment = segments[segments.length - 2];
-                    query.unshift(new ProvideIdQueryStep(previousSegment.edge.idField || 'id'));
+                    query.unshift(new ProvideIdQueryStep(previousSegment.edge.idField || Api_1.Api.defaultIdField));
                     readMode = false;
                 }
                 else {
@@ -302,7 +303,7 @@ var ApiQueryBuilder = (function () {
     };
     ApiQueryBuilder.prototype.buildCheckStep = function (query, currentSegment) {
         if (currentSegment instanceof ApiRequest_1.EntryPathSegment) {
-            query.unshift(new SetResponseQueryStep(new ApiEdgeQueryResponse_1.ApiEdgeQueryResponse((_a = {}, _a[currentSegment.edge.idField || 'id'] = currentSegment.id, _a))));
+            query.unshift(new SetResponseQueryStep(new ApiEdgeQueryResponse_1.ApiEdgeQueryResponse((_a = {}, _a[currentSegment.edge.idField || Api_1.Api.defaultIdField] = currentSegment.id, _a))));
             return false;
         }
         else if (currentSegment instanceof ApiRequest_1.RelatedFieldPathSegment) {
