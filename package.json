@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/ajuhos/api-core#readme",
   "devDependencies": {
+    "coveralls": "^2.11.14",
     "tap": "^8.0.0"
   }
 }
