@@ -89,7 +89,7 @@ local in-memory model and one with a Mongoose model.
 Working Demo: [api-demo](https://github.com/ajuhos/api-demo)
 
 **A complete API with 5 models and relations in 77 lines:**
-```ecmascript 6
+```typescript
 import {ApiEdgeError, OneToOneRelation, OneToManyRelation, ApiEdgeQueryResponse, Api} from "api-core";
 import {MongooseModelFactory} from "api-model-mongoose";
 import {EllipseApiRouter} from "api-provider-ellipse";
