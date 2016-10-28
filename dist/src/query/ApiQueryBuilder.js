@@ -127,6 +127,7 @@ var ExtendContextQueryStep = (function () {
                 _this.context.fields.forEach(function (f) { return scope.context.fields.push(f); });
                 _this.context.populatedFields.forEach(function (f) { return scope.context.populatedFields.push(f); });
                 _this.context.filters.forEach(function (f) { return scope.context.filters.push(f); });
+                _this.context.sortBy.forEach(function (f) { return scope.context.sortBy.push(f); });
                 resolve(scope);
             });
         };

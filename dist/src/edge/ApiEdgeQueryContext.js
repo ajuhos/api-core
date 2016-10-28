@@ -15,6 +15,7 @@ var ApiEdgeQueryContext = (function () {
             _this.fields.forEach(function (f) { return temp.fields.push(f); });
             _this.populatedFields.forEach(function (f) { return temp.populatedFields.push(f); });
             _this.filters.forEach(function (f) { return temp.filters.push(f.clone()); });
+            _this.sortBy.forEach(function (f) { return temp.sortBy.push([f[0], f[1]]); });
             if (_this.pagination) {
                 temp.pagination = {
                     skip: _this.pagination.skip,

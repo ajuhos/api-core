@@ -18,6 +18,7 @@ export class ApiEdgeQueryContext {
         this.fields.forEach(f => temp.fields.push(f));
         this.populatedFields.forEach(f => temp.populatedFields.push(f));
         this.filters.forEach(f => temp.filters.push(f.clone()));
+        this.sortBy.forEach(f => temp.sortBy.push([f[0], f[1]]));
 
         if(this.pagination) {
             temp.pagination = {

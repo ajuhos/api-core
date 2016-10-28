@@ -150,6 +150,7 @@ class ExtendContextQueryStep implements QueryStep {
             this.context.fields.forEach(f => scope.context.fields.push(f));
             this.context.populatedFields.forEach(f => scope.context.populatedFields.push(f));
             this.context.filters.forEach(f => scope.context.filters.push(f));
+            this.context.sortBy.forEach(f => scope.context.sortBy.push(f));
             resolve(scope)
         })
     };
