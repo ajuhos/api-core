@@ -306,7 +306,8 @@ export class ApiQueryBuilder {
         let baseQuery: ApiEdgeQuery;
         if(lastSegment instanceof RelatedFieldPathSegment) {
             if(request.type === ApiRequestType.Update) {
-                baseQuery = new ApiEdgeQuery(lastSegment.relation.to, ApiEdgeQueryType.Update);
+                baseQuery = new ApiEdgeQuery(lastSegment.edge, ApiEdgeQueryType.Patch);
+                request.body = { [lastSegment.relation.relationId]: request.body.id||request.body._id };
             }
             else if(request.type === ApiRequestType.Patch) {
                 baseQuery = new ApiEdgeQuery(lastSegment.relation.to, ApiEdgeQueryType.Patch);

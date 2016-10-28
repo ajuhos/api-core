@@ -204,7 +204,8 @@ var ApiQueryBuilder = (function () {
             var baseQuery;
             if (lastSegment instanceof ApiRequest_1.RelatedFieldPathSegment) {
                 if (request.type === ApiRequest_1.ApiRequestType.Update) {
-                    baseQuery = new ApiEdgeQuery_1.ApiEdgeQuery(lastSegment.relation.to, ApiEdgeQueryType_1.ApiEdgeQueryType.Update);
+                    baseQuery = new ApiEdgeQuery_1.ApiEdgeQuery(lastSegment.edge, ApiEdgeQueryType_1.ApiEdgeQueryType.Patch);
+                    request.body = (_a = {}, _a[lastSegment.relation.relationId] = request.body.id || request.body._id, _a);
                 }
                 else if (request.type === ApiRequest_1.ApiRequestType.Patch) {
                     baseQuery = new ApiEdgeQuery_1.ApiEdgeQuery(lastSegment.relation.to, ApiEdgeQueryType_1.ApiEdgeQueryType.Patch);
@@ -251,6 +252,7 @@ var ApiQueryBuilder = (function () {
                 }
             }
             return query;
+            var _a;
         };
         this.buildCreateQuery = function (request) {
             var query = new ApiQuery_1.ApiQuery();
