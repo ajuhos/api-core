@@ -335,18 +335,24 @@ export class ApiQueryBuilder {
         query.unshift(new ExtendContextQueryStep(request.context));
 
         //STEP 3: Provide ID for the base query.
+        let readMode = true;
         if(lastSegment instanceof EntryPathSegment) {
             query.unshift(new ExtendContextQueryStep(new ApiEdgeQueryContext(lastSegment.id)))
         }
         else if(lastSegment instanceof RelatedFieldPathSegment) {
-            query.unshift(new ProvideIdQueryStep(lastSegment.relation.relationId))
+            if(request.type === ApiRequestType.Update) {
+                query.unshift(new ProvideIdQueryStep());
+                readMode = false; //Provide ID from the previous segment without querying the database.
+            }
+            else {
+                query.unshift(new ProvideIdQueryStep(lastSegment.relation.relationId))
+            }
         }
         else {
             //TODO: Add support for method calls
         }
 
         //STEP 4: Provide filters and validation for the base query.
-        let readMode = true;
         for(let i = segments.length-2; i >= 0; i--) {
             let currentSegment = segments[i];
 

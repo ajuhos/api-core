@@ -229,15 +229,21 @@ var ApiQueryBuilder = (function () {
             if (request.body)
                 query.unshift(new SetBodyQueryStep(request.body));
             query.unshift(new ExtendContextQueryStep(request.context));
+            var readMode = true;
             if (lastSegment instanceof ApiRequest_1.EntryPathSegment) {
                 query.unshift(new ExtendContextQueryStep(new ApiEdgeQueryContext_1.ApiEdgeQueryContext(lastSegment.id)));
             }
             else if (lastSegment instanceof ApiRequest_1.RelatedFieldPathSegment) {
-                query.unshift(new ProvideIdQueryStep(lastSegment.relation.relationId));
+                if (request.type === ApiRequest_1.ApiRequestType.Update) {
+                    query.unshift(new ProvideIdQueryStep());
+                    readMode = false;
+                }
+                else {
+                    query.unshift(new ProvideIdQueryStep(lastSegment.relation.relationId));
+                }
             }
             else {
             }
-            var readMode = true;
             for (var i = segments.length - 2; i >= 0; i--) {
                 var currentSegment = segments[i];
                 var relation = segments[i + 1].relation;
