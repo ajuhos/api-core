@@ -305,8 +305,12 @@ export class ApiQueryBuilder {
         //STEP 1: Create the base query which will provide the final data.
         let baseQuery: ApiEdgeQuery;
         if(lastSegment instanceof RelatedFieldPathSegment) {
-            throw new ApiEdgeError(500, "Not Implemented"); //TODO
-            //baseQuery = new ApiEdgeQuery(lastSegment.relation.to, ApiEdgeQueryType.Get);
+            if(request.type === ApiRequestType.Update) {
+                baseQuery = new ApiEdgeQuery(lastSegment.relation.to, ApiEdgeQueryType.Get);
+            }
+            else {
+                throw new ApiEdgeError(400, "Invalid Delete Query");
+            }
         }
         //TODO: Add support for method calls
         else {

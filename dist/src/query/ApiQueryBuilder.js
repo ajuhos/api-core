@@ -203,7 +203,12 @@ var ApiQueryBuilder = (function () {
             var segments = request.path.segments, lastSegment = segments[segments.length - 1];
             var baseQuery;
             if (lastSegment instanceof ApiRequest_1.RelatedFieldPathSegment) {
-                throw new ApiEdgeError_1.ApiEdgeError(500, "Not Implemented");
+                if (request.type === ApiRequest_1.ApiRequestType.Update) {
+                    baseQuery = new ApiEdgeQuery_1.ApiEdgeQuery(lastSegment.relation.to, ApiEdgeQueryType_1.ApiEdgeQueryType.Get);
+                }
+                else {
+                    throw new ApiEdgeError_1.ApiEdgeError(400, "Invalid Delete Query");
+                }
             }
             else {
                 if (request.type === ApiRequest_1.ApiRequestType.Update) {
