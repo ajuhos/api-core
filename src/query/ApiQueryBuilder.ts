@@ -306,7 +306,7 @@ export class ApiQueryBuilder {
         let baseQuery: ApiEdgeQuery;
         if(lastSegment instanceof RelatedFieldPathSegment) {
             if(request.type === ApiRequestType.Update) {
-                baseQuery = new ApiEdgeQuery(lastSegment.relation.to, ApiEdgeQueryType.Get);
+                baseQuery = new ApiEdgeQuery(lastSegment.relation.to, ApiEdgeQueryType.Update);
             }
             else {
                 throw new ApiEdgeError(400, "Invalid Delete Query");
