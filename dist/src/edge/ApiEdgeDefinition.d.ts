@@ -4,6 +4,7 @@ import { ApiEdgeQueryResponse } from "./ApiEdgeQueryResponse";
 export interface ApiEdgeDefinition {
     name: string;
     pluralName: string;
+    idField: string;
     methods: Object;
     relations: ApiEdgeRelation[];
     getEntry: (context: ApiEdgeQueryContext) => Promise<ApiEdgeQueryResponse>;

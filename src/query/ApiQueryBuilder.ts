@@ -46,7 +46,7 @@ class RelateQueryStep implements QueryStep {
     execute = (scope: QueryScope) => {
         return new Promise((resolve, reject) => {
             if(!scope.response) return reject(new ApiEdgeError(404, "Missing Related Entry"));
-            scope.context.filter(this.relation.relationId, ApiEdgeQueryFilterType.Equals, scope.response.data.id);
+            scope.context.filter(this.relation.relationId, ApiEdgeQueryFilterType.Equals, scope.response.data[this.relation.from.idField||'id']);
             resolve(scope);
         })
     };
@@ -210,7 +210,7 @@ export class ApiQueryBuilder {
         //query.unshift(new NotImplementedQueryStep("CHECK"));
         //TODO
         if(currentSegment instanceof EntryPathSegment) {
-            query.unshift(new SetResponseQueryStep(new ApiEdgeQueryResponse({ id: currentSegment.id })));
+            query.unshift(new SetResponseQueryStep(new ApiEdgeQueryResponse({ [currentSegment.edge.idField||'id']: currentSegment.id })));
             return false
         }
         else if(currentSegment instanceof RelatedFieldPathSegment) {
@@ -341,7 +341,8 @@ export class ApiQueryBuilder {
         }
         else if(lastSegment instanceof RelatedFieldPathSegment) {
             if(request.type === ApiRequestType.Update) {
-                query.unshift(new ProvideIdQueryStep());
+                let previousSegment = segments[segments.length-2];
+                query.unshift(new ProvideIdQueryStep(previousSegment.edge.idField||'id'));
                 readMode = false; //Provide ID from the previous segment without querying the database.
             }
             else {

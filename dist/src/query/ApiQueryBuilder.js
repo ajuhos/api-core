@@ -34,7 +34,7 @@ var RelateQueryStep = (function () {
             return new Promise(function (resolve, reject) {
                 if (!scope.response)
                     return reject(new ApiEdgeError_1.ApiEdgeError(404, "Missing Related Entry"));
-                scope.context.filter(_this.relation.relationId, ApiEdgeQueryFilter_1.ApiEdgeQueryFilterType.Equals, scope.response.data.id);
+                scope.context.filter(_this.relation.relationId, ApiEdgeQueryFilter_1.ApiEdgeQueryFilterType.Equals, scope.response.data[_this.relation.from.idField || 'id']);
                 resolve(scope);
             });
         };
@@ -235,7 +235,8 @@ var ApiQueryBuilder = (function () {
             }
             else if (lastSegment instanceof ApiRequest_1.RelatedFieldPathSegment) {
                 if (request.type === ApiRequest_1.ApiRequestType.Update) {
-                    query.unshift(new ProvideIdQueryStep());
+                    var previousSegment = segments[segments.length - 2];
+                    query.unshift(new ProvideIdQueryStep(previousSegment.edge.idField || 'id'));
                     readMode = false;
                 }
                 else {
@@ -301,7 +302,7 @@ var ApiQueryBuilder = (function () {
     };
     ApiQueryBuilder.prototype.buildCheckStep = function (query, currentSegment) {
         if (currentSegment instanceof ApiRequest_1.EntryPathSegment) {
-            query.unshift(new SetResponseQueryStep(new ApiEdgeQueryResponse_1.ApiEdgeQueryResponse({ id: currentSegment.id })));
+            query.unshift(new SetResponseQueryStep(new ApiEdgeQueryResponse_1.ApiEdgeQueryResponse((_a = {}, _a[currentSegment.edge.idField || 'id'] = currentSegment.id, _a))));
             return false;
         }
         else if (currentSegment instanceof ApiRequest_1.RelatedFieldPathSegment) {
@@ -311,6 +312,7 @@ var ApiQueryBuilder = (function () {
             return false;
         }
         return this.buildProvideIdStep(query, currentSegment);
+        var _a;
     };
     ApiQueryBuilder.prototype.buildReadStep = function (query, currentSegment) {
         if (currentSegment instanceof ApiRequest_1.RelatedFieldPathSegment) {
