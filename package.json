@@ -1,6 +1,6 @@
 {
   "name": "api-core",
-  "version": "0.0.9-alpha.7",
+  "version": "0.0.9-alpha.8",
   "description": "Lightweight framework for building dynamic multi-level APIs for any provider (Express, socket.io, etc.), consumable via multiple channels (HTTP, socket.io, etc.)",
   "main": "dist/index.js",
   "scripts": {

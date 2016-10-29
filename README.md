@@ -1,32 +1,36 @@
-# API Core
+**API Core**
+
+Lightweight framework for building dynamic multi-level APIs for any provider (Express, socket.io, etc.), consumable via multiple channels (HTTP, socket.io, etc.)
 
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/ajuhos/api-core/master/LICENSE)
 [![GitHub issues](https://img.shields.io/github/issues/ajuhos/api-core.svg)](https://github.com/ajuhos/api-core/issues)
 [![Build Status](https://travis-ci.org/ajuhos/api-core.svg?branch=master)](https://travis-ci.org/ajuhos/api-core)
 [![Coverage Status](https://coveralls.io/repos/github/ajuhos/api-core/badge.svg?branch=master)](https://coveralls.io/github/ajuhos/api-core?branch=master)
 
-Features:
+## Features
 
  - Dynamic model-based API routes
- - Extensible API queries with pre- and post-query steps
+ - Extensible API queries with pre- and post-query steps  (coming soon)
      - Transformations (via api-core-mapper or your own library)
      - Authentication, ACL (via node-acl, passport, etc.)
  - Multi level API routes (eg. /schools/42/students/3/courses)
  - Multi channel APIs (eg. consuming HTTP and socket.io via api-provider packages)
  - Multi database APIs (different database for every route, if you need)
+ - Versioned APIs
 
-###### UNDER DEVELOPMENT
-First beta and documentation coming soon...
+## Installation
 
-## Basics
+**API Core is in ``alpha`` and NOT ready for production use.**
 
-### Installation
+To install the latest version, use NPM:
 
 ```bash
 npm install api-core
 ```
 
-### API Edges
+## Basics
+
+#### API Edges
 
 In API Core every API is built from edges. 
 An edge defines operations and relations of a Data Model.
@@ -51,7 +55,7 @@ population and pagination.
 So while you can list students via a HTTP request, you also can do the 
 same via a socket.io message or any custom channel defined by you.
 
-### API Providers
+#### API Providers
 
 You can use API Providers to make your API consumable via different
 channels.
@@ -59,17 +63,16 @@ channels.
 We have (or working on) providers for the following channels:
  
  - HTTP
-     - _Express: api-provider-express_
-     - _Koa: api-provider-koa_
-     - _Restify: api-provder-restify_
+     - _Express: api-provider-express (coming soon)_
+     - _Koa: api-provider-koa (coming soon)_
+     - _Restify: api-provder-restify (coming soon)_
      - Ellipse: [api-provider-ellipse](https://github.com/ajuhos/api-provider-ellipse)
  - Socket
-     - _socket.io: api-provider-socket.io_
+     - _socket.io: api-provider-socket.io (coming soon)_
      
 Also you can implement your own API provider.
-For more information take a look at [api-provider](https://github.com/ajuhos/api-provider).
 
-### Data Models
+#### Data Models
 
 Every API requires a set of data models. As with API Providers, you have
 a bunch of options when choosing your library for creating the models.
@@ -80,13 +83,12 @@ We have (or working on) data model libraries for the following frameworks:
   - _MySQL_
   - ...
   
-
 Also you can implement your own API model library.
 
-## SNEAK PEAK
+## Usage
 
-We have two working samples in the following repository, one with a 
-local in-memory model and one with a Mongoose model.
+We have two working examples in the following repository, one with a 
+local in-memory model (master branch) and one with a Mongoose model (mongodb branch).
 
 Working Demo: [api-demo](https://github.com/ajuhos/api-demo)
 
@@ -171,3 +173,19 @@ router.apply(app);
 
 app.listen(8080);
 ```
+
+## Tests
+
+We maintain high test coverage to provide a reliable framework 
+for your APIs.
+
+To run tests, execute the following NPM commands:
+
+```bash
+npm install
+npm test
+```
+
+## License
+
+The [MIT License](https://github.com/ajuhos/api-core/blob/master/LICENSE). Free forever. :)
