@@ -1,4 +1,4 @@
-**API Core**
+### API Core
 
 Lightweight framework for building dynamic multi-level APIs for any provider (Express, socket.io, etc.), consumable via multiple channels (HTTP, socket.io, etc.)
 
@@ -25,7 +25,7 @@ Lightweight framework for building dynamic multi-level APIs for any provider (Ex
 To install the latest version, use NPM:
 
 ```bash
-npm install api-core
+$ npm install api-core
 ```
 
 ## Basics
@@ -182,8 +182,8 @@ for your APIs.
 To run tests, execute the following NPM commands:
 
 ```bash
-npm install
-npm test
+$ npm install
+$ npm test
 ```
 
 ## License
