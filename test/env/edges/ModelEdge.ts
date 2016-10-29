@@ -17,6 +17,7 @@ export class ModelEdge<ModelType extends Model> implements ApiEdgeDefinition {
     name = "entry";
     pluralName = "entries";
     idField = "id";
+    fields = []; //TODO
 
     provider: ModelType[] = [];
     protected createModel: (obj: any) => ModelType;

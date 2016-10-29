@@ -9,6 +9,7 @@ export declare class ModelEdge<ModelType extends Model> implements ApiEdgeDefini
     name: string;
     pluralName: string;
     idField: string;
+    fields: never[];
     provider: ModelType[];
     protected createModel: (obj: any) => ModelType;
     methods: any;

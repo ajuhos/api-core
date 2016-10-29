@@ -7,6 +7,7 @@ export interface ApiEdgeDefinition {
     name: string;
     pluralName: string;
     idField: string;
+    fields: string[];
 
     methods: Object;
     relations: ApiEdgeRelation[];

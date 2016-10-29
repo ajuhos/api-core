@@ -15,6 +15,7 @@ var ModelEdge = (function () {
         this.name = "entry";
         this.pluralName = "entries";
         this.idField = "id";
+        this.fields = [];
         this.provider = [];
         this.methods = {};
         this.relations = [];
