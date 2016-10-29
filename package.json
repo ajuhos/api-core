@@ -1,7 +1,7 @@
 {
   "name": "api-core",
-  "version": "0.0.9-alpha.8",
-  "description": "Lightweight framework for building dynamic multi-level APIs for any provider (Express, socket.io, etc.), consumable via multiple channels (HTTP, socket.io, etc.)",
+  "version": "0.0.9-alpha.9",
+  "description": "Model-based dynamic multi-level APIs for any provider, plus multiple consumption channels",
   "main": "dist/index.js",
   "scripts": {
     "test": "tap dist/test/*.js --cov"
