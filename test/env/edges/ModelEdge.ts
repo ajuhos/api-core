@@ -1,10 +1,9 @@
-
 import {ApiEdge} from "../../../src/edge/ApiEdgeDefinition";
 import {ApiEdgeQueryFilter, ApiEdgeQueryFilterType} from "../../../src/edge/ApiEdgeQueryFilter";
 import {ApiEdgeQueryContext} from "../../../src/edge/ApiEdgeQueryContext";
 import {ApiEdgeQueryResponse} from "../../../src/edge/ApiEdgeQueryResponse";
 import {ApiEdgeError} from "../../../src/query/ApiEdgeError";
-import {ApiQueryScope} from "../../../src/query/ApiQuery";
+
 export class Model {
     id: string;
 
@@ -118,10 +117,6 @@ export class ModelEdge<ModelType extends Model> extends ApiEdge {
             if(entry) resolve(new ApiEdgeQueryResponse(true));
             else resolve(new ApiEdgeQueryResponse(false));
         })
-    };
-
-    callMethod = (scope: ApiQueryScope): Promise<ApiQueryScope> => {
-        return this.methods[""+scope.context.id](scope);
     }
 
 }

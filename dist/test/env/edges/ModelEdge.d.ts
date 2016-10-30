@@ -1,7 +1,6 @@
 import { ApiEdge } from "../../../src/edge/ApiEdgeDefinition";
 import { ApiEdgeQueryContext } from "../../../src/edge/ApiEdgeQueryContext";
 import { ApiEdgeQueryResponse } from "../../../src/edge/ApiEdgeQueryResponse";
-import { ApiQueryScope } from "../../../src/query/ApiQuery";
 export declare class Model {
     id: string;
     constructor(obj: any);
@@ -26,5 +25,4 @@ export declare class ModelEdge<ModelType extends Model> extends ApiEdge {
     patchEntry: (context: ApiEdgeQueryContext, body: any) => Promise<ApiEdgeQueryResponse>;
     removeEntry: (context: ApiEdgeQueryContext) => Promise<ApiEdgeQueryResponse>;
     exists: (context: ApiEdgeQueryContext) => Promise<ApiEdgeQueryResponse>;
-    callMethod: (scope: ApiQueryScope) => Promise<ApiQueryScope>;
 }

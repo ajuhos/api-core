@@ -328,22 +328,69 @@ tap.test('PUT /schools/s2', function (t) {
         t.end();
     });
 });
-tap.test('POST /students/s2/rename', function (t) {
-    var request = api.parseRequest(['students', 's2', 'class']), query = api.buildQuery(request);
-    t.equal(query.steps.length, 5, 'should build a 5 step query');
+tap.test('GET /students/s2/rename', function (t) {
+    var request = api.parseRequest(['students', 's2', 'rename']);
+    request.type = ApiRequest_1.ApiRequestType.Read;
+    try {
+        api.buildQuery(request);
+        t.ok(false, 'an invalid query should not succeed');
+    }
+    catch (e) {
+        t.ok(e instanceof ApiEdgeError_1.ApiEdgeError);
+        t.equal(e.message, 'Method Not Allowed');
+        t.equal(e.status, 405);
+    }
+    t.end();
+});
+tap.test('/students/s2/withFullName', function (t) {
+    var request = api.parseRequest(['students', 's2', 'withFullName']), query = api.buildQuery(request);
+    t.equal(query.steps.length, 5, 'should build an 5 step query');
     t.ok(query.steps[0] instanceof builder.ExtendContextQueryStep, 'EXTEND');
     t.ok(query.steps[1] instanceof builder.QueryEdgeQueryStep, 'QUERY /students');
-    t.ok(query.steps[2] instanceof builder.ProvideIdQueryStep, 'PROVIDE ID: classId');
-    t.ok(query.steps[3] instanceof builder.ExtendContextQueryStep, 'APPLY PARAMS');
-    t.ok(query.steps[4] instanceof builder.QueryEdgeQueryStep, 'QUERY /classes');
+    t.ok(query.steps[2] instanceof builder.ExtendContextQueryStep, 'APPLY PARAMS');
+    t.ok(query.steps[3] instanceof builder.ProvideIdQueryStep, 'PROVIDE ID');
+    t.ok(query.steps[4] instanceof builder.CallMethodQueryStep, 'call{withFullName}');
     query.execute()
         .then(function (resp) {
         t.same(resp.data, {
-            id: "c1",
-            name: "A",
-            semester: 1,
-            room: "Room 1",
-            schoolId: "s1"
+            id: "s2",
+            firstName: "Dave",
+            lastName: "Test",
+            fullName: "Dave Test",
+            email: "dave.test@gmail.com",
+            phone: "347633445",
+            schoolId: "s1",
+            classId: "c1"
+        });
+        t.equal(resp.metadata, null);
+        t.end();
+    })
+        .catch(function () {
+        t.ok(false, "a valid query should not fail");
+        t.end();
+    });
+});
+tap.test('POST /students/s2/rename', function (t) {
+    var request = api.parseRequest(['students', 's2', 'rename']);
+    request.type = ApiRequest_1.ApiRequestType.Update;
+    request.body = { name: "David Test" };
+    var query = api.buildQuery(request);
+    t.equal(query.steps.length, 5, 'should build a 4 step query');
+    t.ok(query.steps[0] instanceof builder.SetResponseQueryStep, 'SET RESPONSE');
+    t.ok(query.steps[1] instanceof builder.ExtendContextQueryStep, 'APPLY PARAMS');
+    t.ok(query.steps[2] instanceof builder.SetBodyQueryStep, 'SET BODY');
+    t.ok(query.steps[3] instanceof builder.ProvideIdQueryStep, 'PROVIDE ID');
+    t.ok(query.steps[4] instanceof builder.CallMethodQueryStep, 'call{rename}');
+    query.execute()
+        .then(function (resp) {
+        t.same(resp.data, {
+            id: "s2",
+            firstName: "David",
+            lastName: "Test",
+            email: "dave.test@gmail.com",
+            phone: "347633445",
+            schoolId: "s1",
+            classId: "c1"
         });
         t.equal(resp.metadata, null);
         t.end();

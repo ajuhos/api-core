@@ -6,12 +6,13 @@ import {ApiEdgeError} from "./ApiEdgeError";
 import {ApiEdgeQueryFilterType} from "../edge/ApiEdgeQueryFilter";
 import {
     PathSegment, EntryPathSegment, RelatedFieldPathSegment, ApiRequest,
-    EdgePathSegment, ApiRequestType
+    EdgePathSegment, ApiRequestType, MethodPathSegment
 } from "../request/ApiRequest";
 import {ApiEdgeQueryResponse} from "../edge/ApiEdgeQueryResponse";
 import {ApiEdgeQueryType} from "../edge/ApiEdgeQueryType";
 import {OneToOneRelation} from "../relations/OneToOneRelation";
 import {Api} from "../Api";
+import {ApiEdgeMethod} from "../edge/ApiEdgeMethod";
 
 export class QueryEdgeQueryStep implements QueryStep {
     query: ApiEdgeQuery;
@@ -34,6 +35,25 @@ export class QueryEdgeQueryStep implements QueryStep {
     };
 
     inspect = () => `QUERY /${this.query.edge.pluralName}`;
+}
+
+export class CallMethodQueryStep implements QueryStep {
+    method: ApiEdgeMethod;
+
+    constructor(method: ApiEdgeMethod) {
+        this.method = method;
+    }
+
+    execute = (scope: ApiQueryScope) => {
+        return new Promise((resolve, reject) => {
+            this.method.execute(scope).then((response) => {
+                scope.response = response;
+                resolve(scope)
+            }).catch(reject);
+        })
+    };
+
+    inspect = () => `call{${this.method.name}}`;
 }
 
 export class RelateQueryStep implements QueryStep {
@@ -190,7 +210,16 @@ export class ApiQueryBuilder {
         this.api = api;
     }
 
-    private buildProvideIdStep(query: ApiQuery, currentSegment: PathSegment): boolean {
+    private static addMethodCallStep(request: ApiRequest, query: ApiQuery, method: ApiEdgeMethod) {
+        if(method.acceptedTypes & request.type) {
+            query.unshift(new CallMethodQueryStep(method));
+        }
+        else {
+            throw new ApiEdgeError(405, "Method Not Allowed");
+        }
+    }
+
+    private static buildProvideIdStep(query: ApiQuery, currentSegment: PathSegment): boolean {
         if(currentSegment instanceof EntryPathSegment) {
             query.unshift(new ExtendContextQueryStep(new ApiEdgeQueryContext(currentSegment.id)));
             return false
@@ -200,15 +229,14 @@ export class ApiQueryBuilder {
             return true
         }
         else {
-            //TODO: Add support for method calls
+            //TODO: Add support for method calls with parameters
             return false
         }
     }
 
-    private buildCheckStep(query: ApiQuery, currentSegment: PathSegment): boolean {
+    private static buildCheckStep(query: ApiQuery, currentSegment: PathSegment): boolean {
         //STEP 1: Create the check query.
-        //query.unshift(new NotImplementedQueryStep("CHECK"));
-        //TODO
+        //TODO: Check this code...
         if(currentSegment instanceof EntryPathSegment) {
             query.unshift(new SetResponseQueryStep(new ApiEdgeQueryResponse({ [currentSegment.edge.idField||Api.defaultIdField]: currentSegment.id })));
             return false
@@ -217,15 +245,15 @@ export class ApiQueryBuilder {
             query.unshift(new QueryEdgeQueryStep(new ApiEdgeQuery(currentSegment.relation.to, ApiEdgeQueryType.Get)));
         }
         else {
-            //TODO: Add support for method calls
-            return false
+            //TODO: Add support for method calls (non-base query case)
+            throw new ApiEdgeError(500, "Not Implemented")
         }
 
         //STEP 2: Provide ID for the check query.
-        return this.buildProvideIdStep(query, currentSegment)
+        return ApiQueryBuilder.buildProvideIdStep(query, currentSegment)
     }
 
-    private buildReadStep(query: ApiQuery, currentSegment: PathSegment): boolean {
+    private static buildReadStep(query: ApiQuery, currentSegment: PathSegment): boolean {
         //STEP 1: Create the read query.
         if(currentSegment instanceof RelatedFieldPathSegment) {
             query.unshift(new QueryEdgeQueryStep(new ApiEdgeQuery(currentSegment.relation.to, ApiEdgeQueryType.Get)));
@@ -235,7 +263,7 @@ export class ApiQueryBuilder {
         }
 
         //STEP 2: Provide ID for the read query.
-        return this.buildProvideIdStep(query, currentSegment)
+        return ApiQueryBuilder.buildProvideIdStep(query, currentSegment)
     }
 
     private buildReadQuery = (request: ApiRequest): ApiQuery => {
@@ -248,15 +276,21 @@ export class ApiQueryBuilder {
         let baseQuery: ApiEdgeQuery;
         if(lastSegment instanceof EdgePathSegment) {
             baseQuery = new ApiEdgeQuery(lastSegment.edge, ApiEdgeQueryType.List);
+            query.unshift(new QueryEdgeQueryStep(baseQuery));
         }
         else if(lastSegment instanceof RelatedFieldPathSegment) {
             baseQuery = new ApiEdgeQuery(lastSegment.relation.to, ApiEdgeQueryType.Get);
+            query.unshift(new QueryEdgeQueryStep(baseQuery));
+
         }
-        //TODO: Add support for method calls
+        else if(lastSegment instanceof MethodPathSegment) {
+            ApiQueryBuilder.addMethodCallStep(request, query, lastSegment.method);
+            query.unshift(new ProvideIdQueryStep(lastSegment.edge.idField));
+        }
         else {
             baseQuery = new ApiEdgeQuery(lastSegment.edge, ApiEdgeQueryType.Get);
+            query.unshift(new QueryEdgeQueryStep(baseQuery));
         }
-        query.unshift(new QueryEdgeQueryStep(baseQuery));
 
         //STEP 2: Provide context for the base query.
         query.unshift(new ExtendContextQueryStep(request.context));
@@ -269,7 +303,7 @@ export class ApiQueryBuilder {
             query.unshift(new ProvideIdQueryStep(lastSegment.relation.relationId))
         }
         else {
-            //TODO: Add support for method calls
+            //TODO: Add support for method calls with parameters
         }
 
         //STEP 4: Provide filters and validation for the base query.
@@ -285,10 +319,10 @@ export class ApiQueryBuilder {
 
             //STEP 2: Read or Check
             if(readMode) {
-                readMode = this.buildReadStep(query, currentSegment)
+                readMode = ApiQueryBuilder.buildReadStep(query, currentSegment)
             }
             else {
-                readMode = this.buildCheckStep(query, currentSegment)
+                readMode = ApiQueryBuilder.buildCheckStep(query, currentSegment)
             }
         }
 
@@ -300,7 +334,8 @@ export class ApiQueryBuilder {
         let query = new ApiQuery();
 
         let segments = request.path.segments,
-            lastSegment = segments[segments.length-1];
+            lastSegment = segments[segments.length-1],
+            readMode = true;
 
         //STEP 1: Create the base query which will provide the final data.
         let baseQuery: ApiEdgeQuery;
@@ -308,34 +343,41 @@ export class ApiQueryBuilder {
             if(request.type === ApiRequestType.Update) {
                 baseQuery = new ApiEdgeQuery(lastSegment.edge, ApiEdgeQueryType.Patch);
                 request.body = { [lastSegment.relation.relationId]: request.body.id||request.body._id };
+                query.unshift(new QueryEdgeQueryStep(baseQuery));
             }
             else if(request.type === ApiRequestType.Patch) {
                 baseQuery = new ApiEdgeQuery(lastSegment.relation.to, ApiEdgeQueryType.Patch);
+                query.unshift(new QueryEdgeQueryStep(baseQuery));
             }
             else {
                 throw new ApiEdgeError(400, "Invalid Delete Query");
             }
         }
-        //TODO: Add support for method calls
+        else if(lastSegment instanceof MethodPathSegment) {
+            ApiQueryBuilder.addMethodCallStep(request, query, lastSegment.method);
+            query.unshift(new ProvideIdQueryStep(lastSegment.edge.idField));
+            readMode = false;
+        }
         else {
             if(request.type === ApiRequestType.Update) {
                 baseQuery = new ApiEdgeQuery(lastSegment.edge, ApiEdgeQueryType.Update);
+                query.unshift(new QueryEdgeQueryStep(baseQuery));
             }
             else if(request.type === ApiRequestType.Patch) {
                 baseQuery = new ApiEdgeQuery(lastSegment.edge, ApiEdgeQueryType.Patch);
+                query.unshift(new QueryEdgeQueryStep(baseQuery));
             }
             else {
                 baseQuery = new ApiEdgeQuery(lastSegment.edge, ApiEdgeQueryType.Delete);
+                query.unshift(new QueryEdgeQueryStep(baseQuery));
             }
         }
-        query.unshift(new QueryEdgeQueryStep(baseQuery));
 
         //STEP 2: Provide context for the base query.
         if(request.body) query.unshift(new SetBodyQueryStep(request.body));
         query.unshift(new ExtendContextQueryStep(request.context));
 
         //STEP 3: Provide ID for the base query.
-        let readMode = true;
         if(lastSegment instanceof EntryPathSegment) {
             query.unshift(new ExtendContextQueryStep(new ApiEdgeQueryContext(lastSegment.id)))
         }
@@ -350,7 +392,7 @@ export class ApiQueryBuilder {
             }
         }
         else {
-            //TODO: Add support for method calls
+            //TODO: Add support for method calls with parameters
         }
 
         //STEP 4: Provide filters and validation for the base query.
@@ -365,10 +407,10 @@ export class ApiQueryBuilder {
 
             //STEP 2: Read or Check
             if(readMode) {
-                readMode = this.buildReadStep(query, currentSegment)
+                readMode = ApiQueryBuilder.buildReadStep(query, currentSegment)
             }
             else {
-                readMode = this.buildCheckStep(query, currentSegment)
+                readMode = ApiQueryBuilder.buildCheckStep(query, currentSegment)
             }
         }
 

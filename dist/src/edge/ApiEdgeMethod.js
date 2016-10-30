@@ -8,10 +8,14 @@ var ApiRequest_1 = require("../request/ApiRequest");
 var ApiEdgeMethodScope = exports.ApiEdgeMethodScope;
 var ApiEdgeMethod = (function () {
     function ApiEdgeMethod(name, execute, scope, acceptedTypes) {
+        var _this = this;
         if (scope === void 0) { scope = ApiEdgeMethodScope.Edge; }
         if (acceptedTypes === void 0) { acceptedTypes = ApiRequest_1.ApiRequestType.Any; }
         this.acceptedTypes = ApiRequest_1.ApiRequestType.Any;
         this.scope = ApiEdgeMethodScope.Edge;
+        this.inspect = function () {
+            return "call{" + _this.name + "}";
+        };
         this.name = name;
         this.scope = scope;
         this.execute = execute;

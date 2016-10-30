@@ -85,9 +85,6 @@ var ModelEdge = (function (_super) {
                     resolve(new ApiEdgeQueryResponse_1.ApiEdgeQueryResponse(false));
             });
         };
-        this.callMethod = function (scope) {
-            return _this.methods["" + scope.context.id](scope);
-        };
     }
     ModelEdge.prototype.applyMapping = function (item, fields) {
         if (!fields.length)

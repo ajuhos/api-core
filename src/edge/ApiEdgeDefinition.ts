@@ -21,7 +21,6 @@ export interface ApiEdgeDefinition {
     patchEntry: (context: ApiEdgeQueryContext, entryFields: any) => Promise<ApiEdgeQueryResponse>;
     removeEntry: (context: ApiEdgeQueryContext, entryFields: any) => Promise<ApiEdgeQueryResponse>;
     exists: (context: ApiEdgeQueryContext) => Promise<ApiEdgeQueryResponse>;
-    callMethod: (scope: ApiQueryScope) => Promise<ApiQueryScope>;
 }
 
 export abstract class ApiEdge implements ApiEdgeDefinition {
@@ -40,10 +39,9 @@ export abstract class ApiEdge implements ApiEdgeDefinition {
     patchEntry: (context: ApiEdgeQueryContext, entryFields: any) => Promise<ApiEdgeQueryResponse>;
     removeEntry: (context: ApiEdgeQueryContext, entryFields: any) => Promise<ApiEdgeQueryResponse>;
     exists: (context: ApiEdgeQueryContext) => Promise<ApiEdgeQueryResponse>;
-    callMethod: (scope: ApiQueryScope) => Promise<ApiQueryScope>;
 
     edgeMethod = (name: string,
-                  execute: (scope: ApiQueryScope) => Promise<ApiQueryScope>,
+                  execute: (scope: ApiQueryScope) => Promise<ApiEdgeQueryResponse>,
                   acceptedTypes: ApiRequestType = ApiRequestType.Any): ApiEdge => {
         if(this.methods.find((method: ApiEdgeMethod) =>
             method.name === name))
@@ -54,7 +52,7 @@ export abstract class ApiEdge implements ApiEdgeDefinition {
     };
 
     collectionMethod = (name: string,
-                        execute: (scope: ApiQueryScope) => Promise<ApiQueryScope>,
+                        execute: (scope: ApiQueryScope) => Promise<ApiEdgeQueryResponse>,
                         acceptedTypes: ApiRequestType = ApiRequestType.Any): ApiEdge => {
         if(this.methods.find((method: ApiEdgeMethod) =>
             method.name === name &&
@@ -66,7 +64,7 @@ export abstract class ApiEdge implements ApiEdgeDefinition {
     };
 
     entryMethod = (name: string,
-                   execute: (scope: ApiQueryScope) => Promise<ApiQueryScope>,
+                   execute: (scope: ApiQueryScope) => Promise<ApiEdgeQueryResponse>,
                    acceptedTypes: ApiRequestType = ApiRequestType.Any): ApiEdge => {
         if(this.methods.find((method: ApiEdgeMethod) =>
             method.name === name &&

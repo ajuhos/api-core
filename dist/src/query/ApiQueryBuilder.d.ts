@@ -5,9 +5,16 @@ import { ApiEdgeRelation } from "../relations/ApiEdgeRelation";
 import { ApiRequest } from "../request/ApiRequest";
 import { ApiEdgeQueryResponse } from "../edge/ApiEdgeQueryResponse";
 import { Api } from "../Api";
+import { ApiEdgeMethod } from "../edge/ApiEdgeMethod";
 export declare class QueryEdgeQueryStep implements QueryStep {
     query: ApiEdgeQuery;
     constructor(query: ApiEdgeQuery);
+    execute: (scope: ApiQueryScope) => Promise<{}>;
+    inspect: () => string;
+}
+export declare class CallMethodQueryStep implements QueryStep {
+    method: ApiEdgeMethod;
+    constructor(method: ApiEdgeMethod);
     execute: (scope: ApiQueryScope) => Promise<{}>;
     inspect: () => string;
 }
@@ -44,9 +51,10 @@ export declare class ExtendContextQueryStep implements QueryStep {
 export declare class ApiQueryBuilder {
     api: Api;
     constructor(api: Api);
-    private buildProvideIdStep(query, currentSegment);
-    private buildCheckStep(query, currentSegment);
-    private buildReadStep(query, currentSegment);
+    private static addMethodCallStep(request, query, method);
+    private static buildProvideIdStep(query, currentSegment);
+    private static buildCheckStep(query, currentSegment);
+    private static buildReadStep(query, currentSegment);
     private buildReadQuery;
     private buildChangeQuery;
     private buildCreateQuery;
