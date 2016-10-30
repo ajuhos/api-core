@@ -9,7 +9,8 @@ var ApiQuery = (function () {
             _this.steps.unshift(step);
             return _this;
         };
-        this.execute = function () {
+        this.execute = function (identity) {
+            if (identity === void 0) { identity = null; }
             return new Promise(function (resolve, reject) {
                 var next = function (scope) {
                     var step = _this.steps.shift();
@@ -22,7 +23,7 @@ var ApiQuery = (function () {
                         }
                     }
                 };
-                next({ context: new ApiEdgeQueryContext_1.ApiEdgeQueryContext(), body: null, response: null });
+                next({ context: new ApiEdgeQueryContext_1.ApiEdgeQueryContext(), body: null, response: null, identity: identity });
             });
         };
     }
