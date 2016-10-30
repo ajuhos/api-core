@@ -11,7 +11,7 @@ import {ClassEdge} from "./env/edges/ClassEdge";
 import {CourseEdge} from "./env/edges/CourseEdge";
 import {CourseTypeEdge} from "./env/edges/CourseTypeEdge";
 import {SchoolEdge} from "./env/edges/SchoolEdge";
-import {ApiRequestType} from "../src/request/ApiRequest";
+import {ApiRequestType, ApiRequest} from "../src/request/ApiRequest";
 
 const studentEdge = new StudentEdge,
     classEdge = new ClassEdge,
@@ -39,6 +39,36 @@ tap.test('creating the API should work', (t: any) => {
         .relation(new OneToManyRelation(schoolEdge, studentEdge))
         .relation(new OneToManyRelation(schoolEdge, classEdge));
 
+    t.end()
+});
+
+tap.test('Any type queries should fail', (t: any) => {
+    try {
+        let request = new ApiRequest();
+        request.type = ApiRequestType.Any;
+        api.buildQuery(request);
+        t.ok(false, 'an invalid query should not succeed');
+    }
+    catch(e) {
+        t.ok(e instanceof ApiEdgeError);
+        t.equal(e.message, 'Unsupported Query Type');
+        t.equal(e.status, 400);
+    }
+    t.end()
+});
+
+tap.test('Change type queries should fail', (t: any) => {
+    try {
+        let request = new ApiRequest();
+        request.type = ApiRequestType.Change;
+        api.buildQuery(request);
+        t.ok(false, 'an invalid query should not succeed');
+    }
+    catch(e) {
+        t.ok(e instanceof ApiEdgeError);
+        t.equal(e.message, 'Unsupported Query Type');
+        t.equal(e.status, 400);
+    }
     t.end()
 });
 
@@ -347,6 +377,35 @@ tap.test('PUT /schools/s2', (t: any) => {
                     id: "s2",
                     name: "Cool School"
                 });
+            t.equal(resp.metadata, null);
+            t.end()
+        })
+        .catch(() => {
+            t.ok(false, "a valid query should not fail");
+            t.end()
+        });
+});
+
+tap.test('POST /students/s2/rename', (t: any) => {
+    const request = api.parseRequest([ 'students', 's2', 'class' ]),
+        query = api.buildQuery(request);
+
+    t.equal(query.steps.length, 5, 'should build a 5 step query');
+    t.ok(query.steps[0] instanceof builder.ExtendContextQueryStep, 'EXTEND');
+    t.ok(query.steps[1] instanceof builder.QueryEdgeQueryStep, 'QUERY /students');
+    t.ok(query.steps[2] instanceof builder.ProvideIdQueryStep, 'PROVIDE ID: classId');
+    t.ok(query.steps[3] instanceof builder.ExtendContextQueryStep, 'APPLY PARAMS');
+    t.ok(query.steps[4] instanceof builder.QueryEdgeQueryStep, 'QUERY /classes');
+
+    query.execute()
+        .then(resp => {
+            t.same(resp.data, {
+                id: "c1",
+                name: "A",
+                semester: 1,
+                room: "Room 1",
+                schoolId: "s1"
+            });
             t.equal(resp.metadata, null);
             t.end()
         })

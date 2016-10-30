@@ -86,12 +86,14 @@ var ApiRequestPath = (function () {
 }());
 exports.ApiRequestPath = ApiRequestPath;
 (function (ApiRequestType) {
-    ApiRequestType[ApiRequestType["Create"] = 0] = "Create";
-    ApiRequestType[ApiRequestType["Read"] = 1] = "Read";
-    ApiRequestType[ApiRequestType["Update"] = 2] = "Update";
-    ApiRequestType[ApiRequestType["Patch"] = 3] = "Patch";
-    ApiRequestType[ApiRequestType["Delete"] = 4] = "Delete";
-    ApiRequestType[ApiRequestType["Exists"] = 5] = "Exists";
+    ApiRequestType[ApiRequestType["Create"] = 1] = "Create";
+    ApiRequestType[ApiRequestType["Read"] = 2] = "Read";
+    ApiRequestType[ApiRequestType["Update"] = 4] = "Update";
+    ApiRequestType[ApiRequestType["Patch"] = 8] = "Patch";
+    ApiRequestType[ApiRequestType["Delete"] = 16] = "Delete";
+    ApiRequestType[ApiRequestType["Exists"] = 32] = "Exists";
+    ApiRequestType[ApiRequestType["Any"] = 63] = "Any";
+    ApiRequestType[ApiRequestType["Change"] = 12] = "Change";
 })(exports.ApiRequestType || (exports.ApiRequestType = {}));
 var ApiRequestType = exports.ApiRequestType;
 var ApiRequest = (function () {

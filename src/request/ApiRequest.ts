@@ -88,12 +88,15 @@ export class ApiRequestPath {
 }
 
 export enum ApiRequestType {
-    Create,
-    Read,
-    Update,
-    Patch,
-    Delete,
-    Exists
+    Create = 1 << 0,
+    Read   = 1 << 1,
+    Update = 1 << 2,
+    Patch  = 1 << 3,
+    Delete = 1 << 4,
+    Exists = 1 << 5,
+
+    Any = Create | Read | Update | Patch | Delete | Exists,
+    Change = Update | Patch
 }
 
 export class ApiRequest {
