@@ -1,15 +1,26 @@
 const tap = require('tap');
 
 import * as request from "../src/request/ApiRequest";
+
+import {ApiEdgeMethod, ApiEdgeMethodScope} from "../src/edge/ApiEdgeMethod";
 import {ApiRequestPathParser, ApiRequestParser} from "../src/request/ApiRequestParser";
 import {OneToManyRelation} from "../src/relations/OneToManyRelation";
 import {OneToOneRelation} from "../src/relations/OneToOneRelation";
 import {Api} from "../src/Api";
 
+const entryMethod = () => { return new Promise((resolve, reject) => reject("entry")) };
+const collectionMethod = () => { return new Promise((resolve, reject) => reject("collection")) };
+const edgeMethod = () => { return new Promise((resolve, reject) => reject("edge")) };
+
 const edge1: any = function() {
     this.name = "entry";
     this.pluralName = "entries";
     this.relations = [];
+    this.methods = [
+        new ApiEdgeMethod("entryMethod", entryMethod, ApiEdgeMethodScope.Entry),
+        new ApiEdgeMethod("collectionMethod", collectionMethod, ApiEdgeMethodScope.Collection),
+        new ApiEdgeMethod("method", edgeMethod, ApiEdgeMethodScope.Edge)
+    ]
 };
 
 const edge2: any = function() {
@@ -69,6 +80,15 @@ tap.test('parser should parse single entry segment request', (t: any) => {
     t.equal(path.segments[0].edge, edge, 'should be the registered edge');
     t.equal((path.segments[0] as request.EntryPathSegment).id, '42', 'id should be the provided');
     t.equal(path.segments[0].relation, null, 'should have no relation');
+    t.end()
+});
+
+tap.test('parser should parse single edge method segment request', (t: any) => {
+    var path = parser.parse([ 'entries', 'method' ]);
+    t.equal(path.segments.length, 1, 'should have one segment');
+    t.ok(path.segments[0] instanceof request.MethodPathSegment, 'should have an edge path segment');
+    t.equal(path.segments[0].edge, edge, 'should be the registered edge');
+    t.equal(path.segments[0].method, edgeMethod, 'should have no relation');
     t.end()
 });
 

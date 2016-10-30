@@ -6,5 +6,4 @@ export declare enum ApiEdgeQueryType {
     Patch = 4,
     Delete = 5,
     Exists = 6,
-    Call = 7,
 }

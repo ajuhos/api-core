@@ -1,4 +1,10 @@
 "use strict";
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var ApiEdgeDefinition_1 = require("../../../src/edge/ApiEdgeDefinition");
 var ApiEdgeQueryFilter_1 = require("../../../src/edge/ApiEdgeQueryFilter");
 var ApiEdgeQueryResponse_1 = require("../../../src/edge/ApiEdgeQueryResponse");
 var ApiEdgeError_1 = require("../../../src/query/ApiEdgeError");
@@ -9,9 +15,11 @@ var Model = (function () {
     return Model;
 }());
 exports.Model = Model;
-var ModelEdge = (function () {
+var ModelEdge = (function (_super) {
+    __extends(ModelEdge, _super);
     function ModelEdge() {
         var _this = this;
+        _super.apply(this, arguments);
         this.name = "entry";
         this.pluralName = "entries";
         this.idField = "id";
@@ -60,31 +68,11 @@ var ModelEdge = (function () {
                 }).catch(reject);
             });
         };
-        this.updateEntries = function (context, body) {
-            return new Promise(function (resolve, reject) {
-                _this.listEntries(context).then(function (entries) {
-                    entries.data.forEach(function (entry) {
-                        return Object.keys(body).forEach(function (key) { return entry[key] = body[key]; });
-                    });
-                    resolve(new ApiEdgeQueryResponse_1.ApiEdgeQueryResponse(entries.data.map(function (entry) { return _this.applyMapping(entry, context.fields); })));
-                }).catch(reject);
-            });
-        };
         this.removeEntry = function (context) {
             return new Promise(function (resolve, reject) {
                 _this.getEntry(context).then(function (entry) {
                     _this.provider.splice(_this.provider.indexOf(entry), 1);
                     resolve(new ApiEdgeQueryResponse_1.ApiEdgeQueryResponse(entry));
-                }).catch(reject);
-            });
-        };
-        this.removeEntries = function (context) {
-            return new Promise(function (resolve, reject) {
-                _this.listEntries(context).then(function (entries) {
-                    entries.data.forEach(function (entry) {
-                        return _this.provider.splice(_this.provider.indexOf(entry), 1);
-                    });
-                    resolve(new ApiEdgeQueryResponse_1.ApiEdgeQueryResponse(entries.data));
                 }).catch(reject);
             });
         };
@@ -97,8 +85,8 @@ var ModelEdge = (function () {
                     resolve(new ApiEdgeQueryResponse_1.ApiEdgeQueryResponse(false));
             });
         };
-        this.callMethod = function (context, body) {
-            return _this.methods["" + context.id](context, body);
+        this.callMethod = function (scope) {
+            return _this.methods["" + scope.context.id](scope);
         };
     }
     ModelEdge.prototype.applyMapping = function (item, fields) {
@@ -132,6 +120,6 @@ var ModelEdge = (function () {
         return filters.every(function (filter) { return ModelEdge.applyFilter(item, filter); });
     };
     return ModelEdge;
-}());
+}(ApiEdgeDefinition_1.ApiEdge));
 exports.ModelEdge = ModelEdge;
 //# sourceMappingURL=ModelEdge.js.map

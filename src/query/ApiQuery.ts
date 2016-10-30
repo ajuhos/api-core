@@ -2,14 +2,14 @@ import {ApiEdgeQueryContext} from "../edge/ApiEdgeQueryContext";
 import {ApiEdgeQueryResponse} from "../edge/ApiEdgeQueryResponse";
 
 
-export interface QueryScope {
+export interface ApiQueryScope {
     context: ApiEdgeQueryContext,
     body: any|null,
     response: ApiEdgeQueryResponse|null
 }
 
 export interface QueryStep {
-    execute(scope: QueryScope): Promise<QueryScope>;
+    execute(scope: ApiQueryScope): Promise<ApiQueryScope>;
 }
 
 export class ApiQuery {
@@ -27,7 +27,7 @@ export class ApiQuery {
 
     execute = (): Promise<ApiEdgeQueryResponse> => {
         return new Promise<ApiEdgeQueryResponse>((resolve, reject) => {
-            let next = (scope: QueryScope) => {
+            let next = (scope: ApiQueryScope) => {
                 let step = this.steps.shift();
                 if(step) {
                     if (this.steps.length) {

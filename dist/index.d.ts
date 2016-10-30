@@ -1,4 +1,4 @@
-export { ApiEdgeDefinition } from "./src/edge/ApiEdgeDefinition";
+export { ApiEdgeDefinition, ApiEdge } from "./src/edge/ApiEdgeDefinition";
 export { ApiEdgeQueryType } from "./src/edge/ApiEdgeQueryType";
 export { ApiEdgeQueryContext } from "./src/edge/ApiEdgeQueryContext";
 export { ApiEdgeQueryResponse } from "./src/edge/ApiEdgeQueryResponse";
@@ -10,6 +10,6 @@ export { OneToOneRelation } from "./src/relations/OneToOneRelation";
 export { OneToManyRelation } from "./src/relations/OneToManyRelation";
 export { ApiRequest, ApiRequestPath, ApiRequestType } from "./src/request/ApiRequest";
 export { ApiRequestPathParser } from "./src/request/ApiRequestParser";
-export { ApiQuery } from "./src/query/ApiQuery";
+export { ApiQuery, ApiQueryScope } from "./src/query/ApiQuery";
 export { ApiQueryBuilder } from "./src/query/ApiQueryBuilder";
 export { Api } from "./src/Api";

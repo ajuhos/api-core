@@ -1,4 +1,6 @@
 "use strict";
+var ApiEdgeDefinition_1 = require("./src/edge/ApiEdgeDefinition");
+exports.ApiEdge = ApiEdgeDefinition_1.ApiEdge;
 var ApiEdgeQueryType_1 = require("./src/edge/ApiEdgeQueryType");
 exports.ApiEdgeQueryType = ApiEdgeQueryType_1.ApiEdgeQueryType;
 var ApiEdgeQueryContext_1 = require("./src/edge/ApiEdgeQueryContext");

@@ -1,15 +1,16 @@
 import {ApiEdgeRelation} from "../relations/ApiEdgeRelation";
 import {ApiEdgeQueryContext} from "./ApiEdgeQueryContext";
 import {ApiEdgeQueryResponse} from "./ApiEdgeQueryResponse";
+import {ApiQueryScope} from "../query/ApiQuery";
+import {ApiEdgeMethod, ApiEdgeMethodScope} from "./ApiEdgeMethod";
 
 export interface ApiEdgeDefinition {
-
     name: string;
     pluralName: string;
     idField: string;
-    fields: string[];
 
-    methods: Object;
+    fields: string[];
+    methods: ApiEdgeMethod[];
     relations: ApiEdgeRelation[];
 
     getEntry: (context: ApiEdgeQueryContext) => Promise<ApiEdgeQueryResponse>;
@@ -17,10 +18,56 @@ export interface ApiEdgeDefinition {
     createEntry: (context: ApiEdgeQueryContext, entryFields: any) => Promise<ApiEdgeQueryResponse>;
     updateEntry: (context: ApiEdgeQueryContext, entryFields: any) => Promise<ApiEdgeQueryResponse>;
     patchEntry: (context: ApiEdgeQueryContext, entryFields: any) => Promise<ApiEdgeQueryResponse>;
-    updateEntries: (context: ApiEdgeQueryContext, entryFields: any) => Promise<ApiEdgeQueryResponse>;
     removeEntry: (context: ApiEdgeQueryContext, entryFields: any) => Promise<ApiEdgeQueryResponse>;
-    removeEntries: (context: ApiEdgeQueryContext) => Promise<ApiEdgeQueryResponse[]>;
     exists: (context: ApiEdgeQueryContext) => Promise<ApiEdgeQueryResponse>;
-    callMethod: (context: ApiEdgeQueryContext, entryFields: any) => Promise<ApiEdgeQueryResponse>;
+    callMethod: (scope: ApiQueryScope) => Promise<ApiQueryScope>;
+}
 
+export abstract class ApiEdge implements ApiEdgeDefinition {
+    name: string;
+    pluralName: string;
+    idField: string;
+
+    fields: string[];
+    methods: ApiEdgeMethod[];
+    relations: ApiEdgeRelation[];
+
+    getEntry: (context: ApiEdgeQueryContext) => Promise<ApiEdgeQueryResponse>;
+    listEntries: (context: ApiEdgeQueryContext) => Promise<ApiEdgeQueryResponse>;
+    createEntry: (context: ApiEdgeQueryContext, entryFields: any) => Promise<ApiEdgeQueryResponse>;
+    updateEntry: (context: ApiEdgeQueryContext, entryFields: any) => Promise<ApiEdgeQueryResponse>;
+    patchEntry: (context: ApiEdgeQueryContext, entryFields: any) => Promise<ApiEdgeQueryResponse>;
+    removeEntry: (context: ApiEdgeQueryContext, entryFields: any) => Promise<ApiEdgeQueryResponse>;
+    exists: (context: ApiEdgeQueryContext) => Promise<ApiEdgeQueryResponse>;
+    callMethod: (scope: ApiQueryScope) => Promise<ApiQueryScope>;
+
+    edgeMethod = (name: string, execute: (scope: ApiQueryScope) => Promise<ApiQueryScope>): ApiEdge => {
+        if(this.methods.find((method: ApiEdgeMethod) =>
+            method.name === name &&
+            method.scope == ApiEdgeMethodScope.Edge))
+           throw "An edge method with the same name already exists.";
+
+        this.methods.push(new ApiEdgeMethod(name, execute, ApiEdgeMethodScope.Edge));
+        return this
+    };
+
+    collectionMethod = (name: string, execute: (scope: ApiQueryScope) => Promise<ApiQueryScope>): ApiEdge => {
+        if(this.methods.find((method: ApiEdgeMethod) =>
+            method.name === name &&
+            method.scope == ApiEdgeMethodScope.Collection))
+            throw "A collection method with the same name already exists.";
+
+        this.methods.push(new ApiEdgeMethod(name, execute, ApiEdgeMethodScope.Collection));
+        return this
+    };
+
+    entryMethod = (name: string, execute: (scope: ApiQueryScope) => Promise<ApiQueryScope>): ApiEdge => {
+        if(this.methods.find((method: ApiEdgeMethod) =>
+            method.name === name &&
+            method.scope == ApiEdgeMethodScope.Entry))
+            throw "An entry method with the same name already exists.";
+
+        this.methods.push(new ApiEdgeMethod(name, execute, ApiEdgeMethodScope.Entry));
+        return this
+    };
 }

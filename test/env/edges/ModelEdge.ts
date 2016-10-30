@@ -1,9 +1,10 @@
 
-import {ApiEdgeDefinition} from "../../../src/edge/ApiEdgeDefinition";
+import {ApiEdge} from "../../../src/edge/ApiEdgeDefinition";
 import {ApiEdgeQueryFilter, ApiEdgeQueryFilterType} from "../../../src/edge/ApiEdgeQueryFilter";
 import {ApiEdgeQueryContext} from "../../../src/edge/ApiEdgeQueryContext";
 import {ApiEdgeQueryResponse} from "../../../src/edge/ApiEdgeQueryResponse";
 import {ApiEdgeError} from "../../../src/query/ApiEdgeError";
+import {ApiQueryScope} from "../../../src/query/ApiQuery";
 export class Model {
     id: string;
 
@@ -12,7 +13,7 @@ export class Model {
     }
 }
 
-export class ModelEdge<ModelType extends Model> implements ApiEdgeDefinition {
+export class ModelEdge<ModelType extends Model> extends ApiEdge {
 
     name = "entry";
     pluralName = "entries";
@@ -102,32 +103,12 @@ export class ModelEdge<ModelType extends Model> implements ApiEdgeDefinition {
         })
     };
 
-    updateEntries = (context: ApiEdgeQueryContext, body: any): Promise<ApiEdgeQueryResponse> => {
-        return new Promise<ApiEdgeQueryResponse>((resolve, reject) => {
-            this.listEntries(context).then(entries => {
-                entries.data.forEach((entry: any) =>
-                    Object.keys(body).forEach((key: any) => entry[key] = body[key]));
-                resolve(new ApiEdgeQueryResponse(entries.data.map((entry: any) => this.applyMapping(entry, context.fields))))
-            }).catch(reject)
-        })
-    };
-
     removeEntry = (context: ApiEdgeQueryContext): Promise<ApiEdgeQueryResponse> => {
         return new Promise<ApiEdgeQueryResponse>((resolve, reject) => {
             this.getEntry(context).then((entry : any) => {
                 this.provider.splice(this.provider.indexOf(entry), 1);
                 resolve(new ApiEdgeQueryResponse(entry))
             }).catch(reject);
-        })
-    };
-
-    removeEntries = (context: ApiEdgeQueryContext): Promise<ApiEdgeQueryResponse> => {
-        return new Promise<ApiEdgeQueryResponse>((resolve, reject) => {
-            this.listEntries(context).then(entries => {
-                entries.data.forEach((entry: any) =>
-                    this.provider.splice(this.provider.indexOf(entry), 1));
-                resolve(new ApiEdgeQueryResponse(entries.data)); //TODO
-            }).catch(reject)
         })
     };
 
@@ -139,8 +120,8 @@ export class ModelEdge<ModelType extends Model> implements ApiEdgeDefinition {
         })
     };
 
-    callMethod = (context: ApiEdgeQueryContext, body: any): Promise<ApiEdgeQueryResponse> => {
-        return this.methods[""+context.id](context, body);
+    callMethod = (scope: ApiQueryScope): Promise<ApiQueryScope> => {
+        return this.methods[""+scope.context.id](scope);
     }
 
 }
