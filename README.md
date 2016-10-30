@@ -45,7 +45,7 @@ Every edge provides the following operations:
  - Remove an entry (eg. DELETE /students/3)
  - Access to operations of one-to-one relations (eg. GET /students/3/class)
  - Access to operations of one-to-many relations (eg. GET /schools/42/students/3/courses) 
- - Access to custom operations (PUT /students/3/rename)
+ - Access to custom operations (eg. PUT /students/3/rename)
 
 Every operation provides standard features like filtering, sorting, 
 population and pagination.
