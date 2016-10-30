@@ -36,8 +36,4 @@ export class ApiEdgeMethod {
         this.execute = execute;
         this.acceptedTypes = acceptedTypes;
     }
-
-    inspect = () => {
-        return `call{${this.name}}`
-    }
 }

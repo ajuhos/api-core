@@ -12,5 +12,4 @@ export declare class ApiEdgeMethod {
     scope: ApiEdgeMethodScope;
     execute: (scope: ApiQueryScope) => Promise<ApiEdgeQueryResponse>;
     constructor(name: string, execute: (scope: ApiQueryScope) => Promise<ApiEdgeQueryResponse>, scope?: ApiEdgeMethodScope, acceptedTypes?: ApiRequestType);
-    inspect: () => string;
 }
