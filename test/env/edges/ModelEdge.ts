@@ -23,7 +23,7 @@ export class ModelEdge<ModelType extends Model> extends ApiEdge {
     provider: ModelType[] = [];
     protected createModel: (obj: any) => ModelType;
 
-    methods: any = {};
+    methods = [];
     relations = [];
 
     inspect = () => `/${this.pluralName}`;

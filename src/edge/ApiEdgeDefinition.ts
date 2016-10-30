@@ -28,9 +28,9 @@ export abstract class ApiEdge implements ApiEdgeDefinition {
     pluralName: string;
     idField: string;
 
-    fields: string[];
-    methods: ApiEdgeMethod[];
-    relations: ApiEdgeRelation[];
+    fields: string[] = [];
+    methods: ApiEdgeMethod[] = [];
+    relations: ApiEdgeRelation[] = [];
 
     getEntry: (context: ApiEdgeQueryContext) => Promise<ApiEdgeQueryResponse>;
     listEntries: (context: ApiEdgeQueryContext) => Promise<ApiEdgeQueryResponse>;
@@ -43,9 +43,8 @@ export abstract class ApiEdge implements ApiEdgeDefinition {
 
     edgeMethod = (name: string, execute: (scope: ApiQueryScope) => Promise<ApiQueryScope>): ApiEdge => {
         if(this.methods.find((method: ApiEdgeMethod) =>
-            method.name === name &&
-            method.scope == ApiEdgeMethodScope.Edge))
-           throw "An edge method with the same name already exists.";
+            method.name === name))
+           throw "A method with the same name already exists.";
 
         this.methods.push(new ApiEdgeMethod(name, execute, ApiEdgeMethodScope.Edge));
         return this
@@ -54,7 +53,7 @@ export abstract class ApiEdge implements ApiEdgeDefinition {
     collectionMethod = (name: string, execute: (scope: ApiQueryScope) => Promise<ApiQueryScope>): ApiEdge => {
         if(this.methods.find((method: ApiEdgeMethod) =>
             method.name === name &&
-            method.scope == ApiEdgeMethodScope.Collection))
+            (method.scope == ApiEdgeMethodScope.Collection || method.scope == ApiEdgeMethodScope.Edge)))
             throw "A collection method with the same name already exists.";
 
         this.methods.push(new ApiEdgeMethod(name, execute, ApiEdgeMethodScope.Collection));
@@ -64,7 +63,7 @@ export abstract class ApiEdge implements ApiEdgeDefinition {
     entryMethod = (name: string, execute: (scope: ApiQueryScope) => Promise<ApiQueryScope>): ApiEdge => {
         if(this.methods.find((method: ApiEdgeMethod) =>
             method.name === name &&
-            method.scope == ApiEdgeMethodScope.Entry))
+            (method.scope == ApiEdgeMethodScope.Entry || method.scope == ApiEdgeMethodScope.Edge)))
             throw "An entry method with the same name already exists.";
 
         this.methods.push(new ApiEdgeMethod(name, execute, ApiEdgeMethodScope.Entry));

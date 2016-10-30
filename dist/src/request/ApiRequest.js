@@ -14,6 +14,20 @@ var PathSegment = (function () {
     return PathSegment;
 }());
 exports.PathSegment = PathSegment;
+var MethodPathSegment = (function (_super) {
+    __extends(MethodPathSegment, _super);
+    function MethodPathSegment(edge, method) {
+        var _this = this;
+        _super.call(this);
+        this.inspect = function () {
+            return "call{" + _this.method.name + "}";
+        };
+        this.edge = edge;
+        this.method = method;
+    }
+    return MethodPathSegment;
+}(PathSegment));
+exports.MethodPathSegment = MethodPathSegment;
 var EdgePathSegment = (function (_super) {
     __extends(EdgePathSegment, _super);
     function EdgePathSegment(edge, relation) {

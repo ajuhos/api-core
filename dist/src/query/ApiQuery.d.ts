@@ -11,6 +11,5 @@ export interface QueryStep {
 export declare class ApiQuery {
     steps: QueryStep[];
     unshift: (step: QueryStep) => ApiQuery;
-    push: (step: QueryStep) => ApiQuery;
     execute: () => Promise<ApiEdgeQueryResponse>;
 }

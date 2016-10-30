@@ -20,10 +20,10 @@ export class ApiQuery {
         return this
     };
 
-    push = (step: QueryStep): ApiQuery => {
+/*    push = (step: QueryStep): ApiQuery => {
         this.steps.push(step);
         return this
-    };
+    };*/
 
     execute = (): Promise<ApiEdgeQueryResponse> => {
         return new Promise<ApiEdgeQueryResponse>((resolve, reject) => {

@@ -13,7 +13,7 @@ export declare class ModelEdge<ModelType extends Model> extends ApiEdge {
     fields: never[];
     provider: ModelType[];
     protected createModel: (obj: any) => ModelType;
-    methods: any;
+    methods: never[];
     relations: never[];
     inspect: () => string;
     private applyMapping(item, fields);
