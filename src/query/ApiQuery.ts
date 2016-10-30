@@ -5,6 +5,7 @@ import {ApiEdgeQueryResponse} from "../edge/ApiEdgeQueryResponse";
 export interface ApiQueryScope {
     context: ApiEdgeQueryContext,
     body: any|null,
+    identity: any|null,
     response: ApiEdgeQueryResponse|null
 }
 
@@ -25,7 +26,7 @@ export class ApiQuery {
         return this
     };*/
 
-    execute = (): Promise<ApiEdgeQueryResponse> => {
+    execute = (identity: any = null): Promise<ApiEdgeQueryResponse> => {
         return new Promise<ApiEdgeQueryResponse>((resolve, reject) => {
             let next = (scope: ApiQueryScope) => {
                 let step = this.steps.shift();
@@ -39,7 +40,7 @@ export class ApiQuery {
                 }
             };
 
-            next({ context: new ApiEdgeQueryContext(), body: null, response: null});
+            next({ context: new ApiEdgeQueryContext(), body: null, response: null, identity });
         })
     }
 }

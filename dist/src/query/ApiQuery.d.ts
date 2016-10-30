@@ -3,6 +3,7 @@ import { ApiEdgeQueryResponse } from "../edge/ApiEdgeQueryResponse";
 export interface ApiQueryScope {
     context: ApiEdgeQueryContext;
     body: any | null;
+    identity: any | null;
     response: ApiEdgeQueryResponse | null;
 }
 export interface QueryStep {
@@ -11,5 +12,5 @@ export interface QueryStep {
 export declare class ApiQuery {
     steps: QueryStep[];
     unshift: (step: QueryStep) => ApiQuery;
-    execute: () => Promise<ApiEdgeQueryResponse>;
+    execute: (identity?: any) => Promise<ApiEdgeQueryResponse>;
 }

@@ -52,9 +52,10 @@ export declare class ApiQueryBuilder {
     api: Api;
     constructor(api: Api);
     private static addMethodCallStep(request, query, method);
+    private addQueryStep(query, step);
     private static buildProvideIdStep(query, currentSegment);
-    private static buildCheckStep(query, currentSegment);
-    private static buildReadStep(query, currentSegment);
+    private buildCheckStep(query, currentSegment);
+    private buildReadStep(query, currentSegment);
     private buildReadQuery;
     private buildChangeQuery;
     private buildCreateQuery;
