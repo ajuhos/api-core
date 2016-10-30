@@ -2,6 +2,7 @@ import {ApiEdgeDefinition} from "../edge/ApiEdgeDefinition";
 import {OneToManyRelation} from "../relations/OneToManyRelation";
 import {OneToOneRelation} from "../relations/OneToOneRelation";
 import {ApiEdgeQueryContext} from "../edge/ApiEdgeQueryContext";
+import {ApiEdgeMethod} from "../edge/ApiEdgeMethod";
 
 export class PathSegment {
     edge: ApiEdgeDefinition;
@@ -9,6 +10,21 @@ export class PathSegment {
 
     inspect = () => {
         return '';
+    }
+}
+
+export class MethodPathSegment extends PathSegment {
+    edge: ApiEdgeDefinition;
+    method: ApiEdgeMethod;
+
+    constructor(edge: ApiEdgeDefinition, method: ApiEdgeMethod) {
+        super();
+        this.edge = edge;
+        this.method = method;
+    }
+
+    inspect = () => {
+        return `call{${this.method.name}}`;
     }
 }
 
@@ -44,7 +60,7 @@ export class EntryPathSegment extends PathSegment {
     }
 }
 
-export class RelatedFieldPathSegment extends  PathSegment {
+export class RelatedFieldPathSegment extends PathSegment {
     edge: ApiEdgeDefinition;
     relation: OneToOneRelation;
 
@@ -72,12 +88,15 @@ export class ApiRequestPath {
 }
 
 export enum ApiRequestType {
-    Create,
-    Read,
-    Update,
-    Patch,
-    Delete,
-    Exists
+    Create = 1 << 0,
+    Read   = 1 << 1,
+    Update = 1 << 2,
+    Patch  = 1 << 3,
+    Delete = 1 << 4,
+    Exists = 1 << 5,
+
+    Any = Create | Read | Update | Patch | Delete | Exists,
+    Change = Update | Patch
 }
 
 export class ApiRequest {

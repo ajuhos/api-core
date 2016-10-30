@@ -11,7 +11,7 @@ import {ClassEdge} from "./env/edges/ClassEdge";
 import {CourseEdge} from "./env/edges/CourseEdge";
 import {CourseTypeEdge} from "./env/edges/CourseTypeEdge";
 import {SchoolEdge} from "./env/edges/SchoolEdge";
-import {ApiRequestType} from "../src/request/ApiRequest";
+import {ApiRequestType, ApiRequest} from "../src/request/ApiRequest";
 
 const studentEdge = new StudentEdge,
     classEdge = new ClassEdge,
@@ -39,6 +39,36 @@ tap.test('creating the API should work', (t: any) => {
         .relation(new OneToManyRelation(schoolEdge, studentEdge))
         .relation(new OneToManyRelation(schoolEdge, classEdge));
 
+    t.end()
+});
+
+tap.test('Any type queries should fail', (t: any) => {
+    try {
+        let request = new ApiRequest();
+        request.type = ApiRequestType.Any;
+        api.buildQuery(request);
+        t.ok(false, 'an invalid query should not succeed');
+    }
+    catch(e) {
+        t.ok(e instanceof ApiEdgeError);
+        t.equal(e.message, 'Unsupported Query Type');
+        t.equal(e.status, 400);
+    }
+    t.end()
+});
+
+tap.test('Change type queries should fail', (t: any) => {
+    try {
+        let request = new ApiRequest();
+        request.type = ApiRequestType.Change;
+        api.buildQuery(request);
+        t.ok(false, 'an invalid query should not succeed');
+    }
+    catch(e) {
+        t.ok(e instanceof ApiEdgeError);
+        t.equal(e.message, 'Unsupported Query Type');
+        t.equal(e.status, 400);
+    }
     t.end()
 });
 
@@ -347,6 +377,88 @@ tap.test('PUT /schools/s2', (t: any) => {
                     id: "s2",
                     name: "Cool School"
                 });
+            t.equal(resp.metadata, null);
+            t.end()
+        })
+        .catch(() => {
+            t.ok(false, "a valid query should not fail");
+            t.end()
+        });
+});
+
+tap.test('GET /students/s2/rename', (t: any) => {
+    const request = api.parseRequest([ 'students', 's2', 'rename' ]);
+    request.type = ApiRequestType.Read;
+
+    try {
+        api.buildQuery(request);
+        t.ok(false, 'an invalid query should not succeed')
+    }
+    catch(e) {
+        t.ok(e instanceof ApiEdgeError);
+        t.equal(e.message, 'Method Not Allowed');
+        t.equal(e.status, 405);
+    }
+    t.end()
+});
+
+tap.test('/students/s2/withFullName', (t: any) => {
+    const request = api.parseRequest([ 'students', 's2', 'withFullName' ]),
+        query = api.buildQuery(request);
+
+    t.equal(query.steps.length, 5, 'should build an 5 step query');
+    t.ok(query.steps[0] instanceof builder.ExtendContextQueryStep, 'EXTEND');
+    t.ok(query.steps[1] instanceof builder.QueryEdgeQueryStep, 'QUERY /students');
+    t.ok(query.steps[2] instanceof builder.ExtendContextQueryStep, 'APPLY PARAMS');
+    t.ok(query.steps[3] instanceof builder.ProvideIdQueryStep, 'PROVIDE ID');
+    t.ok(query.steps[4] instanceof builder.CallMethodQueryStep, 'call{withFullName}');
+
+    query.execute()
+        .then(resp => {
+            t.same(resp.data, {
+                id: "s2",
+                firstName: "Dave",
+                lastName: "Test",
+                fullName: "Dave Test",
+                email: "dave.test@gmail.com",
+                phone: "347633445",
+                schoolId: "s1",
+                classId: "c1"
+            });
+            t.equal(resp.metadata, null);
+            t.end()
+        })
+        .catch(() => {
+            t.ok(false, "a valid query should not fail");
+            t.end()
+        });
+});
+
+tap.test('POST /students/s2/rename', (t: any) => {
+    const request = api.parseRequest([ 'students', 's2', 'rename' ]);
+    request.type = ApiRequestType.Update;
+    request.body = { name: "David Test" };
+
+    const query = api.buildQuery(request);
+
+    t.equal(query.steps.length, 5, 'should build a 4 step query');
+    t.ok(query.steps[0] instanceof builder.SetResponseQueryStep, 'SET RESPONSE');
+    t.ok(query.steps[1] instanceof builder.ExtendContextQueryStep, 'APPLY PARAMS');
+    t.ok(query.steps[2] instanceof builder.SetBodyQueryStep, 'SET BODY');
+    t.ok(query.steps[3] instanceof builder.ProvideIdQueryStep, 'PROVIDE ID');
+    t.ok(query.steps[4] instanceof builder.CallMethodQueryStep, 'call{rename}');
+
+    query.execute()
+        .then(resp => {
+            t.same(resp.data, {
+                id: "s2",
+                firstName: "David",
+                lastName: "Test",
+                email: "dave.test@gmail.com",
+                phone: "347633445",
+                schoolId: "s1",
+                classId: "c1"
+            });
             t.equal(resp.metadata, null);
             t.end()
         })

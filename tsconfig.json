@@ -10,7 +10,7 @@
     "moduleResolution": "node",
     "sourceMap": true,
     "inlineSources": true,
-    "lib": ["es5", "es2015.promise"]
+    "lib": ["es6", "es2015.promise"]
   },
   "exclude": [
     "node_modules"

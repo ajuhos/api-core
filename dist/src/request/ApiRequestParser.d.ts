@@ -5,6 +5,7 @@ export declare class ApiRequestPathParser {
     constructor(api: Api);
     private findEdgeByName(name);
     private findRelationByName(edge, name);
+    private findMethodByName(edge, name, forEntry);
     parse(segments: string[]): ApiRequestPath;
 }
 export declare class ApiRequestParser {

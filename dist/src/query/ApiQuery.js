@@ -9,10 +9,6 @@ var ApiQuery = (function () {
             _this.steps.unshift(step);
             return _this;
         };
-        this.push = function (step) {
-            _this.steps.push(step);
-            return _this;
-        };
         this.execute = function () {
             return new Promise(function (resolve, reject) {
                 var next = function (scope) {

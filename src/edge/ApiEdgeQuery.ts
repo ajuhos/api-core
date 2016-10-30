@@ -60,8 +60,6 @@ export class ApiEdgeQuery {
                 return this.edge.patchEntry(this.context, this.body);
             case ApiEdgeQueryType.List:
                 return this.edge.listEntries(this.context);
-            case ApiEdgeQueryType.Call:
-                return this.edge.callMethod(this.context, this.body);
         }
     }
 }

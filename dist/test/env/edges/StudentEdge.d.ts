@@ -5,4 +5,5 @@ export declare class StudentEdge extends ModelEdge<Student> {
     pluralName: string;
     provider: Student[];
     protected createModel: (obj: any) => Student;
+    constructor();
 }

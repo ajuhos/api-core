@@ -2,9 +2,16 @@ import { ApiEdgeDefinition } from "../edge/ApiEdgeDefinition";
 import { OneToManyRelation } from "../relations/OneToManyRelation";
 import { OneToOneRelation } from "../relations/OneToOneRelation";
 import { ApiEdgeQueryContext } from "../edge/ApiEdgeQueryContext";
+import { ApiEdgeMethod } from "../edge/ApiEdgeMethod";
 export declare class PathSegment {
     edge: ApiEdgeDefinition;
     relation: OneToManyRelation | null;
+    inspect: () => string;
+}
+export declare class MethodPathSegment extends PathSegment {
+    edge: ApiEdgeDefinition;
+    method: ApiEdgeMethod;
+    constructor(edge: ApiEdgeDefinition, method: ApiEdgeMethod);
     inspect: () => string;
 }
 export declare class EdgePathSegment extends PathSegment {
@@ -32,12 +39,14 @@ export declare class ApiRequestPath {
     inspect: () => string;
 }
 export declare enum ApiRequestType {
-    Create = 0,
-    Read = 1,
-    Update = 2,
-    Patch = 3,
-    Delete = 4,
-    Exists = 5,
+    Create = 1,
+    Read = 2,
+    Update = 4,
+    Patch = 8,
+    Delete = 16,
+    Exists = 32,
+    Any = 63,
+    Change = 12,
 }
 export declare class ApiRequest {
     type: ApiRequestType;
