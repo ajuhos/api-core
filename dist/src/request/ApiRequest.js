@@ -93,7 +93,7 @@ exports.ApiRequestPath = ApiRequestPath;
     ApiRequestType[ApiRequestType["Delete"] = 16] = "Delete";
     ApiRequestType[ApiRequestType["Exists"] = 32] = "Exists";
     ApiRequestType[ApiRequestType["Any"] = 63] = "Any";
-    ApiRequestType[ApiRequestType["Change"] = 12] = "Change";
+    ApiRequestType[ApiRequestType["Change"] = 13] = "Change";
 })(exports.ApiRequestType || (exports.ApiRequestType = {}));
 var ApiRequestType = exports.ApiRequestType;
 var ApiRequest = (function () {

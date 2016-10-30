@@ -46,7 +46,7 @@ export declare enum ApiRequestType {
     Delete = 16,
     Exists = 32,
     Any = 63,
-    Change = 12,
+    Change = 13,
 }
 export declare class ApiRequest {
     type: ApiRequestType;

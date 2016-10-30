@@ -96,7 +96,7 @@ export enum ApiRequestType {
     Exists = 1 << 5,
 
     Any = Create | Read | Update | Patch | Delete | Exists,
-    Change = Update | Patch
+    Change = Create | Update | Patch
 }
 
 export class ApiRequest {
