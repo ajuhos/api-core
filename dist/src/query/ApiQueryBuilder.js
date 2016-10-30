@@ -9,6 +9,7 @@ var ApiEdgeQueryResponse_1 = require("../edge/ApiEdgeQueryResponse");
 var ApiEdgeQueryType_1 = require("../edge/ApiEdgeQueryType");
 var OneToOneRelation_1 = require("../relations/OneToOneRelation");
 var Api_1 = require("../Api");
+var ApiEdgeAction_1 = require("../edge/ApiEdgeAction");
 var QueryEdgeQueryStep = (function () {
     function QueryEdgeQueryStep(query) {
         var _this = this;
@@ -154,7 +155,7 @@ var ApiQueryBuilder = (function () {
             }
             else if (lastSegment instanceof ApiRequest_1.RelatedFieldPathSegment) {
                 baseQuery = new ApiEdgeQuery_1.ApiEdgeQuery(lastSegment.relation.to, ApiEdgeQueryType_1.ApiEdgeQueryType.Get);
-                _this.addQueryStep(query, new QueryEdgeQueryStep(baseQuery));
+                _this.addQueryStep(query, new QueryEdgeQueryStep(baseQuery), lastSegment.relation);
             }
             else if (lastSegment instanceof ApiRequest_1.MethodPathSegment) {
                 ApiQueryBuilder.addMethodCallStep(request, query, lastSegment.method);
@@ -286,6 +287,26 @@ var ApiQueryBuilder = (function () {
         };
         this.api = api;
     }
+    ApiQueryBuilder.prototype.addQueryActions = function (triggerKind, query, edgeQuery, relation) {
+        var edge = edgeQuery.edge, queryType = edgeQuery.type, trigger = relation ? ApiEdgeAction_1.ApiEdgeActionTrigger.Relation : ApiEdgeAction_1.ApiEdgeActionTrigger.Query;
+        var actions;
+        if (relation) {
+            actions = edge.actions.filter(function (action) {
+                return action.triggerKind == triggerKind &&
+                    action.targetTypes == queryType &&
+                    (action.triggers & trigger) &&
+                    (!action.triggerNames.length || action.triggerNames.indexOf(relation.name) == -1);
+            });
+        }
+        else {
+            actions = edge.actions.filter(function (action) {
+                return action.triggerKind == ApiEdgeAction_1.ApiEdgeActionTriggerKind.AfterEvent &&
+                    action.targetTypes == queryType &&
+                    (action.triggers & trigger);
+            });
+        }
+        actions.forEach(function (action) { return query.unshift(action); });
+    };
     ApiQueryBuilder.addMethodCallStep = function (request, query, method) {
         if (method.acceptedTypes & request.type) {
             query.unshift(new CallMethodQueryStep(method));
@@ -294,8 +315,11 @@ var ApiQueryBuilder = (function () {
             throw new ApiEdgeError_1.ApiEdgeError(405, "Method Not Allowed");
         }
     };
-    ApiQueryBuilder.prototype.addQueryStep = function (query, step) {
+    ApiQueryBuilder.prototype.addQueryStep = function (query, step, relation) {
+        if (relation === void 0) { relation = null; }
+        this.addQueryActions(ApiEdgeAction_1.ApiEdgeActionTriggerKind.AfterEvent, query, step.query, relation);
         query.unshift(step);
+        this.addQueryActions(ApiEdgeAction_1.ApiEdgeActionTriggerKind.BeforeEvent, query, step.query, relation);
     };
     ApiQueryBuilder.buildProvideIdStep = function (query, currentSegment) {
         if (currentSegment instanceof ApiRequest_1.EntryPathSegment) {
@@ -316,7 +340,7 @@ var ApiQueryBuilder = (function () {
             return false;
         }
         else if (currentSegment instanceof ApiRequest_1.RelatedFieldPathSegment) {
-            this.addQueryStep(query, new QueryEdgeQueryStep(new ApiEdgeQuery_1.ApiEdgeQuery(currentSegment.relation.to, ApiEdgeQueryType_1.ApiEdgeQueryType.Get)));
+            this.addQueryStep(query, new QueryEdgeQueryStep(new ApiEdgeQuery_1.ApiEdgeQuery(currentSegment.relation.to, ApiEdgeQueryType_1.ApiEdgeQueryType.Get)), currentSegment.relation);
         }
         else {
             throw new ApiEdgeError_1.ApiEdgeError(500, "Not Implemented");
@@ -326,7 +350,7 @@ var ApiQueryBuilder = (function () {
     };
     ApiQueryBuilder.prototype.buildReadStep = function (query, currentSegment) {
         if (currentSegment instanceof ApiRequest_1.RelatedFieldPathSegment) {
-            this.addQueryStep(query, new QueryEdgeQueryStep(new ApiEdgeQuery_1.ApiEdgeQuery(currentSegment.relation.to, ApiEdgeQueryType_1.ApiEdgeQueryType.Get)));
+            this.addQueryStep(query, new QueryEdgeQueryStep(new ApiEdgeQuery_1.ApiEdgeQuery(currentSegment.relation.to, ApiEdgeQueryType_1.ApiEdgeQueryType.Get)), currentSegment.relation);
         }
         else {
             this.addQueryStep(query, new QueryEdgeQueryStep(new ApiEdgeQuery_1.ApiEdgeQuery(currentSegment.edge, ApiEdgeQueryType_1.ApiEdgeQueryType.Get)));

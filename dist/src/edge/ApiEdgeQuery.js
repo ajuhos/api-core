@@ -1,6 +1,7 @@
 "use strict";
 var ApiEdgeQueryType_1 = require('./ApiEdgeQueryType');
 var ApiEdgeQueryContext_1 = require("./ApiEdgeQueryContext");
+var ApiEdgeError_1 = require("../query/ApiEdgeError");
 var ApiEdgeQuery = (function () {
     function ApiEdgeQuery(edge, type, context, body) {
         var _this = this;
@@ -23,6 +24,8 @@ var ApiEdgeQuery = (function () {
                     return _this.edge.patchEntry(_this.context, _this.body);
                 case ApiEdgeQueryType_1.ApiEdgeQueryType.List:
                     return _this.edge.listEntries(_this.context);
+                default:
+                    throw new ApiEdgeError_1.ApiEdgeError(500, "Unsupported Query Type");
             }
         };
         this.edge = edge;

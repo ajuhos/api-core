@@ -4,6 +4,8 @@ import { ApiEdgeQueryResponse } from "./ApiEdgeQueryResponse";
 import { ApiQueryScope } from "../query/ApiQuery";
 import { ApiEdgeMethod } from "./ApiEdgeMethod";
 import { ApiRequestType } from "../request/ApiRequest";
+import { ApiEdgeAction, ApiEdgeActionTriggerKind, ApiEdgeActionTrigger } from "./ApiEdgeAction";
+import { ApiEdgeQueryType } from "./ApiEdgeQueryType";
 export interface ApiEdgeDefinition {
     name: string;
     pluralName: string;
@@ -11,6 +13,7 @@ export interface ApiEdgeDefinition {
     fields: string[];
     methods: ApiEdgeMethod[];
     relations: ApiEdgeRelation[];
+    actions: ApiEdgeAction[];
     getEntry: (context: ApiEdgeQueryContext) => Promise<ApiEdgeQueryResponse>;
     listEntries: (context: ApiEdgeQueryContext) => Promise<ApiEdgeQueryResponse>;
     createEntry: (context: ApiEdgeQueryContext, entryFields: any) => Promise<ApiEdgeQueryResponse>;
@@ -26,6 +29,7 @@ export declare abstract class ApiEdge implements ApiEdgeDefinition {
     fields: string[];
     methods: ApiEdgeMethod[];
     relations: ApiEdgeRelation[];
+    actions: ApiEdgeAction[];
     getEntry: (context: ApiEdgeQueryContext) => Promise<ApiEdgeQueryResponse>;
     listEntries: (context: ApiEdgeQueryContext) => Promise<ApiEdgeQueryResponse>;
     createEntry: (context: ApiEdgeQueryContext, entryFields: any) => Promise<ApiEdgeQueryResponse>;
@@ -33,6 +37,7 @@ export declare abstract class ApiEdge implements ApiEdgeDefinition {
     patchEntry: (context: ApiEdgeQueryContext, entryFields: any) => Promise<ApiEdgeQueryResponse>;
     removeEntry: (context: ApiEdgeQueryContext, entryFields: any) => Promise<ApiEdgeQueryResponse>;
     exists: (context: ApiEdgeQueryContext) => Promise<ApiEdgeQueryResponse>;
+    action: (name: string, execute: (scope: ApiQueryScope) => Promise<ApiEdgeQueryResponse>, targetTypes?: ApiEdgeQueryType, triggerKind?: ApiEdgeActionTriggerKind, triggers?: ApiEdgeActionTrigger, triggerNames?: string[]) => ApiEdge;
     edgeMethod: (name: string, execute: (scope: ApiQueryScope) => Promise<ApiEdgeQueryResponse>, acceptedTypes?: ApiRequestType) => ApiEdge;
     collectionMethod: (name: string, execute: (scope: ApiQueryScope) => Promise<ApiEdgeQueryResponse>, acceptedTypes?: ApiRequestType) => ApiEdge;
     entryMethod: (name: string, execute: (scope: ApiQueryScope) => Promise<ApiEdgeQueryResponse>, acceptedTypes?: ApiRequestType) => ApiEdge;

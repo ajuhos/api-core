@@ -1,9 +1,8 @@
 import {ApiEdgeDefinition} from './ApiEdgeDefinition';
 import {ApiEdgeQueryType} from './ApiEdgeQueryType';
 import {ApiEdgeQueryContext} from "./ApiEdgeQueryContext";
-
-//Required for execute
 import {ApiEdgeQueryResponse} from "./ApiEdgeQueryResponse";
+import {ApiEdgeError} from "../query/ApiEdgeError";
 
 export class ApiEdgeQuery {
 
@@ -44,7 +43,7 @@ export class ApiEdgeQuery {
         this.body = body;
     }
 
-    execute = () => {
+    execute = (): Promise<ApiEdgeQueryResponse> => {
         switch (this.type) {
             case ApiEdgeQueryType.Get:
                 return this.edge.getEntry(this.context);
@@ -60,6 +59,8 @@ export class ApiEdgeQuery {
                 return this.edge.patchEntry(this.context, this.body);
             case ApiEdgeQueryType.List:
                 return this.edge.listEntries(this.context);
+            default:
+                throw new ApiEdgeError(500, "Unsupported Query Type")
         }
     }
 }
