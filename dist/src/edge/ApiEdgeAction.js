@@ -1,10 +1,12 @@
 "use strict";
 var ApiEdgeQueryType_1 = require("./ApiEdgeQueryType");
 (function (ApiEdgeActionTrigger) {
-    ApiEdgeActionTrigger[ApiEdgeActionTrigger["Query"] = 2] = "Query";
-    ApiEdgeActionTrigger[ApiEdgeActionTrigger["Method"] = 4] = "Method";
-    ApiEdgeActionTrigger[ApiEdgeActionTrigger["Relation"] = 8] = "Relation";
-    ApiEdgeActionTrigger[ApiEdgeActionTrigger["Any"] = 14] = "Any";
+    ApiEdgeActionTrigger[ApiEdgeActionTrigger["OutputQuery"] = 2] = "OutputQuery";
+    ApiEdgeActionTrigger[ApiEdgeActionTrigger["SubQuery"] = 4] = "SubQuery";
+    ApiEdgeActionTrigger[ApiEdgeActionTrigger["Method"] = 8] = "Method";
+    ApiEdgeActionTrigger[ApiEdgeActionTrigger["Relation"] = 16] = "Relation";
+    ApiEdgeActionTrigger[ApiEdgeActionTrigger["Query"] = 6] = "Query";
+    ApiEdgeActionTrigger[ApiEdgeActionTrigger["Any"] = 30] = "Any";
 })(exports.ApiEdgeActionTrigger || (exports.ApiEdgeActionTrigger = {}));
 var ApiEdgeActionTrigger = exports.ApiEdgeActionTrigger;
 (function (ApiEdgeActionTriggerKind) {

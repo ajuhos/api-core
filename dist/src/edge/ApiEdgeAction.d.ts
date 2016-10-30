@@ -2,10 +2,12 @@ import { QueryStep, ApiQueryScope } from "../query/ApiQuery";
 import { ApiEdgeQueryResponse } from "./ApiEdgeQueryResponse";
 import { ApiEdgeQueryType } from "./ApiEdgeQueryType";
 export declare enum ApiEdgeActionTrigger {
-    Query = 2,
-    Method = 4,
-    Relation = 8,
-    Any = 14,
+    OutputQuery = 2,
+    SubQuery = 4,
+    Method = 8,
+    Relation = 16,
+    Query = 6,
+    Any = 30,
 }
 export declare enum ApiEdgeActionTriggerKind {
     BeforeEvent = 0,

@@ -4,11 +4,13 @@ import {ApiEdgeQueryType} from "./ApiEdgeQueryType";
 
 export enum ApiEdgeActionTrigger {
 
-    Query = 1 << 1,
-    Method = 1 << 2,
-    Relation = 1 << 3,
+    OutputQuery = 1 << 1,
+    SubQuery = 1 << 2,
+    Method = 1 << 3,
+    Relation = 1 << 4,
 
-    Any = Query | Method | Relation
+    Query = OutputQuery | SubQuery,
+    Any = OutputQuery | Query | Method | Relation
 
 }
 

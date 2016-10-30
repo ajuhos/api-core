@@ -51,9 +51,9 @@ export declare class ExtendContextQueryStep implements QueryStep {
 export declare class ApiQueryBuilder {
     api: Api;
     constructor(api: Api);
-    private addQueryActions(triggerKind, query, edgeQuery, relation);
+    private addQueryActions(triggerKind, query, edgeQuery, relation, output?);
     private static addMethodCallStep(request, query, method);
-    private addQueryStep(query, step, relation?);
+    private addQueryStep(query, step, relation?, output?);
     private static buildProvideIdStep(query, currentSegment);
     private buildCheckStep(query, currentSegment);
     private buildReadStep(query, currentSegment);

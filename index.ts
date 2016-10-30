@@ -16,4 +16,6 @@ export {ApiRequestPathParser} from "./src/request/ApiRequestParser";
 export {ApiQuery, ApiQueryScope} from "./src/query/ApiQuery";
 export {ApiQueryBuilder} from "./src/query/ApiQueryBuilder";
 
+export {ApiEdgeAction, ApiEdgeActionTrigger, ApiEdgeActionTriggerKind} from "./src/edge/ApiEdgeAction";
+
 export {Api} from "./src/Api";
