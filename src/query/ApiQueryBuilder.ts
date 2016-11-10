@@ -14,6 +14,7 @@ import {OneToOneRelation} from "../relations/OneToOneRelation";
 import {Api} from "../Api";
 import {ApiEdgeMethod} from "../edge/ApiEdgeMethod";
 import {ApiEdgeAction, ApiEdgeActionTriggerKind, ApiEdgeActionTrigger} from "../edge/ApiEdgeAction";
+import {ApiAction, ApiActionTriggerKind} from "./ApiAction";
 
 export class QueryEdgeQueryStep implements QueryStep {
     query: ApiEdgeQuery;
@@ -237,7 +238,15 @@ export class ApiQueryBuilder {
                 (action.triggers & trigger))
         }
 
-        actions.forEach((action: ApiEdgeAction) => query.unshift(action))
+        actions.forEach((action: ApiEdgeAction) => query.unshift(action));
+
+        if(output) {
+            const apiTrigger = triggerKind == ApiEdgeActionTriggerKind.BeforeEvent ?
+                ApiActionTriggerKind.BeforeOutput : ApiActionTriggerKind.AfterOutput;
+            this.api.actions
+                .filter((action: ApiAction) => action.triggerKind == apiTrigger)
+                .forEach((action: ApiAction) => query.unshift(action))
+        }
     }
 
     private static addMethodCallStep(request: ApiRequest, query: ApiQuery, method: ApiEdgeMethod) {
@@ -367,7 +376,12 @@ export class ApiQueryBuilder {
             }
         }
 
-        //STEP 5: Return the completed query.
+        //STEP 5: Add OnInput actions
+        this.api.actions
+            .filter((action: ApiAction) => action.triggerKind == ApiActionTriggerKind.OnInput)
+            .forEach((action: ApiAction) => query.unshift(action));
+
+        //STEP 6: Return the completed query.
         return query
     };
 
@@ -455,7 +469,12 @@ export class ApiQueryBuilder {
             }
         }
 
-        //STEP 5: Return the completed query.
+        //STEP 5: Add OnInput actions
+        this.api.actions
+            .filter((action: ApiAction) => action.triggerKind == ApiActionTriggerKind.OnInput)
+            .forEach((action: ApiAction) => query.unshift(action));
+
+        //STEP 6: Return the completed query.
         return query
     };
 
@@ -476,7 +495,12 @@ export class ApiQueryBuilder {
         //STEP 3: Provide context for the base query.
         query.unshift(new SetBodyQueryStep(request.body));
 
-        //STEP 4: Return the completed query.
+        //STEP 4: Add OnInput actions
+        this.api.actions
+            .filter((action: ApiAction) => action.triggerKind == ApiActionTriggerKind.OnInput)
+            .forEach((action: ApiAction) => query.unshift(action));
+
+        //STEP 5: Return the completed query.
         return query
     };
 

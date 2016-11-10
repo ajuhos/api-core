@@ -10,6 +10,7 @@ var ApiEdgeQueryType_1 = require("../edge/ApiEdgeQueryType");
 var OneToOneRelation_1 = require("../relations/OneToOneRelation");
 var Api_1 = require("../Api");
 var ApiEdgeAction_1 = require("../edge/ApiEdgeAction");
+var ApiAction_1 = require("./ApiAction");
 var QueryEdgeQueryStep = (function () {
     function QueryEdgeQueryStep(query) {
         var _this = this;
@@ -188,6 +189,9 @@ var ApiQueryBuilder = (function () {
                     readMode = _this.buildCheckStep(query, currentSegment);
                 }
             }
+            _this.api.actions
+                .filter(function (action) { return action.triggerKind == ApiAction_1.ApiActionTriggerKind.OnInput; })
+                .forEach(function (action) { return query.unshift(action); });
             return query;
         };
         this.buildChangeQuery = function (request) {
@@ -258,6 +262,9 @@ var ApiQueryBuilder = (function () {
                     readMode = _this.buildCheckStep(query, currentSegment);
                 }
             }
+            _this.api.actions
+                .filter(function (action) { return action.triggerKind == ApiAction_1.ApiActionTriggerKind.OnInput; })
+                .forEach(function (action) { return query.unshift(action); });
             return query;
             var _a;
         };
@@ -269,6 +276,9 @@ var ApiQueryBuilder = (function () {
             }
             _this.addQueryStep(query, new QueryEdgeQueryStep(new ApiEdgeQuery_1.ApiEdgeQuery(lastSegment.edge, ApiEdgeQueryType_1.ApiEdgeQueryType.Create)));
             query.unshift(new SetBodyQueryStep(request.body));
+            _this.api.actions
+                .filter(function (action) { return action.triggerKind == ApiAction_1.ApiActionTriggerKind.OnInput; })
+                .forEach(function (action) { return query.unshift(action); });
             return query;
         };
         this.build = function (request) {
@@ -309,6 +319,13 @@ var ApiQueryBuilder = (function () {
             });
         }
         actions.forEach(function (action) { return query.unshift(action); });
+        if (output) {
+            var apiTrigger_1 = triggerKind == ApiEdgeAction_1.ApiEdgeActionTriggerKind.BeforeEvent ?
+                ApiAction_1.ApiActionTriggerKind.BeforeOutput : ApiAction_1.ApiActionTriggerKind.AfterOutput;
+            this.api.actions
+                .filter(function (action) { return action.triggerKind == apiTrigger_1; })
+                .forEach(function (action) { return query.unshift(action); });
+        }
     };
     ApiQueryBuilder.addMethodCallStep = function (request, query, method) {
         if (method.acceptedTypes & request.type) {

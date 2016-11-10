@@ -6,11 +6,12 @@ import { ApiEdgeMethod } from "./ApiEdgeMethod";
 import { ApiRequestType } from "../request/ApiRequest";
 import { ApiEdgeAction, ApiEdgeActionTriggerKind, ApiEdgeActionTrigger } from "./ApiEdgeAction";
 import { ApiEdgeQueryType } from "./ApiEdgeQueryType";
+import { ApiEdgeSchema } from "./ApiEdgeSchema";
 export interface ApiEdgeDefinition {
     name: string;
     pluralName: string;
     idField: string;
-    fields: string[];
+    schema: ApiEdgeSchema;
     methods: ApiEdgeMethod[];
     relations: ApiEdgeRelation[];
     actions: ApiEdgeAction[];
@@ -26,7 +27,7 @@ export declare abstract class ApiEdge implements ApiEdgeDefinition {
     name: string;
     pluralName: string;
     idField: string;
-    fields: string[];
+    schema: ApiEdgeSchema;
     methods: ApiEdgeMethod[];
     relations: ApiEdgeRelation[];
     actions: ApiEdgeAction[];
@@ -37,6 +38,7 @@ export declare abstract class ApiEdge implements ApiEdgeDefinition {
     patchEntry: (context: ApiEdgeQueryContext, entryFields: any) => Promise<ApiEdgeQueryResponse>;
     removeEntry: (context: ApiEdgeQueryContext, entryFields: any) => Promise<ApiEdgeQueryResponse>;
     exists: (context: ApiEdgeQueryContext) => Promise<ApiEdgeQueryResponse>;
+    use: (action: ApiEdgeAction) => this;
     action: (name: string, execute: (scope: ApiQueryScope) => Promise<ApiEdgeQueryResponse>, targetTypes?: ApiEdgeQueryType, triggerKind?: ApiEdgeActionTriggerKind, triggers?: ApiEdgeActionTrigger, triggerNames?: string[]) => ApiEdge;
     edgeMethod: (name: string, execute: (scope: ApiQueryScope) => Promise<ApiEdgeQueryResponse>, acceptedTypes?: ApiRequestType) => ApiEdge;
     collectionMethod: (name: string, execute: (scope: ApiQueryScope) => Promise<ApiEdgeQueryResponse>, acceptedTypes?: ApiRequestType) => ApiEdge;

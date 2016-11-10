@@ -11,19 +11,19 @@ var ApiEdgeQuery = (function () {
         this.execute = function () {
             switch (_this.type) {
                 case ApiEdgeQueryType_1.ApiEdgeQueryType.Get:
-                    return _this.edge.getEntry(_this.context);
+                    return _this.edge.getEntry(_this.context).then(_this.applySchema);
                 case ApiEdgeQueryType_1.ApiEdgeQueryType.Exists:
                     return _this.edge.exists(_this.context);
                 case ApiEdgeQueryType_1.ApiEdgeQueryType.Create:
-                    return _this.edge.createEntry(_this.context, _this.body);
+                    return _this.edge.createEntry(_this.context, _this.body).then(_this.applySchema);
                 case ApiEdgeQueryType_1.ApiEdgeQueryType.Delete:
-                    return _this.edge.removeEntry(_this.context, _this.body);
+                    return _this.edge.removeEntry(_this.context, _this.body).then(_this.applySchema);
                 case ApiEdgeQueryType_1.ApiEdgeQueryType.Update:
-                    return _this.edge.updateEntry(_this.context, _this.body);
+                    return _this.edge.updateEntry(_this.context, _this.body).then(_this.applySchema);
                 case ApiEdgeQueryType_1.ApiEdgeQueryType.Patch:
-                    return _this.edge.patchEntry(_this.context, _this.body);
+                    return _this.edge.patchEntry(_this.context, _this.body).then(_this.applySchema);
                 case ApiEdgeQueryType_1.ApiEdgeQueryType.List:
-                    return _this.edge.listEntries(_this.context);
+                    return _this.edge.listEntries(_this.context).then(_this.applyListSchema);
                 default:
                     throw new ApiEdgeError_1.ApiEdgeError(500, "Unsupported Query Type");
             }
@@ -33,6 +33,22 @@ var ApiEdgeQuery = (function () {
         this.context = context;
         this.body = body;
     }
+    ApiEdgeQuery.prototype.applySchemaOnItem = function (item) {
+        Object;
+    };
+    ApiEdgeQuery.prototype.applyListSchema = function (value) {
+        var _this = this;
+        if (!this.edge.schema)
+            return value;
+        value.data = value.data.map(function (item) { return _this.applySchemaOnItem(item); });
+        return value;
+    };
+    ApiEdgeQuery.prototype.applySchema = function (value) {
+        if (!this.edge.schema)
+            return value;
+        value.data = this.applySchemaOnItem(value.data);
+        return value;
+    };
     return ApiEdgeQuery;
 }());
 exports.ApiEdgeQuery = ApiEdgeQuery;

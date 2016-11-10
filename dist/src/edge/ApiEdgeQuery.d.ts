@@ -8,5 +8,8 @@ export declare class ApiEdgeQuery {
     context: ApiEdgeQueryContext;
     body: any;
     constructor(edge: ApiEdgeDefinition, type?: ApiEdgeQueryType, context?: ApiEdgeQueryContext, body?: any);
+    private applySchemaOnItem(item);
+    private applyListSchema(value);
+    private applySchema(value);
     execute: () => Promise<ApiEdgeQueryResponse>;
 }

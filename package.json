@@ -1,6 +1,6 @@
 {
   "name": "api-core",
-  "version": "0.2.1-1-alpha",
+  "version": "0.3.0",
   "description": "Model-based dynamic multi-level APIs for any provider, plus multiple consumption channels",
   "main": "dist/index.js",
   "scripts": {
@@ -50,5 +50,9 @@
     "sql",
     "transform",
     "web"
-  ]
+  ],
+  "dependencies": {
+    "deep-keys": "^0.3.0",
+    "obj-parse": "^0.3.0"
+  }
 }

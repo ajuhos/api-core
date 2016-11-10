@@ -15,6 +15,7 @@ var ApiQuery = (function () {
                 var next = function (scope) {
                     var step = _this.steps.shift();
                     if (step) {
+                        scope.step++;
                         if (_this.steps.length) {
                             step.execute(scope).then(next).catch(reject);
                         }
@@ -23,7 +24,15 @@ var ApiQuery = (function () {
                         }
                     }
                 };
-                next({ context: new ApiEdgeQueryContext_1.ApiEdgeQueryContext(), body: null, response: null, identity: identity });
+                next({
+                    context: new ApiEdgeQueryContext_1.ApiEdgeQueryContext(),
+                    body: null,
+                    request: _this.request,
+                    response: null,
+                    query: _this,
+                    step: 0,
+                    identity: identity
+                });
             });
         };
     }
