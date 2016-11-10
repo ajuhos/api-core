@@ -16,6 +16,10 @@ var ApiEdgeSchema = (function () {
             return transform;
         else if (transform === "=")
             return function (a) { return a; };
+        else if (transform[0] === "=") {
+            var fieldName = transform.substring(1), parsedField_1 = parse(fieldName);
+            return function (value, entry) { return parsedField_1(entry); };
+        }
         else
             throw "Not Supported Transform";
     };
