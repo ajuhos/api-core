@@ -9,10 +9,11 @@ var ApiEdgeQuery = (function () {
         if (context === void 0) { context = new ApiEdgeQueryContext_1.ApiEdgeQueryContext(); }
         if (body === void 0) { body = null; }
         this.applySchemaOnItem = function (item) {
+            var output = {};
             _this.edge.schema.transformations.forEach(function (transformation) {
-                return transformation.value.assign(item, transformation.apply(transformation.value(item), item));
+                return transformation.value.assign(output, transformation.apply(transformation.value(item), item));
             });
-            return item;
+            return output;
         };
         this.applyListSchema = function (value) {
             if (!_this.edge.schema)

@@ -45,9 +45,10 @@ export class ApiEdgeQuery {
     }
 
     private applySchemaOnItem = (item: any) => {
+        let output = {};
         this.edge.schema.transformations.forEach((transformation: ApiEdgeSchemaTransformation) =>
-            transformation.value.assign(item, transformation.apply(transformation.value(item), item)));
-        return item
+            transformation.value.assign(output, transformation.apply(transformation.value(item), item)));
+        return output
     };
 
     private applyListSchema = (value: ApiEdgeQueryResponse) => {
