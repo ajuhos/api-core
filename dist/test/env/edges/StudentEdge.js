@@ -10,6 +10,7 @@ var ModelEdge_1 = require("./ModelEdge");
 var ApiEdgeError_1 = require("../../../src/query/ApiEdgeError");
 var ApiRequest_1 = require("../../../src/request/ApiRequest");
 var ApiEdgeQueryResponse_1 = require("../../../src/edge/ApiEdgeQueryResponse");
+var ApiEdgeSchema_1 = require("../../../src/edge/ApiEdgeSchema");
 var StudentEdge = (function (_super) {
     __extends(StudentEdge, _super);
     function StudentEdge() {
@@ -17,6 +18,15 @@ var StudentEdge = (function (_super) {
         _super.call(this);
         this.name = "student";
         this.pluralName = "students";
+        this.schema = new ApiEdgeSchema_1.ApiEdgeSchema({
+            id: "=",
+            firstName: "=",
+            lastName: "=",
+            email: "=",
+            phone: "=",
+            schoolId: "=",
+            classId: "="
+        });
         this.provider = RawDataProvider_1.RawDataProvider.students;
         this.createModel = function (obj) { return new Student_1.Student(obj); };
         this.entryMethod("rename", function (scope) {

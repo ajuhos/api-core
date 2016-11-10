@@ -5,10 +5,21 @@ import {ApiQueryScope} from "../../../src/query/ApiQuery";
 import {ApiEdgeError} from "../../../src/query/ApiEdgeError";
 import {ApiRequestType} from "../../../src/request/ApiRequest";
 import {ApiEdgeQueryResponse} from "../../../src/edge/ApiEdgeQueryResponse";
+import {ApiEdgeSchema} from "../../../src/edge/ApiEdgeSchema";
 
 export class StudentEdge extends ModelEdge<Student> {
     name = "student";
     pluralName = "students";
+
+    schema = new ApiEdgeSchema({
+        id: "=",
+        firstName: "=",
+        lastName: "=",
+        email: "=",
+        phone: "=",
+        schoolId: "=",
+        classId: "="
+    });
 
     provider = RawDataProvider.students;
     protected createModel = (obj: any): Student => new Student(obj);

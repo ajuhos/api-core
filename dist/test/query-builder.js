@@ -84,7 +84,7 @@ tap.test('/schools', function (t) {
         t.equal(resp.metadata, null);
         t.end();
     })
-        .catch(function () {
+        .catch(function (e) {
         t.ok(false, "a valid query should not fail");
         t.end();
     });
@@ -318,7 +318,9 @@ tap.test('PUT /schools/s2', function (t) {
         .then(function (resp) {
         t.same(resp.data, {
             id: "s2",
-            name: "Cool School"
+            name: "Cool School",
+            address: null,
+            phone: null
         });
         t.equal(resp.metadata, null);
         t.end();

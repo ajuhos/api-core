@@ -100,7 +100,7 @@ tap.test('/schools', (t: any) => {
             t.equal(resp.metadata, null);
             t.end()
         })
-        .catch(() => {
+        .catch((e) => {
             t.ok(false, "a valid query should not fail");
             t.end()
         });
@@ -375,7 +375,9 @@ tap.test('PUT /schools/s2', (t: any) => {
             t.same(resp.data,
                 {
                     id: "s2",
-                    name: "Cool School"
+                    name: "Cool School",
+                    address: null,
+                    phone: null
                 });
             t.equal(resp.metadata, null);
             t.end()

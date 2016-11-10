@@ -3,6 +3,7 @@ import {ApiEdgeQueryType} from './ApiEdgeQueryType';
 import {ApiEdgeQueryContext} from "./ApiEdgeQueryContext";
 import {ApiEdgeQueryResponse} from "./ApiEdgeQueryResponse";
 import {ApiEdgeError} from "../query/ApiEdgeError";
+import {ApiEdgeSchemaTransformation} from "./ApiEdgeSchema";
 
 export class ApiEdgeQuery {
 
@@ -43,25 +44,27 @@ export class ApiEdgeQuery {
         this.body = body;
     }
 
-    private applySchemaOnItem(item: any) {
-        Object
-    }
+    private applySchemaOnItem = (item: any) => {
+        this.edge.schema.transformations.forEach((transformation: ApiEdgeSchemaTransformation) =>
+            transformation.value.assign(item, transformation.apply(transformation.value(item), item)));
+        return item
+    };
 
-    private applyListSchema(value: ApiEdgeQueryResponse) {
+    private applyListSchema = (value: ApiEdgeQueryResponse) => {
         if(!this.edge.schema)
             return value;
 
         value.data = (value.data as any[]).map((item: any) => this.applySchemaOnItem(item));
         return value
-    }
+    };
 
-    private applySchema(value: ApiEdgeQueryResponse): ApiEdgeQueryResponse|Promise<ApiEdgeQueryResponse> {
+    private applySchema = (value: ApiEdgeQueryResponse): ApiEdgeQueryResponse|Promise<ApiEdgeQueryResponse> => {
         if(!this.edge.schema)
             return value;
 
         value.data = this.applySchemaOnItem(value.data);
         return value
-    }
+    };
 
     execute = (): Promise<ApiEdgeQueryResponse> => {
         switch (this.type) {

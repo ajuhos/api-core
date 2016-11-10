@@ -7,12 +7,19 @@ var __extends = (this && this.__extends) || function (d, b) {
 var RawDataProvider_1 = require("../data/RawDataProvider");
 var ModelEdge_1 = require("./ModelEdge");
 var Course_1 = require("../model/Course");
+var ApiEdgeSchema_1 = require("../../../src/edge/ApiEdgeSchema");
 var CourseEdge = (function (_super) {
     __extends(CourseEdge, _super);
     function CourseEdge() {
         _super.apply(this, arguments);
         this.name = "course";
         this.pluralName = "courses";
+        this.schema = new ApiEdgeSchema_1.ApiEdgeSchema({
+            id: "=",
+            name: "=",
+            classId: "=",
+            courseTypeId: "="
+        });
         this.provider = RawDataProvider_1.RawDataProvider.courses;
         this.createModel = function (obj) { return new Course_1.Course(obj); };
     }

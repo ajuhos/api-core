@@ -8,6 +8,24 @@ var ApiEdgeQuery = (function () {
         if (type === void 0) { type = ApiEdgeQueryType_1.ApiEdgeQueryType.Get; }
         if (context === void 0) { context = new ApiEdgeQueryContext_1.ApiEdgeQueryContext(); }
         if (body === void 0) { body = null; }
+        this.applySchemaOnItem = function (item) {
+            _this.edge.schema.transformations.forEach(function (transformation) {
+                return transformation.value.assign(item, transformation.apply(transformation.value(item), item));
+            });
+            return item;
+        };
+        this.applyListSchema = function (value) {
+            if (!_this.edge.schema)
+                return value;
+            value.data = value.data.map(function (item) { return _this.applySchemaOnItem(item); });
+            return value;
+        };
+        this.applySchema = function (value) {
+            if (!_this.edge.schema)
+                return value;
+            value.data = _this.applySchemaOnItem(value.data);
+            return value;
+        };
         this.execute = function () {
             switch (_this.type) {
                 case ApiEdgeQueryType_1.ApiEdgeQueryType.Get:
@@ -33,22 +51,6 @@ var ApiEdgeQuery = (function () {
         this.context = context;
         this.body = body;
     }
-    ApiEdgeQuery.prototype.applySchemaOnItem = function (item) {
-        Object;
-    };
-    ApiEdgeQuery.prototype.applyListSchema = function (value) {
-        var _this = this;
-        if (!this.edge.schema)
-            return value;
-        value.data = value.data.map(function (item) { return _this.applySchemaOnItem(item); });
-        return value;
-    };
-    ApiEdgeQuery.prototype.applySchema = function (value) {
-        if (!this.edge.schema)
-            return value;
-        value.data = this.applySchemaOnItem(value.data);
-        return value;
-    };
     return ApiEdgeQuery;
 }());
 exports.ApiEdgeQuery = ApiEdgeQuery;
