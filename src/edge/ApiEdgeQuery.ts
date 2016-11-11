@@ -27,6 +27,8 @@ export class ApiEdgeQuery {
      */
     body: any;
 
+    private originalFields: string[] = [];
+
     /**
      * Create a new API Edge Query for the specified API Edge with the specified parameters.
      * @param {ApiEdgeDefinition} edge
@@ -44,12 +46,41 @@ export class ApiEdgeQuery {
         this.body = body;
     }
 
-    private applySchemaOnItem = (item: any) => {
+    private applySchemaOnInputItem = (item: any) => {
         let output = {};
-        this.edge.schema.transformations.forEach((transformation: ApiEdgeSchemaTransformation) =>
-            transformation.value.assign(output, transformation.apply(transformation.value(item), item)));
+        this.edge.schema.transformations.forEach((transformation: ApiEdgeSchemaTransformation) => {
+            if(transformation.parsedField(item) !== undefined)
+                transformation.applyToInput(item, output)
+        });
+
         return output
     };
+
+    private applySchemaOnItem = (item: any): any => {
+        let output = {};
+
+        if(this.context.fields.length) {
+            this.edge.schema.transformations.forEach((transformation: ApiEdgeSchemaTransformation) => {
+                if(this.originalFields.indexOf(transformation.affectedSchemaField) != -1)
+                    transformation.applyToOutput(item, output)
+            });
+        }
+        else {
+            this.edge.schema.transformations.forEach((transformation: ApiEdgeSchemaTransformation) => {
+                transformation.applyToOutput(item, output)
+            });
+        }
+
+        return output
+    };
+
+/*    private applyInputListSchema = (value: ApiEdgeQueryResponse) => {
+        if(!this.edge.schema)
+            return value;
+
+        value.data = (value.data as any[]).map((item: any) => this.applySchemaOnInputItem(item));
+        return value
+    };*/
 
     private applyListSchema = (value: ApiEdgeQueryResponse) => {
         if(!this.edge.schema)
@@ -57,6 +88,13 @@ export class ApiEdgeQuery {
 
         value.data = (value.data as any[]).map((item: any) => this.applySchemaOnItem(item));
         return value
+    };
+
+    private applyInputSchema = (value: any): any|Promise<any> => {
+        if(!this.edge.schema)
+            return value;
+
+        return this.applySchemaOnInputItem(value)
     };
 
     private applySchema = (value: ApiEdgeQueryResponse): ApiEdgeQueryResponse|Promise<ApiEdgeQueryResponse> => {
@@ -68,6 +106,15 @@ export class ApiEdgeQuery {
     };
 
     execute = (): Promise<ApiEdgeQueryResponse> => {
+        if(this.body) {
+            this.body = this.applyInputSchema(this.body)
+        }
+
+        if(this.context.fields.length) {
+            this.originalFields = this.context.fields;
+            this.context.fields = this.edge.schema.transformFields(this.context.fields);
+        }
+
         switch (this.type) {
             case ApiEdgeQueryType.Get:
                 return this.edge.getEntry(this.context).then(this.applySchema);

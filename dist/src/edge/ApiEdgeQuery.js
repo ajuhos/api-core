@@ -8,11 +8,28 @@ var ApiEdgeQuery = (function () {
         if (type === void 0) { type = ApiEdgeQueryType_1.ApiEdgeQueryType.Get; }
         if (context === void 0) { context = new ApiEdgeQueryContext_1.ApiEdgeQueryContext(); }
         if (body === void 0) { body = null; }
-        this.applySchemaOnItem = function (item) {
+        this.originalFields = [];
+        this.applySchemaOnInputItem = function (item) {
             var output = {};
             _this.edge.schema.transformations.forEach(function (transformation) {
-                return transformation.value.assign(output, transformation.apply(transformation.value(item), item));
+                if (transformation.parsedField(item) !== undefined)
+                    transformation.applyToInput(item, output);
             });
+            return output;
+        };
+        this.applySchemaOnItem = function (item) {
+            var output = {};
+            if (_this.context.fields.length) {
+                _this.edge.schema.transformations.forEach(function (transformation) {
+                    if (_this.originalFields.indexOf(transformation.affectedSchemaField) != -1)
+                        transformation.applyToOutput(item, output);
+                });
+            }
+            else {
+                _this.edge.schema.transformations.forEach(function (transformation) {
+                    transformation.applyToOutput(item, output);
+                });
+            }
             return output;
         };
         this.applyListSchema = function (value) {
@@ -21,6 +38,11 @@ var ApiEdgeQuery = (function () {
             value.data = value.data.map(function (item) { return _this.applySchemaOnItem(item); });
             return value;
         };
+        this.applyInputSchema = function (value) {
+            if (!_this.edge.schema)
+                return value;
+            return _this.applySchemaOnInputItem(value);
+        };
         this.applySchema = function (value) {
             if (!_this.edge.schema)
                 return value;
@@ -28,6 +50,13 @@ var ApiEdgeQuery = (function () {
             return value;
         };
         this.execute = function () {
+            if (_this.body) {
+                _this.body = _this.applyInputSchema(_this.body);
+            }
+            if (_this.context.fields.length) {
+                _this.originalFields = _this.context.fields;
+                _this.context.fields = _this.edge.schema.transformFields(_this.context.fields);
+            }
             switch (_this.type) {
                 case ApiEdgeQueryType_1.ApiEdgeQueryType.Get:
                     return _this.edge.getEntry(_this.context).then(_this.applySchema);

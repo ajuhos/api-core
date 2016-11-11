@@ -3,7 +3,7 @@ export {ApiEdgeQueryType} from "./src/edge/ApiEdgeQueryType";
 export {ApiEdgeQueryContext} from "./src/edge/ApiEdgeQueryContext";
 export {ApiEdgeQueryResponse} from "./src/edge/ApiEdgeQueryResponse";
 export {ApiEdgeQueryFilter, ApiEdgeQueryFilterType} from "./src/edge/ApiEdgeQueryFilter";
-export {ApiEdgeSchema} from "./src/edge/ApiEdgeSchema";
+export {ApiEdgeSchema, ApiEdgeSchemaTransformation} from "./src/edge/ApiEdgeSchema";
 export {ApiEdgeQuery} from "./src/edge/ApiEdgeQuery";
 export {ApiEdgeError} from "./src/query/ApiEdgeError";
 
