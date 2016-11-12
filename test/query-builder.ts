@@ -168,7 +168,7 @@ tap.test('/schools/s1/classes', (t: any) => {
                     {
                         id: "c1",
                         name: "A",
-                        semester: 1,
+                        year: 1,
                         room: "Room 1",
                         schoolId: "s1"
                     }
@@ -200,7 +200,7 @@ tap.test('/schools/s1/classes/c1', (t: any) => {
                 {
                     id: "c1",
                     name: "A",
-                    semester: 1,
+                    year: 1,
                     room: "Room 1",
                     schoolId: "s1"
                 });
@@ -229,7 +229,7 @@ tap.test('/students/s2/class', (t: any) => {
             t.same(resp.data, {
                 id: "c1",
                 name: "A",
-                semester: 1,
+                year: 1,
                 room: "Room 1",
                 schoolId: "s1"
             });
@@ -404,8 +404,8 @@ tap.test('GET /students/s2/rename', (t: any) => {
     t.end()
 });
 
-tap.test('/students/s2/withFullName', (t: any) => {
-    const request = api.parseRequest([ 'students', 's2', 'withFullName' ]),
+tap.test('/students/s2/withHungarianName', (t: any) => {
+    const request = api.parseRequest([ 'students', 's2', 'withHungarianName' ]),
         query = api.buildQuery(request);
 
     t.equal(query.steps.length, 5, 'should build an 5 step query');
@@ -413,17 +413,15 @@ tap.test('/students/s2/withFullName', (t: any) => {
     t.ok(query.steps[1] instanceof builder.QueryEdgeQueryStep, 'QUERY /students');
     t.ok(query.steps[2] instanceof builder.ExtendContextQueryStep, 'APPLY PARAMS');
     t.ok(query.steps[3] instanceof builder.ProvideIdQueryStep, 'PROVIDE ID');
-    t.ok(query.steps[4] instanceof builder.CallMethodQueryStep, 'call{withFullName}');
+    t.ok(query.steps[4] instanceof builder.CallMethodQueryStep, 'call{withHungarianName}');
 
     query.execute()
         .then(resp => {
             t.same(resp.data, {
                 id: "s2",
-                firstName: "Dave",
-                lastName: "Test",
                 fullName: "Dave Test",
+                hungarianName: "Test Dave",
                 email: "dave.test@gmail.com",
-                phone: "347633445",
                 schoolId: "s1",
                 classId: "c1"
             });
@@ -439,7 +437,7 @@ tap.test('/students/s2/withFullName', (t: any) => {
 tap.test('POST /students/s2/rename', (t: any) => {
     const request = api.parseRequest([ 'students', 's2', 'rename' ]);
     request.type = ApiRequestType.Update;
-    request.body = { name: "David Test" };
+    request.body = { name: "Test David" };
 
     const query = api.buildQuery(request);
 
@@ -454,10 +452,8 @@ tap.test('POST /students/s2/rename', (t: any) => {
         .then(resp => {
             t.same(resp.data, {
                 id: "s2",
-                firstName: "David",
-                lastName: "Test",
+                fullName: "David Test",
                 email: "dave.test@gmail.com",
-                phone: "347633445",
                 schoolId: "s1",
                 classId: "c1"
             });

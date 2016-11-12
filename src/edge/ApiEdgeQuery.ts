@@ -59,7 +59,7 @@ export class ApiEdgeQuery {
     private applySchemaOnItem = (item: any): any => {
         let output = {};
 
-        if(this.context.fields.length) {
+        if(this.originalFields.length) {
             this.edge.schema.transformations.forEach((transformation: ApiEdgeSchemaTransformation) => {
                 if(this.originalFields.indexOf(transformation.affectedSchemaField) != -1)
                     transformation.applyToOutput(item, output)
@@ -106,13 +106,13 @@ export class ApiEdgeQuery {
     };
 
     execute = (): Promise<ApiEdgeQueryResponse> => {
-        if(this.body) {
-            this.body = this.applyInputSchema(this.body)
-        }
-
         if(this.context.fields.length) {
             this.originalFields = this.context.fields;
             this.context.fields = this.edge.schema.transformFields(this.context.fields);
+        }
+
+        if(this.body) {
+            this.body = this.applyInputSchema(this.body)
         }
 
         switch (this.type) {

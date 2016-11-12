@@ -19,7 +19,7 @@ var ApiEdgeQuery = (function () {
         };
         this.applySchemaOnItem = function (item) {
             var output = {};
-            if (_this.context.fields.length) {
+            if (_this.originalFields.length) {
                 _this.edge.schema.transformations.forEach(function (transformation) {
                     if (_this.originalFields.indexOf(transformation.affectedSchemaField) != -1)
                         transformation.applyToOutput(item, output);
@@ -50,12 +50,12 @@ var ApiEdgeQuery = (function () {
             return value;
         };
         this.execute = function () {
-            if (_this.body) {
-                _this.body = _this.applyInputSchema(_this.body);
-            }
             if (_this.context.fields.length) {
                 _this.originalFields = _this.context.fields;
                 _this.context.fields = _this.edge.schema.transformFields(_this.context.fields);
+            }
+            if (_this.body) {
+                _this.body = _this.applyInputSchema(_this.body);
             }
             switch (_this.type) {
                 case ApiEdgeQueryType_1.ApiEdgeQueryType.Get:

@@ -5,7 +5,9 @@ import {ApiQueryScope} from "../../../src/query/ApiQuery";
 import {ApiEdgeError} from "../../../src/query/ApiEdgeError";
 import {ApiRequestType} from "../../../src/request/ApiRequest";
 import {ApiEdgeQueryResponse} from "../../../src/edge/ApiEdgeQueryResponse";
-import {ApiEdgeSchema} from "../../../src/edge/ApiEdgeSchema";
+import {ApiEdgeSchema, ApiEdgeSchemaTransformation} from "../../../src/edge/ApiEdgeSchema";
+import {ApiEdgeQuery} from "../../../src/edge/ApiEdgeQuery";
+import {ApiEdgeQueryType} from "../../../src/edge/ApiEdgeQueryType";
 
 export class StudentEdge extends ModelEdge<Student> {
     name = "student";
@@ -13,10 +15,19 @@ export class StudentEdge extends ModelEdge<Student> {
 
     schema = new ApiEdgeSchema({
         id: "=",
-        firstName: "=",
-        lastName: "=",
+        fullName: new ApiEdgeSchemaTransformation(
+            (schema: any, model: any) => {
+                const parts = schema.fullName.split(' ');
+                if(parts.length != 2) throw new ApiEdgeError(400, "Invalid full name");
+                model.firstName = parts[0];
+                model.lastName = parts[1]
+            },
+            (model: any, schema: any) => {
+                schema.fullName = [ model.firstName, model.lastName ].join(' ')
+            },
+            [ "firstName", "lastName" ]
+        ),
         email: "=",
-        phone: "=",
         schoolId: "=",
         classId: "="
     });
@@ -27,35 +38,16 @@ export class StudentEdge extends ModelEdge<Student> {
     constructor() {
         super();
 
-        this.entryMethod("rename", (scope: ApiQueryScope): Promise<ApiEdgeQueryResponse> => {
-            return new Promise((resolve, reject) => {
-                if(!scope.body || !scope.body.name)
-                    return reject(new ApiEdgeError(422, "No Name Provided"));
+        this.entryMethod("rename", (scope: ApiQueryScope): Promise<ApiEdgeQueryResponse> =>
+            new Promise((resolve, reject) =>
+                (new ApiEdgeQuery(this, ApiEdgeQueryType.Patch, scope.context, {
+                    fullName: scope.body.name.split(' ').reverse().join(' ')
+                })).execute().then(resolve, reject)), ApiRequestType.Change);
 
-                const nameParts = scope.body.name.split(' ');
-
-                if(nameParts.length != 2 ||
-                    !nameParts[0].length ||
-                    !nameParts[1].length)
-                    return reject(new ApiEdgeError(422, "Invalid Name Provided"));
-
-                this.getEntry(scope.context).then((response: any) => {
-                    const student = response.data;
-                    student.firstName = nameParts[0];
-                    student.lastName = nameParts[1];
-
-                    resolve(new ApiEdgeQueryResponse(student))
-                }).catch(reject);
-            })
-        }, ApiRequestType.Change);
-
-        this.entryMethod("withFullName", (scope: ApiQueryScope): Promise<ApiEdgeQueryResponse> => {
-            return new Promise((resolve, reject) => {
-                if(!scope.response)
-                    return reject(new ApiEdgeError(404, "Not Found"));
-
-                const student = JSON.parse(JSON.stringify(scope.response.data));
-                student.fullName = [ student.firstName, student.lastName ].join(' ');
+        this.entryMethod("withHungarianName", (scope: ApiQueryScope): Promise<ApiEdgeQueryResponse> => {
+            return new Promise(resolve => {
+                const student = JSON.parse(JSON.stringify((scope.response || {} as any).data));
+                student.hungarianName = student.fullName.split(' ').reverse().join(' ');
                 resolve(new ApiEdgeQueryResponse(student))
             })
         }, ApiRequestType.Read)

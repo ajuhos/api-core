@@ -9,6 +9,10 @@ var ApiEdgeSchemaTransformation = (function () {
         this.affectedModelFields = modelFields;
         this.parsedField = parse(schemaField);
     }
+    ApiEdgeSchemaTransformation.prototype.setSchemaField = function (field) {
+        this.affectedSchemaField = field;
+        this.parsedField = parse(field);
+    };
     return ApiEdgeSchemaTransformation;
 }());
 exports.ApiEdgeSchemaTransformation = ApiEdgeSchemaTransformation;
@@ -62,7 +66,7 @@ var ApiEdgeSchema = (function () {
     ApiEdgeSchema.prototype.createTransformation = function (schemaField, schema) {
         var parsedSchemaField = parse(schemaField), transform = parsedSchemaField(schema);
         if (transform instanceof ApiEdgeSchemaTransformation) {
-            transform.affectedSchemaField = schemaField;
+            transform.setSchemaField(schemaField);
             var transformedFields_1 = this.fieldMatrix[transform.affectedSchemaField];
             if (transformedFields_1) {
                 transform.affectedModelFields.forEach(function (field) { return transformedFields_1.push(field); });

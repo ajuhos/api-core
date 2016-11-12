@@ -10,7 +10,7 @@ export class ClassEdge extends ModelEdge<Class> {
     schema = new ApiEdgeSchema({
         id: "=",
         name: "=",
-        semester: "=",
+        year: "=semester",
         room: "=",
         schoolId: "="
     });

@@ -18,6 +18,11 @@ export class ApiEdgeSchemaTransformation {
         this.affectedModelFields = modelFields;
         this.parsedField = parse(schemaField);
     }
+
+    setSchemaField(field: string) {
+        this.affectedSchemaField = field;
+        this.parsedField = parse(field);
+    }
 }
 
 export class ApiEdgeSchema {
@@ -70,7 +75,7 @@ export class ApiEdgeSchema {
             transform: string|ApiEdgeSchemaTransformation = parsedSchemaField(schema);
 
         if(transform instanceof ApiEdgeSchemaTransformation) {
-            transform.affectedSchemaField = schemaField;
+            transform.setSchemaField(schemaField);
 
             let transformedFields = this.fieldMatrix[transform.affectedSchemaField];
             if(transformedFields) {

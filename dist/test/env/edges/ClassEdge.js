@@ -17,7 +17,7 @@ var ClassEdge = (function (_super) {
         this.schema = new ApiEdgeSchema_1.ApiEdgeSchema({
             id: "=",
             name: "=",
-            semester: "=",
+            year: "=semester",
             room: "=",
             schoolId: "="
         });
