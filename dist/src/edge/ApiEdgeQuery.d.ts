@@ -7,6 +7,12 @@ export declare class ApiEdgeQuery {
     type: ApiEdgeQueryType;
     context: ApiEdgeQueryContext;
     body: any;
+    private originalFields;
     constructor(edge: ApiEdgeDefinition, type?: ApiEdgeQueryType, context?: ApiEdgeQueryContext, body?: any);
+    private applySchemaOnInputItem;
+    private applySchemaOnItem;
+    private applyListSchema;
+    private applyInputSchema;
+    private applySchema;
     execute: () => Promise<ApiEdgeQueryResponse>;
 }

@@ -6,6 +6,7 @@ Lightweight framework for building dynamic multi-level APIs for any provider (Ex
 [![GitHub issues](https://img.shields.io/github/issues/ajuhos/api-core.svg)](https://github.com/ajuhos/api-core/issues)
 [![Build Status](https://travis-ci.org/ajuhos/api-core.svg?branch=master)](https://travis-ci.org/ajuhos/api-core)
 [![Coverage Status](https://coveralls.io/repos/github/ajuhos/api-core/badge.svg?branch=master)](https://coveralls.io/github/ajuhos/api-core?branch=master)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/4b1dd6ebe9eb4634aef02811c374efaf)](https://www.codacy.com/app/ajuhos/api-core?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ajuhos/api-core&amp;utm_campaign=Badge_Grade)
 
 ## Features
 

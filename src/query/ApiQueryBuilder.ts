@@ -13,6 +13,8 @@ import {ApiEdgeQueryType} from "../edge/ApiEdgeQueryType";
 import {OneToOneRelation} from "../relations/OneToOneRelation";
 import {Api} from "../Api";
 import {ApiEdgeMethod} from "../edge/ApiEdgeMethod";
+import {ApiEdgeAction, ApiEdgeActionTriggerKind, ApiEdgeActionTrigger} from "../edge/ApiEdgeAction";
+import {ApiAction, ApiActionTriggerKind} from "./ApiAction";
 
 export class QueryEdgeQueryStep implements QueryStep {
     query: ApiEdgeQuery;
@@ -25,7 +27,7 @@ export class QueryEdgeQueryStep implements QueryStep {
         return new Promise((resolve, reject) => {
             this.query.body = scope.body;
             this.query.context = scope.context;
-            //console.log(`QUERY /${this.query.edge.pluralName}`, scope.context);
+
             this.query.execute().then((response) => {
                 scope.context = new ApiEdgeQueryContext();
                 scope.response = response;
@@ -210,18 +212,61 @@ export class ApiQueryBuilder {
         this.api = api;
     }
 
+    private addQueryActions(triggerKind: ApiEdgeActionTriggerKind,
+                            query: ApiQuery,
+                            edgeQuery: ApiEdgeQuery,
+                            relation: ApiEdgeRelation|null,
+                            output: boolean = false) {
+        const edge = edgeQuery.edge,
+            queryType = edgeQuery.type,
+            trigger = relation ?
+                ApiEdgeActionTrigger.Relation :
+                (output ? ApiEdgeActionTrigger.OutputQuery : ApiEdgeActionTrigger.SubQuery);
+
+        let actions: ApiEdgeAction[];
+        if(relation) {
+            actions = edge.actions.filter((action: ApiEdgeAction) =>
+                action.triggerKind == triggerKind &&
+                (action.targetTypes & queryType) &&
+                (action.triggers & trigger) &&
+                (!action.triggerNames.length || action.triggerNames.indexOf(relation.name) == -1))
+        }
+        else {
+            actions = edge.actions.filter((action: ApiEdgeAction) =>
+                action.triggerKind == triggerKind &&
+                (action.targetTypes & queryType) &&
+                (action.triggers & trigger))
+        }
+
+        actions.forEach((action: ApiEdgeAction) => query.unshift(action));
+
+        if(output) {
+            const apiTrigger = triggerKind == ApiEdgeActionTriggerKind.BeforeEvent ?
+                ApiActionTriggerKind.BeforeOutput : ApiActionTriggerKind.AfterOutput;
+            this.api.actions
+                .filter((action: ApiAction) => action.triggerKind == apiTrigger)
+                .forEach((action: ApiAction) => query.unshift(action))
+        }
+    }
+
     private static addMethodCallStep(request: ApiRequest, query: ApiQuery, method: ApiEdgeMethod) {
         if(method.acceptedTypes & request.type) {
+            //TODO: this.addPostMethodActions(request, query, method);
             query.unshift(new CallMethodQueryStep(method));
+            //TODO: this.addPreMethodActions(request, query, method);
         }
         else {
             throw new ApiEdgeError(405, "Method Not Allowed");
         }
     }
 
-    private addQueryStep(query: ApiQuery, step: QueryEdgeQueryStep) {
-        //TODO: Add support for pre- and post-query steps.
+    private addQueryStep(query: ApiQuery,
+                         step: QueryEdgeQueryStep,
+                         relation: ApiEdgeRelation|null = null,
+                         output: boolean = false) {
+        this.addQueryActions(ApiEdgeActionTriggerKind.AfterEvent, query, step.query, relation, output);
         query.unshift(step);
+        this.addQueryActions(ApiEdgeActionTriggerKind.BeforeEvent, query, step.query, relation, output);
     }
 
     private static buildProvideIdStep(query: ApiQuery, currentSegment: PathSegment): boolean {
@@ -247,7 +292,7 @@ export class ApiQueryBuilder {
             return false
         }
         else if(currentSegment instanceof RelatedFieldPathSegment) {
-            this.addQueryStep(query, new QueryEdgeQueryStep(new ApiEdgeQuery(currentSegment.relation.to, ApiEdgeQueryType.Get)));
+            this.addQueryStep(query, new QueryEdgeQueryStep(new ApiEdgeQuery(currentSegment.relation.to, ApiEdgeQueryType.Get)), currentSegment.relation);
         }
         else {
             //TODO: Add support for method calls (non-base query case)
@@ -261,7 +306,7 @@ export class ApiQueryBuilder {
     private buildReadStep(query: ApiQuery, currentSegment: PathSegment): boolean {
         //STEP 1: Create the read query.
         if(currentSegment instanceof RelatedFieldPathSegment) {
-            this.addQueryStep(query, new QueryEdgeQueryStep(new ApiEdgeQuery(currentSegment.relation.to, ApiEdgeQueryType.Get)));
+            this.addQueryStep(query, new QueryEdgeQueryStep(new ApiEdgeQuery(currentSegment.relation.to, ApiEdgeQueryType.Get)), currentSegment.relation);
         }
         else {
             this.addQueryStep(query, new QueryEdgeQueryStep(new ApiEdgeQuery(currentSegment.edge, ApiEdgeQueryType.Get)));
@@ -281,11 +326,11 @@ export class ApiQueryBuilder {
         let baseQuery: ApiEdgeQuery;
         if(lastSegment instanceof EdgePathSegment) {
             baseQuery = new ApiEdgeQuery(lastSegment.edge, ApiEdgeQueryType.List);
-            this.addQueryStep(query, new QueryEdgeQueryStep(baseQuery));
+            this.addQueryStep(query, new QueryEdgeQueryStep(baseQuery), null, true);
         }
         else if(lastSegment instanceof RelatedFieldPathSegment) {
             baseQuery = new ApiEdgeQuery(lastSegment.relation.to, ApiEdgeQueryType.Get);
-            this.addQueryStep(query, new QueryEdgeQueryStep(baseQuery));
+            this.addQueryStep(query, new QueryEdgeQueryStep(baseQuery), lastSegment.relation, true);
 
         }
         else if(lastSegment instanceof MethodPathSegment) {
@@ -294,7 +339,7 @@ export class ApiQueryBuilder {
         }
         else {
             baseQuery = new ApiEdgeQuery(lastSegment.edge, ApiEdgeQueryType.Get);
-            this.addQueryStep(query, new QueryEdgeQueryStep(baseQuery));
+            this.addQueryStep(query, new QueryEdgeQueryStep(baseQuery), null, true);
         }
 
         //STEP 2: Provide context for the base query.
@@ -331,7 +376,12 @@ export class ApiQueryBuilder {
             }
         }
 
-        //STEP 5: Return the completed query.
+        //STEP 5: Add OnInput actions
+        this.api.actions
+            .filter((action: ApiAction) => action.triggerKind == ApiActionTriggerKind.OnInput)
+            .forEach((action: ApiAction) => query.unshift(action));
+
+        //STEP 6: Return the completed query.
         return query
     };
 
@@ -348,11 +398,11 @@ export class ApiQueryBuilder {
             if(request.type === ApiRequestType.Update) {
                 baseQuery = new ApiEdgeQuery(lastSegment.edge, ApiEdgeQueryType.Patch);
                 request.body = { [lastSegment.relation.relationId]: request.body.id||request.body._id };
-                this.addQueryStep(query, new QueryEdgeQueryStep(baseQuery));
+                this.addQueryStep(query, new QueryEdgeQueryStep(baseQuery), null, true);
             }
             else if(request.type === ApiRequestType.Patch) {
                 baseQuery = new ApiEdgeQuery(lastSegment.relation.to, ApiEdgeQueryType.Patch);
-                this.addQueryStep(query, new QueryEdgeQueryStep(baseQuery));
+                this.addQueryStep(query, new QueryEdgeQueryStep(baseQuery), null, true);
             }
             else {
                 throw new ApiEdgeError(400, "Invalid Delete Query");
@@ -366,15 +416,15 @@ export class ApiQueryBuilder {
         else {
             if(request.type === ApiRequestType.Update) {
                 baseQuery = new ApiEdgeQuery(lastSegment.edge, ApiEdgeQueryType.Update);
-                this.addQueryStep(query, new QueryEdgeQueryStep(baseQuery));
+                this.addQueryStep(query, new QueryEdgeQueryStep(baseQuery), null, true);
             }
             else if(request.type === ApiRequestType.Patch) {
                 baseQuery = new ApiEdgeQuery(lastSegment.edge, ApiEdgeQueryType.Patch);
-                this.addQueryStep(query, new QueryEdgeQueryStep(baseQuery));
+                this.addQueryStep(query, new QueryEdgeQueryStep(baseQuery), null, true);
             }
             else {
                 baseQuery = new ApiEdgeQuery(lastSegment.edge, ApiEdgeQueryType.Delete);
-                this.addQueryStep(query, new QueryEdgeQueryStep(baseQuery));
+                this.addQueryStep(query, new QueryEdgeQueryStep(baseQuery), null, true);
             }
         }
 
@@ -419,7 +469,12 @@ export class ApiQueryBuilder {
             }
         }
 
-        //STEP 5: Return the completed query.
+        //STEP 5: Add OnInput actions
+        this.api.actions
+            .filter((action: ApiAction) => action.triggerKind == ApiActionTriggerKind.OnInput)
+            .forEach((action: ApiAction) => query.unshift(action));
+
+        //STEP 6: Return the completed query.
         return query
     };
 
@@ -440,7 +495,12 @@ export class ApiQueryBuilder {
         //STEP 3: Provide context for the base query.
         query.unshift(new SetBodyQueryStep(request.body));
 
-        //STEP 4: Return the completed query.
+        //STEP 4: Add OnInput actions
+        this.api.actions
+            .filter((action: ApiAction) => action.triggerKind == ApiActionTriggerKind.OnInput)
+            .forEach((action: ApiAction) => query.unshift(action));
+
+        //STEP 5: Return the completed query.
         return query
     };
 

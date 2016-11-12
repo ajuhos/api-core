@@ -4,15 +4,19 @@ import {ApiEdgeQueryResponse} from "./ApiEdgeQueryResponse";
 import {ApiQueryScope} from "../query/ApiQuery";
 import {ApiEdgeMethod, ApiEdgeMethodScope} from "./ApiEdgeMethod";
 import {ApiRequestType} from "../request/ApiRequest";
+import {ApiEdgeAction, ApiEdgeActionTriggerKind, ApiEdgeActionTrigger} from "./ApiEdgeAction";
+import {ApiEdgeQueryType} from "./ApiEdgeQueryType";
+import {ApiEdgeSchema} from "./ApiEdgeSchema";
 
 export interface ApiEdgeDefinition {
     name: string;
     pluralName: string;
     idField: string;
 
-    fields: string[];
+    schema: ApiEdgeSchema;
     methods: ApiEdgeMethod[];
     relations: ApiEdgeRelation[];
+    actions: ApiEdgeAction[];
 
     getEntry: (context: ApiEdgeQueryContext) => Promise<ApiEdgeQueryResponse>;
     listEntries: (context: ApiEdgeQueryContext) => Promise<ApiEdgeQueryResponse>;
@@ -28,9 +32,10 @@ export abstract class ApiEdge implements ApiEdgeDefinition {
     pluralName: string;
     idField: string;
 
-    fields: string[] = [];
+    schema: ApiEdgeSchema;
     methods: ApiEdgeMethod[] = [];
     relations: ApiEdgeRelation[] = [];
+    actions: ApiEdgeAction[] = [];
 
     getEntry: (context: ApiEdgeQueryContext) => Promise<ApiEdgeQueryResponse>;
     listEntries: (context: ApiEdgeQueryContext) => Promise<ApiEdgeQueryResponse>;
@@ -39,6 +44,21 @@ export abstract class ApiEdge implements ApiEdgeDefinition {
     patchEntry: (context: ApiEdgeQueryContext, entryFields: any) => Promise<ApiEdgeQueryResponse>;
     removeEntry: (context: ApiEdgeQueryContext, entryFields: any) => Promise<ApiEdgeQueryResponse>;
     exists: (context: ApiEdgeQueryContext) => Promise<ApiEdgeQueryResponse>;
+
+    use = (action: ApiEdgeAction) => {
+        this.actions.unshift(action);
+        return this
+    };
+
+    action = (name: string,
+              execute: (scope: ApiQueryScope) => Promise<ApiEdgeQueryResponse>,
+              targetTypes: ApiEdgeQueryType = ApiEdgeQueryType.Any,
+              triggerKind: ApiEdgeActionTriggerKind = ApiEdgeActionTriggerKind.BeforeEvent,
+              triggers: ApiEdgeActionTrigger = ApiEdgeActionTrigger.Any,
+              triggerNames: string[] = []): ApiEdge => {
+        this.actions.unshift(new ApiEdgeAction(name, execute, targetTypes, triggerKind, triggers, triggerNames));
+        return this
+    };
 
     edgeMethod = (name: string,
                   execute: (scope: ApiQueryScope) => Promise<ApiEdgeQueryResponse>,

@@ -1,9 +1,9 @@
 import {ApiEdgeDefinition} from './ApiEdgeDefinition';
 import {ApiEdgeQueryType} from './ApiEdgeQueryType';
 import {ApiEdgeQueryContext} from "./ApiEdgeQueryContext";
-
-//Required for execute
 import {ApiEdgeQueryResponse} from "./ApiEdgeQueryResponse";
+import {ApiEdgeError} from "../query/ApiEdgeError";
+import {ApiEdgeSchemaTransformation} from "./ApiEdgeSchema";
 
 export class ApiEdgeQuery {
 
@@ -27,6 +27,8 @@ export class ApiEdgeQuery {
      */
     body: any;
 
+    private originalFields: string[] = [];
+
     /**
      * Create a new API Edge Query for the specified API Edge with the specified parameters.
      * @param {ApiEdgeDefinition} edge
@@ -44,22 +46,92 @@ export class ApiEdgeQuery {
         this.body = body;
     }
 
-    execute = () => {
+    private applySchemaOnInputItem = (item: any) => {
+        let output = {};
+        this.edge.schema.transformations.forEach((transformation: ApiEdgeSchemaTransformation) => {
+            if(transformation.parsedField(item) !== undefined)
+                transformation.applyToInput(item, output)
+        });
+
+        return output
+    };
+
+    private applySchemaOnItem = (item: any): any => {
+        let output = {};
+
+        if(this.originalFields.length) {
+            this.edge.schema.transformations.forEach((transformation: ApiEdgeSchemaTransformation) => {
+                if(this.originalFields.indexOf(transformation.affectedSchemaField) != -1)
+                    transformation.applyToOutput(item, output)
+            });
+        }
+        else {
+            this.edge.schema.transformations.forEach((transformation: ApiEdgeSchemaTransformation) => {
+                transformation.applyToOutput(item, output)
+            });
+        }
+
+        return output
+    };
+
+/*    private applyInputListSchema = (value: ApiEdgeQueryResponse) => {
+        if(!this.edge.schema)
+            return value;
+
+        value.data = (value.data as any[]).map((item: any) => this.applySchemaOnInputItem(item));
+        return value
+    };*/
+
+    private applyListSchema = (value: ApiEdgeQueryResponse) => {
+        if(!this.edge.schema)
+            return value;
+
+        value.data = (value.data as any[]).map((item: any) => this.applySchemaOnItem(item));
+        return value
+    };
+
+    private applyInputSchema = (value: any): any|Promise<any> => {
+        if(!this.edge.schema)
+            return value;
+
+        return this.applySchemaOnInputItem(value)
+    };
+
+    private applySchema = (value: ApiEdgeQueryResponse): ApiEdgeQueryResponse|Promise<ApiEdgeQueryResponse> => {
+        if(!this.edge.schema)
+            return value;
+
+        value.data = this.applySchemaOnItem(value.data);
+        return value
+    };
+
+    execute = (): Promise<ApiEdgeQueryResponse> => {
+        if(this.context.fields.length) {
+            this.originalFields = this.context.fields;
+            this.context.fields = this.edge.schema.transformFields(this.context.fields);
+        }
+
+        if(this.body) {
+            this.body = this.applyInputSchema(this.body)
+        }
+
         switch (this.type) {
             case ApiEdgeQueryType.Get:
-                return this.edge.getEntry(this.context);
+                return this.edge.getEntry(this.context).then(this.applySchema);
             case ApiEdgeQueryType.Exists:
                 return this.edge.exists(this.context);
             case ApiEdgeQueryType.Create:
-                return this.edge.createEntry(this.context, this.body);
+                return this.edge.createEntry(this.context, this.body).then(this.applySchema);
             case ApiEdgeQueryType.Delete:
-                return this.edge.removeEntry(this.context, this.body);
+                return this.edge.removeEntry(this.context, this.body).then(this.applySchema);
             case ApiEdgeQueryType.Update:
-                return this.edge.updateEntry(this.context, this.body);
+                return this.edge.updateEntry(this.context, this.body).then(this.applySchema);
             case ApiEdgeQueryType.Patch:
-                return this.edge.patchEntry(this.context, this.body);
+                return this.edge.patchEntry(this.context, this.body).then(this.applySchema);
             case ApiEdgeQueryType.List:
-                return this.edge.listEntries(this.context);
+                return this.edge.listEntries(this.context).then(this.applyListSchema);
+            default:
+                throw new ApiEdgeError(500, "Unsupported Query Type")
         }
     }
 }

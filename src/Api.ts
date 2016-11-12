@@ -2,8 +2,10 @@ import {ApiEdgeDefinition} from "./edge/ApiEdgeDefinition";
 import {ApiRequestParser} from "./request/ApiRequestParser";
 import {ApiQueryBuilder} from "./query/ApiQueryBuilder";
 import {ApiRequest} from "./request/ApiRequest";
-import {ApiQuery} from "./query/ApiQuery";
+import {ApiQuery, ApiQueryScope} from "./query/ApiQuery";
 import {ApiEdgeRelation} from "./relations/ApiEdgeRelation";
+import {ApiAction, ApiActionTriggerKind} from "./query/ApiAction";
+import {ApiEdgeQueryResponse} from "./edge/ApiEdgeQueryResponse";
 
 export class Api {
     static defaultIdPostfix: string = "Id";
@@ -11,6 +13,7 @@ export class Api {
 
     version: string;
     edges: ApiEdgeDefinition[] = [];
+    actions: ApiAction[] = [];
     private parser: ApiRequestParser;
     private queryBuilder: ApiQueryBuilder;
 
@@ -39,5 +42,17 @@ export class Api {
         relation.to.relations.push(relation);
         return this
     }
+
+    use = (action: ApiAction) => {
+        this.actions.unshift(action);
+        return this
+    };
+
+    action = (name: string,
+              execute: (scope: ApiQueryScope) => Promise<ApiQueryScope>,
+              triggerKind: ApiActionTriggerKind = ApiActionTriggerKind.OnInput): Api => {
+        this.actions.unshift(new ApiAction(name, execute, triggerKind));
+        return this
+    };
 
 }

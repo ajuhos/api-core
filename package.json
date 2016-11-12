@@ -1,10 +1,11 @@
 {
   "name": "api-core",
-  "version": "0.1.0-alpha.1",
+  "version": "0.4.1",
   "description": "Model-based dynamic multi-level APIs for any provider, plus multiple consumption channels",
   "main": "dist/index.js",
   "scripts": {
-    "test": "tap dist/test/*.js --cov"
+    "test": "tap dist/test/*.js --cov",
+    "cover": "npm test -- --coverage-report=lcov"
   },
   "repository": {
     "type": "git",
@@ -49,5 +50,9 @@
     "sql",
     "transform",
     "web"
-  ]
+  ],
+  "dependencies": {
+    "deep-keys": "^0.3.0",
+    "obj-parse": "^0.3.0"
+  }
 }

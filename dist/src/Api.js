@@ -1,6 +1,7 @@
 "use strict";
 var ApiRequestParser_1 = require("./request/ApiRequestParser");
 var ApiQueryBuilder_1 = require("./query/ApiQueryBuilder");
+var ApiAction_1 = require("./query/ApiAction");
 var Api = (function () {
     function Api(version) {
         var _this = this;
@@ -9,11 +10,21 @@ var Api = (function () {
             edges[_i - 1] = arguments[_i];
         }
         this.edges = [];
+        this.actions = [];
         this.parseRequest = function (requestParts) {
             return _this.parser.parse(requestParts);
         };
         this.buildQuery = function (request) {
             return _this.queryBuilder.build(request);
+        };
+        this.use = function (action) {
+            _this.actions.unshift(action);
+            return _this;
+        };
+        this.action = function (name, execute, triggerKind) {
+            if (triggerKind === void 0) { triggerKind = ApiAction_1.ApiActionTriggerKind.OnInput; }
+            _this.actions.unshift(new ApiAction_1.ApiAction(name, execute, triggerKind));
+            return _this;
         };
         this.version = version;
         this.edges = edges;

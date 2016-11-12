@@ -84,7 +84,7 @@ tap.test('/schools', function (t) {
         t.equal(resp.metadata, null);
         t.end();
     })
-        .catch(function () {
+        .catch(function (e) {
         t.ok(false, "a valid query should not fail");
         t.end();
     });
@@ -139,7 +139,7 @@ tap.test('/schools/s1/classes', function (t) {
             {
                 id: "c1",
                 name: "A",
-                semester: 1,
+                year: 1,
                 room: "Room 1",
                 schoolId: "s1"
             }
@@ -166,7 +166,7 @@ tap.test('/schools/s1/classes/c1', function (t) {
         t.same(resp.data, {
             id: "c1",
             name: "A",
-            semester: 1,
+            year: 1,
             room: "Room 1",
             schoolId: "s1"
         });
@@ -191,7 +191,7 @@ tap.test('/students/s2/class', function (t) {
         t.same(resp.data, {
             id: "c1",
             name: "A",
-            semester: 1,
+            year: 1,
             room: "Room 1",
             schoolId: "s1"
         });
@@ -318,7 +318,9 @@ tap.test('PUT /schools/s2', function (t) {
         .then(function (resp) {
         t.same(resp.data, {
             id: "s2",
-            name: "Cool School"
+            name: "Cool School",
+            address: null,
+            phone: null
         });
         t.equal(resp.metadata, null);
         t.end();
@@ -342,23 +344,21 @@ tap.test('GET /students/s2/rename', function (t) {
     }
     t.end();
 });
-tap.test('/students/s2/withFullName', function (t) {
-    var request = api.parseRequest(['students', 's2', 'withFullName']), query = api.buildQuery(request);
+tap.test('/students/s2/withHungarianName', function (t) {
+    var request = api.parseRequest(['students', 's2', 'withHungarianName']), query = api.buildQuery(request);
     t.equal(query.steps.length, 5, 'should build an 5 step query');
     t.ok(query.steps[0] instanceof builder.ExtendContextQueryStep, 'EXTEND');
     t.ok(query.steps[1] instanceof builder.QueryEdgeQueryStep, 'QUERY /students');
     t.ok(query.steps[2] instanceof builder.ExtendContextQueryStep, 'APPLY PARAMS');
     t.ok(query.steps[3] instanceof builder.ProvideIdQueryStep, 'PROVIDE ID');
-    t.ok(query.steps[4] instanceof builder.CallMethodQueryStep, 'call{withFullName}');
+    t.ok(query.steps[4] instanceof builder.CallMethodQueryStep, 'call{withHungarianName}');
     query.execute()
         .then(function (resp) {
         t.same(resp.data, {
             id: "s2",
-            firstName: "Dave",
-            lastName: "Test",
             fullName: "Dave Test",
+            hungarianName: "Test Dave",
             email: "dave.test@gmail.com",
-            phone: "347633445",
             schoolId: "s1",
             classId: "c1"
         });
@@ -373,7 +373,7 @@ tap.test('/students/s2/withFullName', function (t) {
 tap.test('POST /students/s2/rename', function (t) {
     var request = api.parseRequest(['students', 's2', 'rename']);
     request.type = ApiRequest_1.ApiRequestType.Update;
-    request.body = { name: "David Test" };
+    request.body = { name: "Test David" };
     var query = api.buildQuery(request);
     t.equal(query.steps.length, 5, 'should build a 4 step query');
     t.ok(query.steps[0] instanceof builder.SetResponseQueryStep, 'SET RESPONSE');
@@ -385,10 +385,8 @@ tap.test('POST /students/s2/rename', function (t) {
         .then(function (resp) {
         t.same(resp.data, {
             id: "s2",
-            firstName: "David",
-            lastName: "Test",
+            fullName: "David Test",
             email: "dave.test@gmail.com",
-            phone: "347633445",
             schoolId: "s1",
             classId: "c1"
         });

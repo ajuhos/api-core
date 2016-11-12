@@ -1,12 +1,16 @@
 import {ApiEdgeQueryContext} from "../edge/ApiEdgeQueryContext";
 import {ApiEdgeQueryResponse} from "../edge/ApiEdgeQueryResponse";
+import {ApiRequest} from "../request/ApiRequest";
 
 
 export interface ApiQueryScope {
     context: ApiEdgeQueryContext,
     body: any|null,
     identity: any|null,
-    response: ApiEdgeQueryResponse|null
+    response: ApiEdgeQueryResponse|null,
+    query: ApiQuery,
+    request: ApiRequest,
+    step: number
 }
 
 export interface QueryStep {
@@ -14,6 +18,7 @@ export interface QueryStep {
 }
 
 export class ApiQuery {
+    request: ApiRequest;
     steps: QueryStep[] = [];
 
     unshift = (step: QueryStep): ApiQuery => {
@@ -31,6 +36,7 @@ export class ApiQuery {
             let next = (scope: ApiQueryScope) => {
                 let step = this.steps.shift();
                 if(step) {
+                    scope.step++;
                     if (this.steps.length) {
                         step.execute(scope).then(next).catch(reject);
                     }
@@ -40,7 +46,15 @@ export class ApiQuery {
                 }
             };
 
-            next({ context: new ApiEdgeQueryContext(), body: null, response: null, identity });
+            next({
+                context: new ApiEdgeQueryContext(),
+                body: null,
+                request: this.request,
+                response: null,
+                query: this,
+                step: 0,
+                identity
+            });
         })
     }
 }
