@@ -1,7 +1,8 @@
 "use strict";
 var parse = require('obj-parse'), deepKeys = require('deep-keys');
 var ApiEdgeSchemaTransformation = (function () {
-    function ApiEdgeSchemaTransformation(input, output, schemaField, modelFields) {
+    function ApiEdgeSchemaTransformation(input, output, modelFields, schemaField) {
+        if (schemaField === void 0) { schemaField = ""; }
         this.applyToInput = input;
         this.applyToOutput = output;
         this.affectedSchemaField = schemaField;
@@ -61,6 +62,7 @@ var ApiEdgeSchema = (function () {
     ApiEdgeSchema.prototype.createTransformation = function (schemaField, schema) {
         var parsedSchemaField = parse(schemaField), transform = parsedSchemaField(schema);
         if (transform instanceof ApiEdgeSchemaTransformation) {
+            transform.affectedSchemaField = schemaField;
             var transformedFields_1 = this.fieldMatrix[transform.affectedSchemaField];
             if (transformedFields_1) {
                 transform.affectedModelFields.forEach(function (field) { return transformedFields_1.push(field); });
@@ -73,7 +75,7 @@ var ApiEdgeSchema = (function () {
             return transform;
         }
         else if (typeof transform === "string") {
-            return new ApiEdgeSchemaTransformation(ApiEdgeSchema.createInputTransformer(parsedSchemaField, transform), ApiEdgeSchema.createOutputTransformer(parsedSchemaField, transform), schemaField, [schemaField]);
+            return new ApiEdgeSchemaTransformation(ApiEdgeSchema.createInputTransformer(parsedSchemaField, transform), ApiEdgeSchema.createOutputTransformer(parsedSchemaField, transform), [schemaField], schemaField);
         }
     };
     ApiEdgeSchema.prototype.fixFields = function (fieldName) {

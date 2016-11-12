@@ -4,7 +4,7 @@ export declare class ApiEdgeSchemaTransformation {
     affectedSchemaField: string;
     affectedModelFields: string[];
     parsedField: any;
-    constructor(input: (schema: any, model: any) => void, output: (model: any, schema: any) => void, schemaField: string, modelFields: string[]);
+    constructor(input: (schema: any, model: any) => void, output: (model: any, schema: any) => void, modelFields: string[], schemaField?: string);
 }
 export declare class ApiEdgeSchema {
     fields: string[];

@@ -10,8 +10,8 @@ export class ApiEdgeSchemaTransformation {
 
     constructor(input: (schema: any, model: any) => void,
                 output: (model: any, schema: any) => void,
-                schemaField: string,
-                modelFields: string[]) {
+                modelFields: string[],
+                schemaField: string = "") {
         this.applyToInput = input;
         this.applyToOutput = output;
         this.affectedSchemaField = schemaField;
@@ -70,6 +70,8 @@ export class ApiEdgeSchema {
             transform: string|ApiEdgeSchemaTransformation = parsedSchemaField(schema);
 
         if(transform instanceof ApiEdgeSchemaTransformation) {
+            transform.affectedSchemaField = schemaField;
+
             let transformedFields = this.fieldMatrix[transform.affectedSchemaField];
             if(transformedFields) {
                 transform.affectedModelFields.forEach((field: string) => transformedFields.push(field))
@@ -87,8 +89,8 @@ export class ApiEdgeSchema {
             return new ApiEdgeSchemaTransformation(
                 ApiEdgeSchema.createInputTransformer(parsedSchemaField, transform),
                 ApiEdgeSchema.createOutputTransformer(parsedSchemaField, transform),
-                schemaField,
-                [ schemaField ]
+                [ schemaField ],
+                schemaField
             );
         }
     }
