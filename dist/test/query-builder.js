@@ -282,9 +282,9 @@ tap.test('PATCH /schools/s2', function (t) {
     };
     var query = api.buildQuery(request);
     t.equal(query.steps.length, 4, 'should build a 4 step query');
-    t.ok(query.steps[0] instanceof builder.ExtendContextQueryStep, 'EXTEND');
-    t.ok(query.steps[1] instanceof builder.ExtendContextQueryStep, 'APPLY PARAMS');
-    t.ok(query.steps[2] instanceof builder.SetBodyQueryStep, 'SET BODY');
+    t.ok(query.steps[0] instanceof builder.SetBodyQueryStep, 'SET BODY');
+    t.ok(query.steps[1] instanceof builder.ExtendContextQueryStep, 'EXTEND');
+    t.ok(query.steps[2] instanceof builder.ExtendContextQueryStep, 'APPLY PARAMS');
     t.ok(query.steps[3] instanceof builder.QueryEdgeQueryStep, 'QUERY');
     query.execute()
         .then(function (resp) {
@@ -310,9 +310,9 @@ tap.test('PUT /schools/s2', function (t) {
     };
     var query = api.buildQuery(request);
     t.equal(query.steps.length, 4, 'should build a 4 step query');
-    t.ok(query.steps[0] instanceof builder.ExtendContextQueryStep, 'EXTEND');
-    t.ok(query.steps[1] instanceof builder.ExtendContextQueryStep, 'APPLY PARAMS');
-    t.ok(query.steps[2] instanceof builder.SetBodyQueryStep, 'SET BODY');
+    t.ok(query.steps[0] instanceof builder.SetBodyQueryStep, 'SET BODY');
+    t.ok(query.steps[1] instanceof builder.ExtendContextQueryStep, 'EXTEND');
+    t.ok(query.steps[2] instanceof builder.ExtendContextQueryStep, 'APPLY PARAMS');
     t.ok(query.steps[3] instanceof builder.QueryEdgeQueryStep, 'QUERY');
     query.execute()
         .then(function (resp) {
@@ -376,9 +376,9 @@ tap.test('POST /students/s2/rename', function (t) {
     request.body = { name: "Test David" };
     var query = api.buildQuery(request);
     t.equal(query.steps.length, 5, 'should build a 4 step query');
-    t.ok(query.steps[0] instanceof builder.SetResponseQueryStep, 'SET RESPONSE');
-    t.ok(query.steps[1] instanceof builder.ExtendContextQueryStep, 'APPLY PARAMS');
-    t.ok(query.steps[2] instanceof builder.SetBodyQueryStep, 'SET BODY');
+    t.ok(query.steps[0] instanceof builder.SetBodyQueryStep, 'SET BODY');
+    t.ok(query.steps[1] instanceof builder.SetResponseQueryStep, 'SET RESPONSE');
+    t.ok(query.steps[2] instanceof builder.ExtendContextQueryStep, 'APPLY PARAMS');
     t.ok(query.steps[3] instanceof builder.ProvideIdQueryStep, 'PROVIDE ID');
     t.ok(query.steps[4] instanceof builder.CallMethodQueryStep, 'call{rename}');
     query.execute()

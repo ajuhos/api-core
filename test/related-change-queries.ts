@@ -192,3 +192,77 @@ tap.test('POST /schools/s2/classes/c1/students (invalid body)', (t: any) => {
         });
 });
 
+tap.test('PATCH /schools/s2/students/s7', (t: any) => {
+    const request = api.parseRequest([ 'schools', 's2', 'students', 's7' ]);
+    request.type = ApiRequestType.Patch;
+    request.body = {
+        fullName: "Merry Test",
+    };
+    const query = api.buildQuery(request);
+
+    t.equal(query.steps.length, 8, 'should build a 8 step query');
+    t.ok(query.steps[0] instanceof builder.SetBodyQueryStep, 'SET BODY');
+    t.ok(query.steps[1] instanceof builder.ExtendContextQueryStep, 'EXTEND');
+    t.ok(query.steps[2] instanceof builder.QueryEdgeQueryStep, 'QUERY /schools');
+    t.ok(query.steps[3] instanceof builder.RelateChangeQueryStep, 'RELATE CHANGE schoolId');
+    t.ok(query.steps[4] instanceof builder.RelateQueryStep, 'RELATE schoolId');
+    t.ok(query.steps[5] instanceof builder.ExtendContextQueryStep, 'EXTEND CONTEXT');
+    t.ok(query.steps[6] instanceof builder.ExtendContextQueryStep, 'APPLY PARAMS');
+    t.ok(query.steps[7] instanceof builder.QueryEdgeQueryStep, 'QUERY /students');
+
+    query.execute()
+        .then(resp => {
+            t.same(resp.data,
+                {
+                    id: "s7",
+                    fullName: "Merry Test",
+                    email: "marry.test@gmail.com",
+                    schoolId: "s2",
+                    classId: "c1"
+                });
+            t.equal(resp.metadata, null);
+            t.end()
+        })
+        .catch(() => {
+            t.ok(false, "a valid query should not fail");
+            t.end()
+        });
+});
+
+tap.test('PATCH /schools/s2/students/s7 (invalid body)', (t: any) => {
+    const request = api.parseRequest([ 'schools', 's2', 'students', 's7' ]);
+    request.type = ApiRequestType.Patch;
+    request.body = {
+        fullName: "Merry Test",
+        schoolId: "s3"
+    };
+    const query = api.buildQuery(request);
+
+    t.equal(query.steps.length, 8, 'should build a 8 step query');
+    t.ok(query.steps[0] instanceof builder.SetBodyQueryStep, 'SET BODY');
+    t.ok(query.steps[1] instanceof builder.ExtendContextQueryStep, 'EXTEND');
+    t.ok(query.steps[2] instanceof builder.QueryEdgeQueryStep, 'QUERY /schools');
+    t.ok(query.steps[3] instanceof builder.RelateChangeQueryStep, 'RELATE CHANGE schoolId');
+    t.ok(query.steps[4] instanceof builder.RelateQueryStep, 'RELATE schoolId');
+    t.ok(query.steps[5] instanceof builder.ExtendContextQueryStep, 'EXTEND CONTEXT');
+    t.ok(query.steps[6] instanceof builder.ExtendContextQueryStep, 'APPLY PARAMS');
+    t.ok(query.steps[7] instanceof builder.QueryEdgeQueryStep, 'QUERY /students');
+
+    query.execute()
+        .then(resp => {
+            t.same(resp.data,
+                {
+                    id: "s7",
+                    fullName: "Merry Test",
+                    email: "marry.test@gmail.com",
+                    schoolId: "s2",
+                    classId: "c1"
+                });
+            t.equal(resp.metadata, null);
+            t.end()
+        })
+        .catch(() => {
+            t.ok(false, "a valid query should not fail");
+            t.end()
+        });
+});

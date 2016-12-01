@@ -451,7 +451,6 @@ export class ApiQueryBuilder {
         }
 
         //STEP 2: Provide context for the base query.
-        if(request.body) query.unshift(new SetBodyQueryStep(request.body));
         query.unshift(new ExtendContextQueryStep(request.context));
 
         //STEP 3: Provide ID for the base query.
@@ -480,6 +479,7 @@ export class ApiQueryBuilder {
             let relation = segments[i+1].relation;
             if(relation && !(relation instanceof OneToOneRelation)) {
                 query.unshift(new RelateQueryStep(relation));
+                query.unshift(new RelateChangeQueryStep(relation));
             }
 
             //STEP 2: Read or Check
@@ -491,12 +491,15 @@ export class ApiQueryBuilder {
             }
         }
 
-        //STEP 5: Add OnInput actions
+        //STEP 5: Provide body for the query
+        if(request.body) query.unshift(new SetBodyQueryStep(request.body));
+
+        //STEP 6: Add OnInput actions
         this.api.actions
             .filter((action: ApiAction) => action.triggerKind == ApiActionTriggerKind.OnInput)
             .forEach((action: ApiAction) => query.unshift(action));
 
-        //STEP 6: Return the completed query.
+        //STEP 7: Return the completed query.
         return query
     };
 

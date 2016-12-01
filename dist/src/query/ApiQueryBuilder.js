@@ -251,8 +251,6 @@ var ApiQueryBuilder = (function () {
                     _this.addQueryStep(query, new QueryEdgeQueryStep(baseQuery), null, true);
                 }
             }
-            if (request.body)
-                query.unshift(new SetBodyQueryStep(request.body));
             query.unshift(new ExtendContextQueryStep(request.context));
             if (lastSegment instanceof ApiRequest_1.EntryPathSegment) {
                 query.unshift(new ExtendContextQueryStep(new ApiEdgeQueryContext_1.ApiEdgeQueryContext(lastSegment.id)));
@@ -274,6 +272,7 @@ var ApiQueryBuilder = (function () {
                 var relation = segments[i + 1].relation;
                 if (relation && !(relation instanceof OneToOneRelation_1.OneToOneRelation)) {
                     query.unshift(new RelateQueryStep(relation));
+                    query.unshift(new RelateChangeQueryStep(relation));
                 }
                 if (readMode) {
                     readMode = _this.buildReadStep(query, currentSegment);
@@ -282,6 +281,8 @@ var ApiQueryBuilder = (function () {
                     readMode = _this.buildCheckStep(query, currentSegment);
                 }
             }
+            if (request.body)
+                query.unshift(new SetBodyQueryStep(request.body));
             _this.api.actions
                 .filter(function (action) { return action.triggerKind == ApiAction_1.ApiActionTriggerKind.OnInput; })
                 .forEach(function (action) { return query.unshift(action); });
