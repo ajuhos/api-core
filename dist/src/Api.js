@@ -11,6 +11,9 @@ var Api = (function () {
         }
         this.edges = [];
         this.actions = [];
+        this.findEdge = function (name) {
+            return _this.edges.find(function (edge) { return edge.pluralName == name; });
+        };
         this.parseRequest = function (requestParts) {
             return _this.parser.parse(requestParts);
         };

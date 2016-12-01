@@ -24,6 +24,10 @@ export class Api {
         this.queryBuilder = new ApiQueryBuilder(this);
     }
 
+    findEdge = (name: string|null|undefined) => {
+        return this.edges.find((edge: ApiEdgeDefinition) => edge.pluralName == name)
+    };
+
     parseRequest = (requestParts: string[]) => {
         return this.parser.parse(requestParts);
     };

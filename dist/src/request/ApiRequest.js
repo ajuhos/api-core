@@ -97,8 +97,9 @@ exports.ApiRequestPath = ApiRequestPath;
 })(exports.ApiRequestType || (exports.ApiRequestType = {}));
 var ApiRequestType = exports.ApiRequestType;
 var ApiRequest = (function () {
-    function ApiRequest() {
+    function ApiRequest(api) {
         this.body = null;
+        this.api = api;
         this.path = new ApiRequestPath();
         this.type = ApiRequestType.Read;
         this.context = new ApiEdgeQueryContext_1.ApiEdgeQueryContext();

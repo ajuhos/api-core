@@ -34,7 +34,7 @@ tap.test('creating the API should work', function (t) {
 });
 tap.test('Any type queries should fail', function (t) {
     try {
-        var request = new ApiRequest_1.ApiRequest();
+        var request = new ApiRequest_1.ApiRequest(api);
         request.type = ApiRequest_1.ApiRequestType.Any;
         api.buildQuery(request);
         t.ok(false, 'an invalid query should not succeed');
@@ -48,7 +48,7 @@ tap.test('Any type queries should fail', function (t) {
 });
 tap.test('Change type queries should fail', function (t) {
     try {
-        var request = new ApiRequest_1.ApiRequest();
+        var request = new ApiRequest_1.ApiRequest(api);
         request.type = ApiRequest_1.ApiRequestType.Change;
         api.buildQuery(request);
         t.ok(false, 'an invalid query should not succeed');

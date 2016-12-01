@@ -12,6 +12,7 @@ export declare class Api {
     private parser;
     private queryBuilder;
     constructor(version: string, ...edges: ApiEdgeDefinition[]);
+    findEdge: (name: string | null | undefined) => ApiEdgeDefinition | undefined;
     parseRequest: (requestParts: string[]) => ApiRequest;
     buildQuery: (request: ApiRequest) => ApiQuery;
     edge(edge: ApiEdgeDefinition): this;

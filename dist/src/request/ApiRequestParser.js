@@ -9,7 +9,7 @@ var ApiRequestPathParser = (function () {
         this.api = api;
     }
     ApiRequestPathParser.prototype.findEdgeByName = function (name) {
-        return this.api.edges.find(function (edge) { return edge.pluralName === name; });
+        return this.api.findEdge(name);
     };
     ApiRequestPathParser.prototype.findRelationByName = function (edge, name) {
         return edge.relations.find(function (rel) { return rel.name === name; });
@@ -92,7 +92,7 @@ var ApiRequestParser = (function () {
         this.pathParser = new ApiRequestPathParser(api);
     }
     ApiRequestParser.prototype.parse = function (segments) {
-        var request = new ApiRequest_1.ApiRequest();
+        var request = new ApiRequest_1.ApiRequest(this.api);
         request.path = this.pathParser.parse(segments);
         return request;
     };

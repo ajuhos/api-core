@@ -5,6 +5,7 @@ export {ApiEdgeQueryResponse} from "./src/edge/ApiEdgeQueryResponse";
 export {ApiEdgeQueryFilter, ApiEdgeQueryFilterType} from "./src/edge/ApiEdgeQueryFilter";
 export {ApiEdgeSchema, ApiEdgeSchemaTransformation} from "./src/edge/ApiEdgeSchema";
 export {ApiEdgeQuery} from "./src/edge/ApiEdgeQuery";
+export {ApiEdgeMethod, ApiEdgeMethodScope} from "./src/edge/ApiEdgeMethod";
 export {ApiEdgeError} from "./src/query/ApiEdgeError";
 
 export {ApiEdgeRelation} from "./src/relations/ApiEdgeRelation";

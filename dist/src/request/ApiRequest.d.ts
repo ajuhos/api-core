@@ -3,6 +3,7 @@ import { OneToManyRelation } from "../relations/OneToManyRelation";
 import { OneToOneRelation } from "../relations/OneToOneRelation";
 import { ApiEdgeQueryContext } from "../edge/ApiEdgeQueryContext";
 import { ApiEdgeMethod } from "../edge/ApiEdgeMethod";
+import { Api } from "../Api";
 export declare class PathSegment {
     edge: ApiEdgeDefinition;
     relation: OneToManyRelation | null;
@@ -49,9 +50,10 @@ export declare enum ApiRequestType {
     Change = 13,
 }
 export declare class ApiRequest {
+    api: Api;
     type: ApiRequestType;
     path: ApiRequestPath;
     body: any | null;
     context: ApiEdgeQueryContext;
-    constructor();
+    constructor(api: Api);
 }

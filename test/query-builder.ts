@@ -44,7 +44,7 @@ tap.test('creating the API should work', (t: any) => {
 
 tap.test('Any type queries should fail', (t: any) => {
     try {
-        let request = new ApiRequest();
+        let request = new ApiRequest(api);
         request.type = ApiRequestType.Any;
         api.buildQuery(request);
         t.ok(false, 'an invalid query should not succeed');
@@ -59,7 +59,7 @@ tap.test('Any type queries should fail', (t: any) => {
 
 tap.test('Change type queries should fail', (t: any) => {
     try {
-        let request = new ApiRequest();
+        let request = new ApiRequest(api);
         request.type = ApiRequestType.Change;
         api.buildQuery(request);
         t.ok(false, 'an invalid query should not succeed');

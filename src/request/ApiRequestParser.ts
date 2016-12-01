@@ -18,7 +18,7 @@ export class ApiRequestPathParser {
     }
 
     private findEdgeByName(name: string|null|undefined): ApiEdgeDefinition|undefined {
-        return this.api.edges.find((edge: ApiEdgeDefinition) => edge.pluralName === name);
+        return this.api.findEdge(name);
     }
 
     private findRelationByName(edge: ApiEdgeDefinition, name: string|null|undefined): ApiEdgeRelation|undefined {
@@ -117,7 +117,7 @@ export class ApiRequestParser {
     }
 
     parse(segments: string[]): ApiRequest {
-        let request = new ApiRequest();
+        let request = new ApiRequest(this.api);
         request.path = this.pathParser.parse(segments);
         return request;
     }
