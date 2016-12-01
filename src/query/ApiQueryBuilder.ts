@@ -15,6 +15,7 @@ import {Api} from "../Api";
 import {ApiEdgeMethod} from "../edge/ApiEdgeMethod";
 import {ApiEdgeAction, ApiEdgeActionTriggerKind, ApiEdgeActionTrigger} from "../edge/ApiEdgeAction";
 import {ApiAction, ApiActionTriggerKind} from "./ApiAction";
+const parse = require('obj-parse');
 
 export class QueryEdgeQueryStep implements QueryStep {
     query: ApiEdgeQuery;
@@ -74,6 +75,27 @@ export class RelateQueryStep implements QueryStep {
     };
 
     inspect = () => `RELATE ${this.relation.relationId}`;
+}
+
+export class RelateChangeQueryStep implements QueryStep {
+    relation: ApiEdgeRelation;
+
+    constructor(relation: ApiEdgeRelation) {
+        this.relation = relation;
+    }
+
+    execute = (scope: ApiQueryScope) => {
+        return new Promise((resolve, reject) => {
+            if(!scope.body) return reject(new ApiEdgeError(404, "Missing Body"));
+            if(!scope.response) return reject(new ApiEdgeError(404, "Missing Related Entry"));
+            parse(this.relation.relationId).assign(
+                scope.body,
+                scope.response.data[this.relation.from.idField||Api.defaultIdField]);
+            resolve(scope);
+        })
+    };
+
+    inspect = () => `RELATE CHANGE ${this.relation.relationId}`;
 }
 
 /*export class CheckResponseQueryStep implements QueryStep {
@@ -429,7 +451,6 @@ export class ApiQueryBuilder {
         }
 
         //STEP 2: Provide context for the base query.
-        if(request.body) query.unshift(new SetBodyQueryStep(request.body));
         query.unshift(new ExtendContextQueryStep(request.context));
 
         //STEP 3: Provide ID for the base query.
@@ -458,6 +479,9 @@ export class ApiQueryBuilder {
             let relation = segments[i+1].relation;
             if(relation && !(relation instanceof OneToOneRelation)) {
                 query.unshift(new RelateQueryStep(relation));
+                if(request.type !== ApiRequestType.Delete) {
+                    query.unshift(new RelateChangeQueryStep(relation));
+                }
             }
 
             //STEP 2: Read or Check
@@ -469,12 +493,15 @@ export class ApiQueryBuilder {
             }
         }
 
-        //STEP 5: Add OnInput actions
+        //STEP 5: Provide body for the query
+        if(request.body) query.unshift(new SetBodyQueryStep(request.body));
+
+        //STEP 6: Add OnInput actions
         this.api.actions
             .filter((action: ApiAction) => action.triggerKind == ApiActionTriggerKind.OnInput)
             .forEach((action: ApiAction) => query.unshift(action));
 
-        //STEP 6: Return the completed query.
+        //STEP 7: Return the completed query.
         return query
     };
 
@@ -484,13 +511,22 @@ export class ApiQueryBuilder {
         let segments = request.path.segments,
             lastSegment = segments[segments.length-1];
 
-        //STEP 1: Validate query
-        if(segments.length != 1 || !(lastSegment instanceof EdgePathSegment)) {
-            throw new ApiEdgeError(400, "Invalid Create Query")
-        }
-
-        //STEP 2: Create the base query which will provide the final data.
+        //STEP 1: Create the base query which will provide the final data.
         this.addQueryStep(query, new QueryEdgeQueryStep(new ApiEdgeQuery(lastSegment.edge, ApiEdgeQueryType.Create)));
+
+        //STEP 2: Provide filters and validation for the base query.
+        for(let i = segments.length-2; i >= 0; i--) {
+            let currentSegment = segments[i];
+
+            //STEP 1: Relate to the current query.
+            let relation = segments[i+1].relation;
+            if(relation && !(relation instanceof OneToOneRelation)) {
+                query.unshift(new RelateChangeQueryStep(relation));
+            }
+
+            //STEP 2: Read or Check
+            this.buildReadStep(query, currentSegment)
+        }
 
         //STEP 3: Provide context for the base query.
         query.unshift(new SetBodyQueryStep(request.body));
