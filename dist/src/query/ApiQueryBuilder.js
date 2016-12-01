@@ -11,6 +11,7 @@ var OneToOneRelation_1 = require("../relations/OneToOneRelation");
 var Api_1 = require("../Api");
 var ApiEdgeAction_1 = require("../edge/ApiEdgeAction");
 var ApiAction_1 = require("./ApiAction");
+var parse = require('obj-parse');
 var QueryEdgeQueryStep = (function () {
     function QueryEdgeQueryStep(query) {
         var _this = this;
@@ -65,6 +66,25 @@ var RelateQueryStep = (function () {
     return RelateQueryStep;
 }());
 exports.RelateQueryStep = RelateQueryStep;
+var RelateChangeQueryStep = (function () {
+    function RelateChangeQueryStep(relation) {
+        var _this = this;
+        this.execute = function (scope) {
+            return new Promise(function (resolve, reject) {
+                if (!scope.body)
+                    return reject(new ApiEdgeError_1.ApiEdgeError(404, "Missing Body"));
+                if (!scope.response)
+                    return reject(new ApiEdgeError_1.ApiEdgeError(404, "Missing Related Entry"));
+                parse(_this.relation.relationId).assign(scope.body, scope.response.data[_this.relation.from.idField || Api_1.Api.defaultIdField]);
+                resolve(scope);
+            });
+        };
+        this.inspect = function () { return ("RELATE CHANGE " + _this.relation.relationId); };
+        this.relation = relation;
+    }
+    return RelateChangeQueryStep;
+}());
+exports.RelateChangeQueryStep = RelateChangeQueryStep;
 var SetResponseQueryStep = (function () {
     function SetResponseQueryStep(response) {
         var _this = this;
@@ -271,10 +291,15 @@ var ApiQueryBuilder = (function () {
         this.buildCreateQuery = function (request) {
             var query = new ApiQuery_1.ApiQuery();
             var segments = request.path.segments, lastSegment = segments[segments.length - 1];
-            if (segments.length != 1 || !(lastSegment instanceof ApiRequest_1.EdgePathSegment)) {
-                throw new ApiEdgeError_1.ApiEdgeError(400, "Invalid Create Query");
-            }
             _this.addQueryStep(query, new QueryEdgeQueryStep(new ApiEdgeQuery_1.ApiEdgeQuery(lastSegment.edge, ApiEdgeQueryType_1.ApiEdgeQueryType.Create)));
+            for (var i = segments.length - 2; i >= 0; i--) {
+                var currentSegment = segments[i];
+                var relation = segments[i + 1].relation;
+                if (relation && !(relation instanceof OneToOneRelation_1.OneToOneRelation)) {
+                    query.unshift(new RelateChangeQueryStep(relation));
+                }
+                _this.buildReadStep(query, currentSegment);
+            }
             query.unshift(new SetBodyQueryStep(request.body));
             _this.api.actions
                 .filter(function (action) { return action.triggerKind == ApiAction_1.ApiActionTriggerKind.OnInput; })

@@ -13,7 +13,7 @@ export { OneToManyRelation } from "./src/relations/OneToManyRelation";
 export { ApiRequest, ApiRequestPath, ApiRequestType, EdgePathSegment, EntryPathSegment, MethodPathSegment, PathSegment, RelatedFieldPathSegment } from "./src/request/ApiRequest";
 export { ApiRequestPathParser } from "./src/request/ApiRequestParser";
 export { ApiQuery, ApiQueryScope } from "./src/query/ApiQuery";
-export { ApiQueryBuilder, CallMethodQueryStep, ExtendContextQueryStep, ProvideIdQueryStep, QueryEdgeQueryStep, RelateQueryStep, SetBodyQueryStep, SetResponseQueryStep } from "./src/query/ApiQueryBuilder";
+export { ApiQueryBuilder, CallMethodQueryStep, ExtendContextQueryStep, ProvideIdQueryStep, QueryEdgeQueryStep, RelateQueryStep, SetBodyQueryStep, SetResponseQueryStep, RelateChangeQueryStep } from "./src/query/ApiQueryBuilder";
 export { ApiEdgeAction, ApiEdgeActionTrigger, ApiEdgeActionTriggerKind } from "./src/edge/ApiEdgeAction";
 export { ApiAction, ApiActionTriggerKind } from "./src/query/ApiAction";
 export { Api } from "./src/Api";

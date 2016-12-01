@@ -24,6 +24,12 @@ export declare class RelateQueryStep implements QueryStep {
     execute: (scope: ApiQueryScope) => Promise<{}>;
     inspect: () => string;
 }
+export declare class RelateChangeQueryStep implements QueryStep {
+    relation: ApiEdgeRelation;
+    constructor(relation: ApiEdgeRelation);
+    execute: (scope: ApiQueryScope) => Promise<{}>;
+    inspect: () => string;
+}
 export declare class SetResponseQueryStep implements QueryStep {
     response: ApiEdgeQueryResponse;
     constructor(response: ApiEdgeQueryResponse);

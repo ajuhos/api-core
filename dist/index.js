@@ -46,6 +46,7 @@ exports.QueryEdgeQueryStep = ApiQueryBuilder_1.QueryEdgeQueryStep;
 exports.RelateQueryStep = ApiQueryBuilder_1.RelateQueryStep;
 exports.SetBodyQueryStep = ApiQueryBuilder_1.SetBodyQueryStep;
 exports.SetResponseQueryStep = ApiQueryBuilder_1.SetResponseQueryStep;
+exports.RelateChangeQueryStep = ApiQueryBuilder_1.RelateChangeQueryStep;
 var ApiEdgeAction_1 = require("./src/edge/ApiEdgeAction");
 exports.ApiEdgeAction = ApiEdgeAction_1.ApiEdgeAction;
 exports.ApiEdgeActionTrigger = ApiEdgeAction_1.ApiEdgeActionTrigger;

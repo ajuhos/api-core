@@ -62,7 +62,7 @@ const parser = new ApiRequestPathParser(
 );
 
 tap.test('path should be empty when the input array is empty', (t: any) => {
-    var path = parser.parse([]);
+    const path = parser.parse([]);
     t.equal(path.segments.length, 0);
     t.end()
 });
@@ -89,7 +89,7 @@ tap.test('parser should not allow invalid methods', (t: any) => {
 });
 
 tap.test('parser should parse single edge segment request', (t: any) => {
-    var path = parser.parse([ 'entries' ]);
+    const path = parser.parse([ 'entries' ]);
     t.equal(path.segments.length, 1, 'should have one segment');
     t.ok(path.segments[0] instanceof request.EdgePathSegment, 'should have an edge path segment');
     t.equal(path.segments[0].edge, edge, 'should be the registered edge');
@@ -98,7 +98,7 @@ tap.test('parser should parse single edge segment request', (t: any) => {
 });
 
 tap.test('parser should parse single entry segment request', (t: any) => {
-    var path = parser.parse([ 'entries', '42' ]);
+    const path = parser.parse([ 'entries', '42' ]);
     t.equal(path.segments.length, 1, 'should have one segment');
     t.ok(path.segments[0] instanceof request.EntryPathSegment, 'should have an entry path segment');
     t.equal(path.segments[0].edge, edge, 'should be the registered edge');
@@ -108,7 +108,7 @@ tap.test('parser should parse single entry segment request', (t: any) => {
 });
 
 tap.test('parser should parse single edge method segment request', (t: any) => {
-    var path = parser.parse([ 'entries', 'method' ]);
+    const path = parser.parse([ 'entries', 'method' ]);
     t.equal(path.segments.length, 1, 'should have one segment');
     t.ok(path.segments[0] instanceof request.MethodPathSegment, 'should have a method path segment');
     t.equal(path.segments[0].edge, edge, 'should be the registered edge');
@@ -117,7 +117,7 @@ tap.test('parser should parse single edge method segment request', (t: any) => {
 });
 
 tap.test('parser should parse single related entry segment request', (t: any) => {
-    var path = parser.parse([ 'entries', '42', 'relatedEntry' ]);
+    const path = parser.parse([ 'entries', '42', 'relatedEntry' ]);
     t.equal(path.segments.length, 2, 'should have two segments');
 
     t.ok(path.segments[0] instanceof request.EntryPathSegment, 'should have an entry path segment');
@@ -133,7 +133,7 @@ tap.test('parser should parse single related entry segment request', (t: any) =>
 });
 
 tap.test('parser should parse single entry method segment request', (t: any) => {
-    var path = parser.parse([ 'entries', '42', 'entryMethod' ]);
+    const path = parser.parse([ 'entries', '42', 'entryMethod' ]);
     t.equal(path.segments.length, 2, 'should have two segments');
 
     t.ok(path.segments[0] instanceof request.EntryPathSegment, 'should have an entry path segment');
@@ -149,7 +149,7 @@ tap.test('parser should parse single entry method segment request', (t: any) => 
 });
 
 tap.test('parser should parse single related entry method segment request', (t: any) => {
-    var path = parser.parse([ 'entries', '42', 'relatedEntry', 'relatedEntryMethod' ]);
+    const path = parser.parse([ 'entries', '42', 'relatedEntry', 'relatedEntryMethod' ]);
     t.equal(path.segments.length, 3, 'should have two segments');
 
     t.ok(path.segments[0] instanceof request.EntryPathSegment, 'should have an entry path segment');
@@ -169,7 +169,7 @@ tap.test('parser should parse single related entry method segment request', (t: 
 });
 
 tap.test('parser should parse single related collection segment request', (t: any) => {
-    var path = parser.parse([ 'entries', '42', 'relatedCollection' ]);
+    const path = parser.parse([ 'entries', '42', 'relatedCollection' ]);
     t.equal(path.segments.length, 2, 'should have two segments');
 
     t.ok(path.segments[0] instanceof request.EntryPathSegment, 'should have an entry path segment');
@@ -185,13 +185,13 @@ tap.test('parser should parse single related collection segment request', (t: an
 });
 
 tap.test('unsupported relation should cause error', (t: any) => {
-    var unsupportedRelation: any = function() {
+    const unsupportedRelation: any = function() {
         this.name = "unsupported";
         this.from = edge;
         this.to = relatedEdge;
     };
 
-    var badParser = new ApiRequestPathParser(
+    const badParser = new ApiRequestPathParser(
         new Api('1.0')
             .edge(edge)
             .edge(relatedEdge)
@@ -203,8 +203,8 @@ tap.test('unsupported relation should cause error', (t: any) => {
 });
 
 tap.test('request parser should work too', (t: any) => {
-    var requestParser = new ApiRequestParser(new Api('1.0'));
-    var request = requestParser.parse([]);
+    const requestParser = new ApiRequestParser(new Api('1.0'));
+    const request = requestParser.parse([]);
     t.equal(request.path.segments.length, 0);
     t.end()
 });
