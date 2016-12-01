@@ -266,3 +266,109 @@ tap.test('PATCH /schools/s2/students/s7 (invalid body)', (t: any) => {
             t.end()
         });
 });
+
+tap.test('PUT /schools/s2/students/s7', (t: any) => {
+    const request = api.parseRequest([ 'schools', 's2', 'students', 's7' ]);
+    request.type = ApiRequestType.Update;
+    request.body = {
+        id: "s7",
+        fullName: "Merry Test",
+        email: "merry.test@gmail.com",
+        schoolId: "s2",
+        classId: "c1"
+    };
+    const query = api.buildQuery(request);
+
+    t.equal(query.steps.length, 8, 'should build a 8 step query');
+    t.ok(query.steps[0] instanceof builder.SetBodyQueryStep, 'SET BODY');
+    t.ok(query.steps[1] instanceof builder.ExtendContextQueryStep, 'EXTEND');
+    t.ok(query.steps[2] instanceof builder.QueryEdgeQueryStep, 'QUERY /schools');
+    t.ok(query.steps[3] instanceof builder.RelateChangeQueryStep, 'RELATE CHANGE schoolId');
+    t.ok(query.steps[4] instanceof builder.RelateQueryStep, 'RELATE schoolId');
+    t.ok(query.steps[5] instanceof builder.ExtendContextQueryStep, 'EXTEND CONTEXT');
+    t.ok(query.steps[6] instanceof builder.ExtendContextQueryStep, 'APPLY PARAMS');
+    t.ok(query.steps[7] instanceof builder.QueryEdgeQueryStep, 'QUERY /students');
+
+    query.execute()
+        .then(resp => {
+            t.same(resp.data,
+                {
+                    id: "s7",
+                    fullName: "Merry Test",
+                    email: "merry.test@gmail.com",
+                    schoolId: "s2",
+                    classId: "c1"
+                });
+            t.equal(resp.metadata, null);
+            t.end()
+        })
+        .catch(() => {
+            t.ok(false, "a valid query should not fail");
+            t.end()
+        });
+});
+
+tap.test('PUT /schools/s2/students/s7 (invalid body)', (t: any) => {
+    const request = api.parseRequest([ 'schools', 's2', 'students', 's7' ]);
+    request.type = ApiRequestType.Update;
+    request.body = {
+        id: "s7",
+        fullName: "Merry Test",
+        email: "merry.test@gmail.com",
+        schoolId: "s3",
+        classId: "c1"
+    };
+    const query = api.buildQuery(request);
+
+    t.equal(query.steps.length, 8, 'should build a 8 step query');
+    t.ok(query.steps[0] instanceof builder.SetBodyQueryStep, 'SET BODY');
+    t.ok(query.steps[1] instanceof builder.ExtendContextQueryStep, 'EXTEND');
+    t.ok(query.steps[2] instanceof builder.QueryEdgeQueryStep, 'QUERY /schools');
+    t.ok(query.steps[3] instanceof builder.RelateChangeQueryStep, 'RELATE CHANGE schoolId');
+    t.ok(query.steps[4] instanceof builder.RelateQueryStep, 'RELATE schoolId');
+    t.ok(query.steps[5] instanceof builder.ExtendContextQueryStep, 'EXTEND CONTEXT');
+    t.ok(query.steps[6] instanceof builder.ExtendContextQueryStep, 'APPLY PARAMS');
+    t.ok(query.steps[7] instanceof builder.QueryEdgeQueryStep, 'QUERY /students');
+
+    query.execute()
+        .then(resp => {
+            t.same(resp.data,
+                {
+                    id: "s7",
+                    fullName: "Merry Test",
+                    email: "merry.test@gmail.com",
+                    schoolId: "s2",
+                    classId: "c1"
+                });
+            t.equal(resp.metadata, null);
+            t.end()
+        })
+        .catch(() => {
+            t.ok(false, "a valid query should not fail");
+            t.end()
+        });
+});
+
+tap.test('DELETE /schools/s2/students/s7', (t: any) => {
+    const request = api.parseRequest([ 'schools', 's2', 'students', 's7' ]);
+    request.type = ApiRequestType.Delete;
+    const query = api.buildQuery(request);
+
+    t.equal(query.steps.length, 6, 'should build a 6 step query');
+    t.ok(query.steps[0] instanceof builder.ExtendContextQueryStep, 'EXTEND');
+    t.ok(query.steps[1] instanceof builder.QueryEdgeQueryStep, 'QUERY /schools');
+    t.ok(query.steps[2] instanceof builder.RelateQueryStep, 'RELATE schoolId');
+    t.ok(query.steps[3] instanceof builder.ExtendContextQueryStep, 'EXTEND CONTEXT');
+    t.ok(query.steps[4] instanceof builder.ExtendContextQueryStep, 'APPLY PARAMS');
+    t.ok(query.steps[5] instanceof builder.QueryEdgeQueryStep, 'QUERY /students');
+
+    query.execute()
+        .then(resp => {
+            t.equal(resp.metadata, null);
+            t.end()
+        })
+        .catch(() => {
+            t.ok(false, "a valid query should not fail");
+            t.end()
+        });
+});

@@ -272,7 +272,9 @@ var ApiQueryBuilder = (function () {
                 var relation = segments[i + 1].relation;
                 if (relation && !(relation instanceof OneToOneRelation_1.OneToOneRelation)) {
                     query.unshift(new RelateQueryStep(relation));
-                    query.unshift(new RelateChangeQueryStep(relation));
+                    if (request.type !== ApiRequest_1.ApiRequestType.Delete) {
+                        query.unshift(new RelateChangeQueryStep(relation));
+                    }
                 }
                 if (readMode) {
                     readMode = _this.buildReadStep(query, currentSegment);
