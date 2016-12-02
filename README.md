@@ -18,10 +18,11 @@ Lightweight framework for building dynamic multi-level APIs for any provider (Ex
  - Multi channel APIs (eg. consuming HTTP and socket.io via api-provider packages)
  - Multi database APIs (different database for every route, if you need)
  - Versioned APIs
+ - Swagger compatibility (via [api-core-mapper](https://github.com/ajuhos/api-core-mapper))
 
 ## Installation
 
-**API Core is in ``alpha`` and NOT ready for production use.**
+**API Core is in ``beta`` and NOT ready for production use.**
 
 To install the latest version, use NPM:
 
@@ -64,7 +65,7 @@ channels.
 We have (or working on) providers for the following channels:
  
  - HTTP
-     - _Express: api-provider-express (coming soon)_
+     - Express: [api-provider-express](https://github.com/ajuhos/api-provider-express)
      - _Koa: api-provider-koa (coming soon)_
      - _Restify: api-provder-restify (coming soon)_
      - Ellipse: [api-provider-ellipse](https://github.com/ajuhos/api-provider-ellipse)
