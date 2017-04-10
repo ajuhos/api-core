@@ -1,5 +1,4 @@
 import { QueryStep, ApiQueryScope } from "../query/ApiQuery";
-import { ApiEdgeQueryResponse } from "./ApiEdgeQueryResponse";
 import { ApiEdgeQueryType } from "./ApiEdgeQueryType";
 export declare enum ApiEdgeActionTrigger {
     OutputQuery = 2,
@@ -20,6 +19,6 @@ export declare class ApiEdgeAction implements QueryStep {
     triggers: ApiEdgeActionTrigger;
     triggerNames: string[];
     execute: (scope: ApiQueryScope) => Promise<ApiQueryScope>;
-    constructor(name: string, execute: (scope: ApiQueryScope) => Promise<ApiEdgeQueryResponse>, targetTypes?: ApiEdgeQueryType, triggerKind?: ApiEdgeActionTriggerKind, triggers?: ApiEdgeActionTrigger, triggerNames?: string[]);
+    constructor(name: string, execute: (scope: ApiQueryScope) => Promise<ApiQueryScope>, targetTypes?: ApiEdgeQueryType, triggerKind?: ApiEdgeActionTriggerKind, triggers?: ApiEdgeActionTrigger, triggerNames?: string[]);
     inspect: () => string;
 }
