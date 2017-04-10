@@ -1,5 +1,4 @@
 import {QueryStep, ApiQueryScope} from "../query/ApiQuery";
-import {ApiEdgeQueryResponse} from "./ApiEdgeQueryResponse";
 import {ApiEdgeQueryType} from "./ApiEdgeQueryType";
 
 export enum ApiEdgeActionTrigger {
