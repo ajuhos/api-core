@@ -40,6 +40,6 @@ export enum ApiEdgeQueryType {
 
     Any = List | Get | Create | Update | Patch | Delete | Exists,
     Change = Update | Patch,
-    Read = Get | Exists,
+    Read = Get | List,
     ReadOrChange = Read | Change
 }

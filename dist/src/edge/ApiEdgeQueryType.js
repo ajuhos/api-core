@@ -9,8 +9,8 @@
     ApiEdgeQueryType[ApiEdgeQueryType["Exists"] = 128] = "Exists";
     ApiEdgeQueryType[ApiEdgeQueryType["Any"] = 254] = "Any";
     ApiEdgeQueryType[ApiEdgeQueryType["Change"] = 48] = "Change";
-    ApiEdgeQueryType[ApiEdgeQueryType["Read"] = 132] = "Read";
-    ApiEdgeQueryType[ApiEdgeQueryType["ReadOrChange"] = 180] = "ReadOrChange";
+    ApiEdgeQueryType[ApiEdgeQueryType["Read"] = 6] = "Read";
+    ApiEdgeQueryType[ApiEdgeQueryType["ReadOrChange"] = 54] = "ReadOrChange";
 })(exports.ApiEdgeQueryType || (exports.ApiEdgeQueryType = {}));
 var ApiEdgeQueryType = exports.ApiEdgeQueryType;
 //# sourceMappingURL=ApiEdgeQueryType.js.map

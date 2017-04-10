@@ -8,6 +8,6 @@ export declare enum ApiEdgeQueryType {
     Exists = 128,
     Any = 254,
     Change = 48,
-    Read = 132,
-    ReadOrChange = 180,
+    Read = 6,
+    ReadOrChange = 54,
 }
