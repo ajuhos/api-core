@@ -29,7 +29,7 @@ export class ApiEdgeAction implements QueryStep {
     triggers: ApiEdgeActionTrigger = ApiEdgeActionTrigger.Any;
     triggerNames: string[] = [];
 
-    execute: (scope: ApiQueryScope) => Promise<ApiQueryScope>; 
+    execute: (scope: ApiQueryScope) => Promise<ApiQueryScope>;
 
     constructor(name: string,
                 execute: (scope: ApiQueryScope) => Promise<ApiQueryScope>,
