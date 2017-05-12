@@ -6,6 +6,7 @@ export declare enum ApiEdgeQueryFilterType {
     LowerThan = 4,
     NotEquals = 5,
     Similar = 6,
+    In = 7,
 }
 export declare class ApiEdgeQueryFilter {
     field: string;

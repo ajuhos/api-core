@@ -3,7 +3,7 @@ import {ApiEdgeQuery} from "../edge/ApiEdgeQuery";
 import {ApiEdgeQueryContext} from "../edge/ApiEdgeQueryContext";
 import {ApiEdgeRelation} from "../relations/ApiEdgeRelation";
 import {ApiEdgeError} from "./ApiEdgeError";
-import {ApiEdgeQueryFilterType} from "../edge/ApiEdgeQueryFilter";
+import {ApiEdgeQueryFilter, ApiEdgeQueryFilterType} from "../edge/ApiEdgeQueryFilter";
 import {
     PathSegment, EntryPathSegment, RelatedFieldPathSegment, ApiRequest,
     EdgePathSegment, ApiRequestType, MethodPathSegment
@@ -19,41 +19,60 @@ const parse = require('obj-parse');
 
 export class EmbedQueryQueryStep implements QueryStep {
     query: ApiQuery;
-    segment: EntryPathSegment;
+    request: ApiRequest;
+    segment: PathSegment;
     targetField: string;
+    idField: string;
 
-    constructor(query: ApiQuery, segment: EntryPathSegment) {
+    constructor(query: ApiQuery, segment: PathSegment, request: ApiRequest) {
         this.query = query;
+        this.query.request = this.request = request;
         this.segment = segment;
 
         if(!this.segment.relation) throw new Error('Invalid relation provided.');
         this.targetField = this.segment.relation.name;
+        this.idField = this.segment.relation.to.idField||Api.defaultIdField;
     }
-
-    private executeSingle = (scope: ApiQueryScope, target: any) => {
-        return new Promise((resolve, reject) => {
-            //Now we can replace TBD and provide a real id for the query.
-            this.segment.id = target[this.targetField];
-
-            this.query.execute(scope.identity).then((response) => {
-                target[this.targetField] = response;
-                resolve(scope)
-            }).catch(reject);
-        })
-    };
 
     execute = (scope: ApiQueryScope) => {
         return new Promise((resolve, reject) => {
             if(scope.response) {
-                if(Array.isArray(scope.response.data)) {
-                    const p = Promise.resolve();
-                    for(let entry of scope.response.data) {
-                        p.then(() => this.executeSingle(scope, entry))
+                const target = scope.response.data;
+
+                if(Array.isArray(target)) {
+                    const targetIndex: { [key: string]: any[] } = {},
+                        ids: string[] = [];
+
+                    for(let entry of target) {
+                        const id = entry[this.targetField];
+                        if(targetIndex[id]) targetIndex[id].push(entry);
+                        else targetIndex[id] = [entry];
+                        ids.push(id);
                     }
-                    p.then(() => resolve(scope), reject)
+
+                    this.request.context.filters = [
+                        new ApiEdgeQueryFilter(this.idField, ApiEdgeQueryFilterType.In, ids)
+                    ];
+
+                    this.query.execute(scope.identity).then((response) => {
+                        for(let entry of response.data) {
+                            const id = entry[this.idField];
+                            for(let subEntry of targetIndex[id]) {
+                                subEntry[this.targetField] = entry;
+                            }
+                        }
+                        resolve(scope)
+                    }).catch(reject);
                 }
                 else {
-                    this.executeSingle(scope, scope.response.data).then(resolve, reject)
+
+                    //Now we can replace TBD and provide a real id for the query.
+                    (this.segment as EntryPathSegment).id = target[this.targetField];
+
+                    this.query.execute(scope.identity).then((response) => {
+                        target[this.targetField] = response.data;
+                        resolve(scope)
+                    }).catch(reject);
                 }
             }
             else resolve(scope)
@@ -403,19 +422,34 @@ export class ApiQueryBuilder {
         return ApiQueryBuilder.buildProvideIdStep(query, currentSegment)
     }
 
-    private buildEmbedSteps(query: ApiQuery, request: ApiRequest) {
-        for(let relation of request.context.populatedRelations) {
-            // The id is literally TBD, it is going to be set one we have the data,
-            // what we build now is only an execution plan.
-            const segment = new EntryPathSegment(relation.to, 'TBD', null);
+    private buildEmbedSteps(query: ApiQuery, request: ApiRequest, lastSegment: PathSegment) {
+        if(request.type === ApiRequestType.Read && lastSegment instanceof EdgePathSegment) {
+            for (let relation of request.context.populatedRelations) {
+                const segment = new EdgePathSegment(relation.to, relation);
 
-            const embedRequest = new ApiRequest(request.api);
-            embedRequest.path.add(segment);
+                const embedRequest = new ApiRequest(request.api);
+                embedRequest.path.add(segment);
 
-            // We add the step directly directly, as pre- and post-actions are not
-            // supported on embed query steps. These actions will be executed as
-            // part of the sub-query.
-            query.unshift(new EmbedQueryQueryStep(this.build(embedRequest), segment));
+                // We add the step directly directly, as pre- and post-actions are not
+                // supported on embed query steps. These actions will be executed as
+                // part of the sub-query.
+                query.unshift(new EmbedQueryQueryStep(this.build(embedRequest), segment, embedRequest));
+            }
+        }
+        else {
+            for (let relation of request.context.populatedRelations) {
+                // The id is literally TBD, it is going to be set one we have the data,
+                // what we build now is only an execution plan.
+                const segment = new EntryPathSegment(relation.to, 'TBD', relation);
+
+                const embedRequest = new ApiRequest(request.api);
+                embedRequest.path.add(segment);
+
+                // We add the step directly directly, as pre- and post-actions are not
+                // supported on embed query steps. These actions will be executed as
+                // part of the sub-query.
+                query.unshift(new EmbedQueryQueryStep(this.build(embedRequest), segment, embedRequest));
+            }
         }
     }
 
@@ -426,7 +460,7 @@ export class ApiQueryBuilder {
             lastSegment = segments[segments.length-1];
 
         //STEP 0: Create embed queries
-        this.buildEmbedSteps(query, request);
+        this.buildEmbedSteps(query, request, lastSegment);
 
         //STEP 1: Create the base query which will provide the final data.
         let baseQuery: ApiEdgeQuery;
@@ -500,7 +534,7 @@ export class ApiQueryBuilder {
             readMode = true;
 
         //STEP 0: Create embed queries
-        this.buildEmbedSteps(query, request);
+        this.buildEmbedSteps(query, request, lastSegment);
 
         //STEP 1: Create the base query which will provide the final data.
         let baseQuery: ApiEdgeQuery;
@@ -599,6 +633,9 @@ export class ApiQueryBuilder {
 
         let segments = request.path.segments,
             lastSegment = segments[segments.length-1];
+
+        //STEP 0: Create embed queries
+        this.buildEmbedSteps(query, request, lastSegment);
 
         //STEP 1: Create the base query which will provide the final data.
         this.addQueryStep(query, new QueryEdgeQueryStep(new ApiEdgeQuery(lastSegment.edge, ApiEdgeQueryType.Create)));

@@ -34,10 +34,10 @@ export class ApiQuery {
     execute = (identity: any = null): Promise<ApiEdgeQueryResponse> => {
         return new Promise<ApiEdgeQueryResponse>((resolve, reject) => {
             let next = (scope: ApiQueryScope) => {
-                let step = this.steps.shift();
+                let step = this.steps[scope.step];
                 if(step) {
                     scope.step++;
-                    if (this.steps.length) {
+                    if (scope.step < this.steps.length) {
                         step.execute(scope).then(next).catch(reject);
                     }
                     else {

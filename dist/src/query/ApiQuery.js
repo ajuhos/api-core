@@ -13,10 +13,10 @@ var ApiQuery = (function () {
             if (identity === void 0) { identity = null; }
             return new Promise(function (resolve, reject) {
                 var next = function (scope) {
-                    var step = _this.steps.shift();
+                    var step = _this.steps[scope.step];
                     if (step) {
                         scope.step++;
-                        if (_this.steps.length) {
+                        if (scope.step < _this.steps.length) {
                             step.execute(scope).then(next).catch(reject);
                         }
                         else {
