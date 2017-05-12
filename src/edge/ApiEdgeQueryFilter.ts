@@ -4,7 +4,8 @@ export enum ApiEdgeQueryFilterType {
     GreaterThan,
     LowerThanOrEquals,
     LowerThan,
-    NotEquals
+    NotEquals,
+    Similar
 }
 
 export class ApiEdgeQueryFilter {

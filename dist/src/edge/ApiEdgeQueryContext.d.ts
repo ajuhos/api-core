@@ -1,8 +1,9 @@
 import { ApiEdgeQueryFilter, ApiEdgeQueryFilterType } from "./ApiEdgeQueryFilter";
+import { OneToOneRelation } from "../relations/OneToOneRelation";
 export declare class ApiEdgeQueryContext {
     id: string | null;
     fields: string[];
-    populatedFields: string[];
+    populatedRelations: OneToOneRelation[];
     pagination: {
         skip: number;
         limit: number;
@@ -13,7 +14,7 @@ export declare class ApiEdgeQueryContext {
     constructor(id?: string | null, fields?: string[]);
     paginate: (skip: number, limit: number) => this;
     sort: (fieldName: string, ascending?: boolean) => this;
-    populate(field: string): this;
+    populate(relation: OneToOneRelation): this;
     field(field: string): this;
     filter(field: string, type: ApiEdgeQueryFilterType, value: any): this;
 }

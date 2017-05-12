@@ -111,7 +111,7 @@ tap.test('/schools/s2', (t: any) => {
         query = api.buildQuery(request);
 
     t.equal(query.steps.length, 3, 'should build a 3 step query');
-    t.ok(query.steps[0] instanceof builder.ExtendContextQueryStep);
+    t.ok(query.steps[0] instanceof builder.ExtendContextLiveQueryStep);
     t.ok(query.steps[1] instanceof builder.ExtendContextQueryStep);
     t.ok(query.steps[2] instanceof builder.QueryEdgeQueryStep);
 
@@ -155,7 +155,7 @@ tap.test('/schools/s1/classes', (t: any) => {
         query = api.buildQuery(request);
 
     t.equal(query.steps.length, 5, 'should build a 5 step query');
-    t.ok(query.steps[0] instanceof builder.ExtendContextQueryStep, 'EXTEND');
+    t.ok(query.steps[0] instanceof builder.ExtendContextLiveQueryStep, 'EXTEND');
     t.ok(query.steps[1] instanceof builder.QueryEdgeQueryStep, 'QUERY /schools');
     t.ok(query.steps[2] instanceof builder.RelateQueryStep, 'RELATE schoolId');
     t.ok(query.steps[3] instanceof builder.ExtendContextQueryStep, 'APPLY PARAMS');
@@ -187,10 +187,10 @@ tap.test('/schools/s1/classes/c1', (t: any) => {
         query = api.buildQuery(request);
 
     t.equal(query.steps.length, 6, 'should build a 6 step query');
-    t.ok(query.steps[0] instanceof builder.ExtendContextQueryStep, 'EXTEND');
+    t.ok(query.steps[0] instanceof builder.ExtendContextLiveQueryStep, 'EXTEND');
     t.ok(query.steps[1] instanceof builder.QueryEdgeQueryStep, 'QUERY /schools');
     t.ok(query.steps[2] instanceof builder.RelateQueryStep, 'RELATE schoolId');
-    t.ok(query.steps[3] instanceof builder.ExtendContextQueryStep, 'EXTEND');
+    t.ok(query.steps[3] instanceof builder.ExtendContextLiveQueryStep, 'EXTEND');
     t.ok(query.steps[4] instanceof builder.ExtendContextQueryStep, 'APPLY PARAMS');
     t.ok(query.steps[5] instanceof builder.QueryEdgeQueryStep, 'QUERY /classes');
 
@@ -218,7 +218,7 @@ tap.test('/students/s2/class', (t: any) => {
         query = api.buildQuery(request);
 
     t.equal(query.steps.length, 5, 'should build a 5 step query');
-    t.ok(query.steps[0] instanceof builder.ExtendContextQueryStep, 'EXTEND');
+    t.ok(query.steps[0] instanceof builder.ExtendContextLiveQueryStep, 'EXTEND');
     t.ok(query.steps[1] instanceof builder.QueryEdgeQueryStep, 'QUERY /students');
     t.ok(query.steps[2] instanceof builder.ProvideIdQueryStep, 'PROVIDE ID: classId');
     t.ok(query.steps[3] instanceof builder.ExtendContextQueryStep, 'APPLY PARAMS');
@@ -292,7 +292,7 @@ tap.test('DELETE /schools/s3', (t: any) => {
     const query = api.buildQuery(request);
 
     t.equal(query.steps.length, 3, 'should build a 3 step query');
-    t.ok(query.steps[0] instanceof builder.ExtendContextQueryStep);
+    t.ok(query.steps[0] instanceof builder.ExtendContextLiveQueryStep);
     t.ok(query.steps[1] instanceof builder.ExtendContextQueryStep);
     t.ok(query.steps[2] instanceof builder.QueryEdgeQueryStep);
 
@@ -334,7 +334,7 @@ tap.test('PATCH /schools/s2', (t: any) => {
 
     t.equal(query.steps.length, 4, 'should build a 4 step query');
     t.ok(query.steps[0] instanceof builder.SetBodyQueryStep, 'SET BODY');
-    t.ok(query.steps[1] instanceof builder.ExtendContextQueryStep, 'EXTEND');
+    t.ok(query.steps[1] instanceof builder.ExtendContextLiveQueryStep, 'EXTEND');
     t.ok(query.steps[2] instanceof builder.ExtendContextQueryStep, 'APPLY PARAMS');
     t.ok(query.steps[3] instanceof builder.QueryEdgeQueryStep, 'QUERY');
 
@@ -366,7 +366,7 @@ tap.test('PUT /schools/s2', (t: any) => {
 
     t.equal(query.steps.length, 4, 'should build a 4 step query');
     t.ok(query.steps[0] instanceof builder.SetBodyQueryStep, 'SET BODY');
-    t.ok(query.steps[1] instanceof builder.ExtendContextQueryStep, 'EXTEND');
+    t.ok(query.steps[1] instanceof builder.ExtendContextLiveQueryStep, 'EXTEND');
     t.ok(query.steps[2] instanceof builder.ExtendContextQueryStep, 'APPLY PARAMS');
     t.ok(query.steps[3] instanceof builder.QueryEdgeQueryStep, 'QUERY');
 
@@ -409,7 +409,7 @@ tap.test('/students/s2/withHungarianName', (t: any) => {
         query = api.buildQuery(request);
 
     t.equal(query.steps.length, 5, 'should build an 5 step query');
-    t.ok(query.steps[0] instanceof builder.ExtendContextQueryStep, 'EXTEND');
+    t.ok(query.steps[0] instanceof builder.ExtendContextLiveQueryStep, 'EXTEND');
     t.ok(query.steps[1] instanceof builder.QueryEdgeQueryStep, 'QUERY /students');
     t.ok(query.steps[2] instanceof builder.ExtendContextQueryStep, 'APPLY PARAMS');
     t.ok(query.steps[3] instanceof builder.ProvideIdQueryStep, 'PROVIDE ID');

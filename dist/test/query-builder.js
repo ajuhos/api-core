@@ -92,7 +92,7 @@ tap.test('/schools', function (t) {
 tap.test('/schools/s2', function (t) {
     var request = api.parseRequest(['schools', 's2']), query = api.buildQuery(request);
     t.equal(query.steps.length, 3, 'should build a 3 step query');
-    t.ok(query.steps[0] instanceof builder.ExtendContextQueryStep);
+    t.ok(query.steps[0] instanceof builder.ExtendContextLiveQueryStep);
     t.ok(query.steps[1] instanceof builder.ExtendContextQueryStep);
     t.ok(query.steps[2] instanceof builder.QueryEdgeQueryStep);
     query.execute()
@@ -128,7 +128,7 @@ tap.test('/schools/s5', function (t) {
 tap.test('/schools/s1/classes', function (t) {
     var request = api.parseRequest(['schools', 's1', 'classes']), query = api.buildQuery(request);
     t.equal(query.steps.length, 5, 'should build a 5 step query');
-    t.ok(query.steps[0] instanceof builder.ExtendContextQueryStep, 'EXTEND');
+    t.ok(query.steps[0] instanceof builder.ExtendContextLiveQueryStep, 'EXTEND');
     t.ok(query.steps[1] instanceof builder.QueryEdgeQueryStep, 'QUERY /schools');
     t.ok(query.steps[2] instanceof builder.RelateQueryStep, 'RELATE schoolId');
     t.ok(query.steps[3] instanceof builder.ExtendContextQueryStep, 'APPLY PARAMS');
@@ -155,10 +155,10 @@ tap.test('/schools/s1/classes', function (t) {
 tap.test('/schools/s1/classes/c1', function (t) {
     var request = api.parseRequest(['schools', 's1', 'classes', 'c1']), query = api.buildQuery(request);
     t.equal(query.steps.length, 6, 'should build a 6 step query');
-    t.ok(query.steps[0] instanceof builder.ExtendContextQueryStep, 'EXTEND');
+    t.ok(query.steps[0] instanceof builder.ExtendContextLiveQueryStep, 'EXTEND');
     t.ok(query.steps[1] instanceof builder.QueryEdgeQueryStep, 'QUERY /schools');
     t.ok(query.steps[2] instanceof builder.RelateQueryStep, 'RELATE schoolId');
-    t.ok(query.steps[3] instanceof builder.ExtendContextQueryStep, 'EXTEND');
+    t.ok(query.steps[3] instanceof builder.ExtendContextLiveQueryStep, 'EXTEND');
     t.ok(query.steps[4] instanceof builder.ExtendContextQueryStep, 'APPLY PARAMS');
     t.ok(query.steps[5] instanceof builder.QueryEdgeQueryStep, 'QUERY /classes');
     query.execute()
@@ -181,7 +181,7 @@ tap.test('/schools/s1/classes/c1', function (t) {
 tap.test('/students/s2/class', function (t) {
     var request = api.parseRequest(['students', 's2', 'class']), query = api.buildQuery(request);
     t.equal(query.steps.length, 5, 'should build a 5 step query');
-    t.ok(query.steps[0] instanceof builder.ExtendContextQueryStep, 'EXTEND');
+    t.ok(query.steps[0] instanceof builder.ExtendContextLiveQueryStep, 'EXTEND');
     t.ok(query.steps[1] instanceof builder.QueryEdgeQueryStep, 'QUERY /students');
     t.ok(query.steps[2] instanceof builder.ProvideIdQueryStep, 'PROVIDE ID: classId');
     t.ok(query.steps[3] instanceof builder.ExtendContextQueryStep, 'APPLY PARAMS');
@@ -246,7 +246,7 @@ tap.test('DELETE /schools/s3', function (t) {
     request.type = ApiRequest_1.ApiRequestType.Delete;
     var query = api.buildQuery(request);
     t.equal(query.steps.length, 3, 'should build a 3 step query');
-    t.ok(query.steps[0] instanceof builder.ExtendContextQueryStep);
+    t.ok(query.steps[0] instanceof builder.ExtendContextLiveQueryStep);
     t.ok(query.steps[1] instanceof builder.ExtendContextQueryStep);
     t.ok(query.steps[2] instanceof builder.QueryEdgeQueryStep);
     query.execute()
@@ -283,7 +283,7 @@ tap.test('PATCH /schools/s2', function (t) {
     var query = api.buildQuery(request);
     t.equal(query.steps.length, 4, 'should build a 4 step query');
     t.ok(query.steps[0] instanceof builder.SetBodyQueryStep, 'SET BODY');
-    t.ok(query.steps[1] instanceof builder.ExtendContextQueryStep, 'EXTEND');
+    t.ok(query.steps[1] instanceof builder.ExtendContextLiveQueryStep, 'EXTEND');
     t.ok(query.steps[2] instanceof builder.ExtendContextQueryStep, 'APPLY PARAMS');
     t.ok(query.steps[3] instanceof builder.QueryEdgeQueryStep, 'QUERY');
     query.execute()
@@ -311,7 +311,7 @@ tap.test('PUT /schools/s2', function (t) {
     var query = api.buildQuery(request);
     t.equal(query.steps.length, 4, 'should build a 4 step query');
     t.ok(query.steps[0] instanceof builder.SetBodyQueryStep, 'SET BODY');
-    t.ok(query.steps[1] instanceof builder.ExtendContextQueryStep, 'EXTEND');
+    t.ok(query.steps[1] instanceof builder.ExtendContextLiveQueryStep, 'EXTEND');
     t.ok(query.steps[2] instanceof builder.ExtendContextQueryStep, 'APPLY PARAMS');
     t.ok(query.steps[3] instanceof builder.QueryEdgeQueryStep, 'QUERY');
     query.execute()
@@ -347,7 +347,7 @@ tap.test('GET /students/s2/rename', function (t) {
 tap.test('/students/s2/withHungarianName', function (t) {
     var request = api.parseRequest(['students', 's2', 'withHungarianName']), query = api.buildQuery(request);
     t.equal(query.steps.length, 5, 'should build an 5 step query');
-    t.ok(query.steps[0] instanceof builder.ExtendContextQueryStep, 'EXTEND');
+    t.ok(query.steps[0] instanceof builder.ExtendContextLiveQueryStep, 'EXTEND');
     t.ok(query.steps[1] instanceof builder.QueryEdgeQueryStep, 'QUERY /students');
     t.ok(query.steps[2] instanceof builder.ExtendContextQueryStep, 'APPLY PARAMS');
     t.ok(query.steps[3] instanceof builder.ProvideIdQueryStep, 'PROVIDE ID');

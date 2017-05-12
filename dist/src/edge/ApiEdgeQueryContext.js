@@ -6,14 +6,14 @@ var ApiEdgeQueryContext = (function () {
         if (id === void 0) { id = null; }
         if (fields === void 0) { fields = []; }
         this.fields = [];
-        this.populatedFields = [];
+        this.populatedRelations = [];
         this.sortBy = [];
         this.filters = [];
         this.clone = function () {
             var temp = new ApiEdgeQueryContext();
             temp.id = _this.id;
             _this.fields.forEach(function (f) { return temp.fields.push(f); });
-            _this.populatedFields.forEach(function (f) { return temp.populatedFields.push(f); });
+            _this.populatedRelations.forEach(function (f) { return temp.populatedRelations.push(f); });
             _this.filters.forEach(function (f) { return temp.filters.push(f.clone()); });
             _this.sortBy.forEach(function (f) { return temp.sortBy.push([f[0], f[1]]); });
             if (_this.pagination) {
@@ -38,8 +38,8 @@ var ApiEdgeQueryContext = (function () {
         this.id = id;
         this.fields = fields;
     }
-    ApiEdgeQueryContext.prototype.populate = function (field) {
-        this.populatedFields.push(field);
+    ApiEdgeQueryContext.prototype.populate = function (relation) {
+        this.populatedRelations.push(relation);
         return this;
     };
     ApiEdgeQueryContext.prototype.field = function (field) {

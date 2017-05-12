@@ -15,14 +15,6 @@ tap.test('adding fields should work', function (t) {
     t.same(context.fields, ['test', 'test2']);
     t.end();
 });
-tap.test('adding populated fields should work', function (t) {
-    var context = new ApiEdgeQueryContext_1.ApiEdgeQueryContext();
-    context.populate('test');
-    t.same(context.populatedFields, ['test']);
-    context.populate('test2');
-    t.same(context.populatedFields, ['test', 'test2']);
-    t.end();
-});
 tap.test('pagination should work', function (t) {
     var context = new ApiEdgeQueryContext_1.ApiEdgeQueryContext();
     t.notOk(context.pagination);
@@ -70,7 +62,6 @@ tap.test('cloning should work', function (t) {
     context.sort('test', true);
     context.filter('test', ApiEdgeQueryFilter_1.ApiEdgeQueryFilterType.NotEquals, 10);
     context.paginate(10, 20);
-    context.populate('test');
     context.field('test');
     var clonedContext = context.clone();
     t.equal(JSON.stringify(clonedContext), JSON.stringify(context));

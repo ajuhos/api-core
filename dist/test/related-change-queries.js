@@ -43,7 +43,7 @@ tap.test('POST /schools/s2/students', function (t) {
     var query = api.buildQuery(request);
     t.equal(query.steps.length, 5, 'should build a 5 step query');
     t.ok(query.steps[0] instanceof builder.SetBodyQueryStep, 'SET BODY');
-    t.ok(query.steps[1] instanceof builder.ExtendContextQueryStep, 'EXTEND');
+    t.ok(query.steps[1] instanceof builder.ExtendContextLiveQueryStep, 'EXTEND');
     t.ok(query.steps[2] instanceof builder.QueryEdgeQueryStep, 'QUERY /schools');
     t.ok(query.steps[3] instanceof builder.RelateChangeQueryStep, 'RELATE CHANGE schoolId');
     t.ok(query.steps[4] instanceof builder.QueryEdgeQueryStep, 'QUERY /students');
@@ -75,10 +75,10 @@ tap.test('POST /schools/s2/classes/c1/students', function (t) {
     var query = api.buildQuery(request);
     t.equal(query.steps.length, 8, 'should build a 8 step query');
     t.ok(query.steps[0] instanceof builder.SetBodyQueryStep, 'SET BODY');
-    t.ok(query.steps[1] instanceof builder.ExtendContextQueryStep, 'EXTEND');
+    t.ok(query.steps[1] instanceof builder.ExtendContextLiveQueryStep, 'EXTEND');
     t.ok(query.steps[2] instanceof builder.QueryEdgeQueryStep, 'QUERY /schools');
     t.ok(query.steps[3] instanceof builder.RelateChangeQueryStep, 'RELATE CHANGE schoolId');
-    t.ok(query.steps[4] instanceof builder.ExtendContextQueryStep, 'EXTEND');
+    t.ok(query.steps[4] instanceof builder.ExtendContextLiveQueryStep, 'EXTEND');
     t.ok(query.steps[5] instanceof builder.QueryEdgeQueryStep, 'QUERY /classes');
     t.ok(query.steps[6] instanceof builder.RelateChangeQueryStep, 'RELATE CHANGE classId');
     t.ok(query.steps[7] instanceof builder.QueryEdgeQueryStep, 'QUERY /students');
@@ -112,7 +112,7 @@ tap.test('POST /schools/s2/students (invalid body)', function (t) {
     var query = api.buildQuery(request);
     t.equal(query.steps.length, 5, 'should build a 5 step query');
     t.ok(query.steps[0] instanceof builder.SetBodyQueryStep, 'SET BODY');
-    t.ok(query.steps[1] instanceof builder.ExtendContextQueryStep, 'EXTEND');
+    t.ok(query.steps[1] instanceof builder.ExtendContextLiveQueryStep, 'EXTEND');
     t.ok(query.steps[2] instanceof builder.QueryEdgeQueryStep, 'QUERY /schools');
     t.ok(query.steps[3] instanceof builder.RelateChangeQueryStep, 'RELATE CHANGE schoolId');
     t.ok(query.steps[4] instanceof builder.QueryEdgeQueryStep, 'QUERY /students');
@@ -146,10 +146,10 @@ tap.test('POST /schools/s2/classes/c1/students (invalid body)', function (t) {
     var query = api.buildQuery(request);
     t.equal(query.steps.length, 8, 'should build a 8 step query');
     t.ok(query.steps[0] instanceof builder.SetBodyQueryStep, 'SET BODY');
-    t.ok(query.steps[1] instanceof builder.ExtendContextQueryStep, 'EXTEND');
+    t.ok(query.steps[1] instanceof builder.ExtendContextLiveQueryStep, 'EXTEND');
     t.ok(query.steps[2] instanceof builder.QueryEdgeQueryStep, 'QUERY /schools');
     t.ok(query.steps[3] instanceof builder.RelateChangeQueryStep, 'RELATE CHANGE schoolId');
-    t.ok(query.steps[4] instanceof builder.ExtendContextQueryStep, 'EXTEND');
+    t.ok(query.steps[4] instanceof builder.ExtendContextLiveQueryStep, 'EXTEND');
     t.ok(query.steps[5] instanceof builder.QueryEdgeQueryStep, 'QUERY /classes');
     t.ok(query.steps[6] instanceof builder.RelateChangeQueryStep, 'RELATE CHANGE classId');
     t.ok(query.steps[7] instanceof builder.QueryEdgeQueryStep, 'QUERY /students');
@@ -179,11 +179,11 @@ tap.test('PATCH /schools/s2/students/s7', function (t) {
     var query = api.buildQuery(request);
     t.equal(query.steps.length, 8, 'should build a 8 step query');
     t.ok(query.steps[0] instanceof builder.SetBodyQueryStep, 'SET BODY');
-    t.ok(query.steps[1] instanceof builder.ExtendContextQueryStep, 'EXTEND');
+    t.ok(query.steps[1] instanceof builder.ExtendContextLiveQueryStep, 'EXTEND');
     t.ok(query.steps[2] instanceof builder.QueryEdgeQueryStep, 'QUERY /schools');
     t.ok(query.steps[3] instanceof builder.RelateChangeQueryStep, 'RELATE CHANGE schoolId');
     t.ok(query.steps[4] instanceof builder.RelateQueryStep, 'RELATE schoolId');
-    t.ok(query.steps[5] instanceof builder.ExtendContextQueryStep, 'EXTEND CONTEXT');
+    t.ok(query.steps[5] instanceof builder.ExtendContextLiveQueryStep, 'EXTEND CONTEXT');
     t.ok(query.steps[6] instanceof builder.ExtendContextQueryStep, 'APPLY PARAMS');
     t.ok(query.steps[7] instanceof builder.QueryEdgeQueryStep, 'QUERY /students');
     query.execute()
@@ -213,11 +213,11 @@ tap.test('PATCH /schools/s2/students/s7 (invalid body)', function (t) {
     var query = api.buildQuery(request);
     t.equal(query.steps.length, 8, 'should build a 8 step query');
     t.ok(query.steps[0] instanceof builder.SetBodyQueryStep, 'SET BODY');
-    t.ok(query.steps[1] instanceof builder.ExtendContextQueryStep, 'EXTEND');
+    t.ok(query.steps[1] instanceof builder.ExtendContextLiveQueryStep, 'EXTEND');
     t.ok(query.steps[2] instanceof builder.QueryEdgeQueryStep, 'QUERY /schools');
     t.ok(query.steps[3] instanceof builder.RelateChangeQueryStep, 'RELATE CHANGE schoolId');
     t.ok(query.steps[4] instanceof builder.RelateQueryStep, 'RELATE schoolId');
-    t.ok(query.steps[5] instanceof builder.ExtendContextQueryStep, 'EXTEND CONTEXT');
+    t.ok(query.steps[5] instanceof builder.ExtendContextLiveQueryStep, 'EXTEND CONTEXT');
     t.ok(query.steps[6] instanceof builder.ExtendContextQueryStep, 'APPLY PARAMS');
     t.ok(query.steps[7] instanceof builder.QueryEdgeQueryStep, 'QUERY /students');
     query.execute()
@@ -250,11 +250,11 @@ tap.test('PUT /schools/s2/students/s7', function (t) {
     var query = api.buildQuery(request);
     t.equal(query.steps.length, 8, 'should build a 8 step query');
     t.ok(query.steps[0] instanceof builder.SetBodyQueryStep, 'SET BODY');
-    t.ok(query.steps[1] instanceof builder.ExtendContextQueryStep, 'EXTEND');
+    t.ok(query.steps[1] instanceof builder.ExtendContextLiveQueryStep, 'EXTEND');
     t.ok(query.steps[2] instanceof builder.QueryEdgeQueryStep, 'QUERY /schools');
     t.ok(query.steps[3] instanceof builder.RelateChangeQueryStep, 'RELATE CHANGE schoolId');
     t.ok(query.steps[4] instanceof builder.RelateQueryStep, 'RELATE schoolId');
-    t.ok(query.steps[5] instanceof builder.ExtendContextQueryStep, 'EXTEND CONTEXT');
+    t.ok(query.steps[5] instanceof builder.ExtendContextLiveQueryStep, 'EXTEND CONTEXT');
     t.ok(query.steps[6] instanceof builder.ExtendContextQueryStep, 'APPLY PARAMS');
     t.ok(query.steps[7] instanceof builder.QueryEdgeQueryStep, 'QUERY /students');
     query.execute()
@@ -287,11 +287,11 @@ tap.test('PUT /schools/s2/students/s7 (invalid body)', function (t) {
     var query = api.buildQuery(request);
     t.equal(query.steps.length, 8, 'should build a 8 step query');
     t.ok(query.steps[0] instanceof builder.SetBodyQueryStep, 'SET BODY');
-    t.ok(query.steps[1] instanceof builder.ExtendContextQueryStep, 'EXTEND');
+    t.ok(query.steps[1] instanceof builder.ExtendContextLiveQueryStep, 'EXTEND');
     t.ok(query.steps[2] instanceof builder.QueryEdgeQueryStep, 'QUERY /schools');
     t.ok(query.steps[3] instanceof builder.RelateChangeQueryStep, 'RELATE CHANGE schoolId');
     t.ok(query.steps[4] instanceof builder.RelateQueryStep, 'RELATE schoolId');
-    t.ok(query.steps[5] instanceof builder.ExtendContextQueryStep, 'EXTEND CONTEXT');
+    t.ok(query.steps[5] instanceof builder.ExtendContextLiveQueryStep, 'EXTEND CONTEXT');
     t.ok(query.steps[6] instanceof builder.ExtendContextQueryStep, 'APPLY PARAMS');
     t.ok(query.steps[7] instanceof builder.QueryEdgeQueryStep, 'QUERY /students');
     query.execute()
@@ -316,10 +316,10 @@ tap.test('DELETE /schools/s2/students/s7', function (t) {
     request.type = ApiRequest_1.ApiRequestType.Delete;
     var query = api.buildQuery(request);
     t.equal(query.steps.length, 6, 'should build a 6 step query');
-    t.ok(query.steps[0] instanceof builder.ExtendContextQueryStep, 'EXTEND');
+    t.ok(query.steps[0] instanceof builder.ExtendContextLiveQueryStep, 'EXTEND');
     t.ok(query.steps[1] instanceof builder.QueryEdgeQueryStep, 'QUERY /schools');
     t.ok(query.steps[2] instanceof builder.RelateQueryStep, 'RELATE schoolId');
-    t.ok(query.steps[3] instanceof builder.ExtendContextQueryStep, 'EXTEND CONTEXT');
+    t.ok(query.steps[3] instanceof builder.ExtendContextLiveQueryStep, 'EXTEND CONTEXT');
     t.ok(query.steps[4] instanceof builder.ExtendContextQueryStep, 'APPLY PARAMS');
     t.ok(query.steps[5] instanceof builder.QueryEdgeQueryStep, 'QUERY /students');
     query.execute()

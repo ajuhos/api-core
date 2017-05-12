@@ -51,7 +51,7 @@ export abstract class ApiEdge implements ApiEdgeDefinition {
     };
 
     action = (name: string,
-              execute: (scope: ApiQueryScope) => Promise<ApiEdgeQueryResponse>,
+              execute: (scope: ApiQueryScope) => Promise<ApiQueryScope>,
               targetTypes: ApiEdgeQueryType = ApiEdgeQueryType.Any,
               triggerKind: ApiEdgeActionTriggerKind = ApiEdgeActionTriggerKind.BeforeEvent,
               triggers: ApiEdgeActionTrigger = ApiEdgeActionTrigger.Any,

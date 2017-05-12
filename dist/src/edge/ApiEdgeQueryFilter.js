@@ -6,6 +6,7 @@
     ApiEdgeQueryFilterType[ApiEdgeQueryFilterType["LowerThanOrEquals"] = 3] = "LowerThanOrEquals";
     ApiEdgeQueryFilterType[ApiEdgeQueryFilterType["LowerThan"] = 4] = "LowerThan";
     ApiEdgeQueryFilterType[ApiEdgeQueryFilterType["NotEquals"] = 5] = "NotEquals";
+    ApiEdgeQueryFilterType[ApiEdgeQueryFilterType["Similar"] = 6] = "Similar";
 })(exports.ApiEdgeQueryFilterType || (exports.ApiEdgeQueryFilterType = {}));
 var ApiEdgeQueryFilterType = exports.ApiEdgeQueryFilterType;
 var ApiEdgeQueryFilter = (function () {

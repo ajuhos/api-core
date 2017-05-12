@@ -1,9 +1,10 @@
 import {ApiEdgeQueryFilter, ApiEdgeQueryFilterType} from "./ApiEdgeQueryFilter";
+import {OneToOneRelation} from "../relations/OneToOneRelation";
 
 export class ApiEdgeQueryContext {
     id: string|null;
     fields: string[] = [];
-    populatedFields: string[] = [];
+    populatedRelations: OneToOneRelation[] = [];
     pagination: {
         skip: number,
         limit: number
@@ -16,7 +17,7 @@ export class ApiEdgeQueryContext {
         temp.id = this.id;
 
         this.fields.forEach(f => temp.fields.push(f));
-        this.populatedFields.forEach(f => temp.populatedFields.push(f));
+        this.populatedRelations.forEach(f => temp.populatedRelations.push(f));
         this.filters.forEach(f => temp.filters.push(f.clone()));
         this.sortBy.forEach(f => temp.sortBy.push([f[0], f[1]]));
 
@@ -47,8 +48,8 @@ export class ApiEdgeQueryContext {
         return this
     };
 
-    populate(field: string) {
-        this.populatedFields.push(field);
+    populate(relation: OneToOneRelation) {
+        this.populatedRelations.push(relation);
         return this
     }
 

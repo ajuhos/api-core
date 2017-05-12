@@ -12,6 +12,50 @@ var Api_1 = require("../Api");
 var ApiEdgeAction_1 = require("../edge/ApiEdgeAction");
 var ApiAction_1 = require("./ApiAction");
 var parse = require('obj-parse');
+var EmbedQueryQueryStep = (function () {
+    function EmbedQueryQueryStep(query, segment) {
+        var _this = this;
+        this.executeSingle = function (scope, target) {
+            return new Promise(function (resolve, reject) {
+                _this.segment.id = target[_this.targetField];
+                _this.query.execute(scope.identity).then(function (response) {
+                    target[_this.targetField] = response;
+                    resolve(scope);
+                }).catch(reject);
+            });
+        };
+        this.execute = function (scope) {
+            return new Promise(function (resolve, reject) {
+                if (scope.response) {
+                    if (Array.isArray(scope.response.data)) {
+                        var p = Promise.resolve();
+                        var _loop_1 = function(entry) {
+                            p.then(function () { return _this.executeSingle(scope, entry); });
+                        };
+                        for (var _i = 0, _a = scope.response.data; _i < _a.length; _i++) {
+                            var entry = _a[_i];
+                            _loop_1(entry);
+                        }
+                        p.then(function () { return resolve(scope); }, reject);
+                    }
+                    else {
+                        _this.executeSingle(scope, scope.response.data).then(resolve, reject);
+                    }
+                }
+                else
+                    resolve(scope);
+            });
+        };
+        this.inspect = function () { return ("EMBED QUERY /" + _this.targetField); };
+        this.query = query;
+        this.segment = segment;
+        if (!this.segment.relation)
+            throw new Error('Invalid relation provided.');
+        this.targetField = this.segment.relation.name;
+    }
+    return EmbedQueryQueryStep;
+}());
+exports.EmbedQueryQueryStep = EmbedQueryQueryStep;
 var QueryEdgeQueryStep = (function () {
     function QueryEdgeQueryStep(query) {
         var _this = this;
@@ -144,7 +188,7 @@ var ExtendContextQueryStep = (function () {
                     scope.context.pagination = _this.context.pagination;
                 }
                 _this.context.fields.forEach(function (f) { return scope.context.fields.push(f); });
-                _this.context.populatedFields.forEach(function (f) { return scope.context.populatedFields.push(f); });
+                _this.context.populatedRelations.forEach(function (f) { return scope.context.populatedRelations.push(f); });
                 _this.context.filters.forEach(function (f) { return scope.context.filters.push(f); });
                 _this.context.sortBy.forEach(function (f) { return scope.context.sortBy.push(f); });
                 resolve(scope);
@@ -163,12 +207,30 @@ var ExtendContextQueryStep = (function () {
     return ExtendContextQueryStep;
 }());
 exports.ExtendContextQueryStep = ExtendContextQueryStep;
+var ExtendContextLiveQueryStep = (function () {
+    function ExtendContextLiveQueryStep(func) {
+        var _this = this;
+        this.execute = function (scope) {
+            return new Promise(function (resolve) {
+                _this.apply(scope.context);
+                resolve(scope);
+            });
+        };
+        this.inspect = function () {
+            return "EXTEND CONTEXT LIVE";
+        };
+        this.apply = func;
+    }
+    return ExtendContextLiveQueryStep;
+}());
+exports.ExtendContextLiveQueryStep = ExtendContextLiveQueryStep;
 var ApiQueryBuilder = (function () {
     function ApiQueryBuilder(api) {
         var _this = this;
         this.buildReadQuery = function (request) {
             var query = new ApiQuery_1.ApiQuery();
             var segments = request.path.segments, lastSegment = segments[segments.length - 1];
+            _this.buildEmbedSteps(query, request);
             var baseQuery;
             if (lastSegment instanceof ApiRequest_1.EdgePathSegment) {
                 baseQuery = new ApiEdgeQuery_1.ApiEdgeQuery(lastSegment.edge, ApiEdgeQueryType_1.ApiEdgeQueryType.List);
@@ -188,7 +250,8 @@ var ApiQueryBuilder = (function () {
             }
             query.unshift(new ExtendContextQueryStep(request.context));
             if (lastSegment instanceof ApiRequest_1.EntryPathSegment) {
-                query.unshift(new ExtendContextQueryStep(new ApiEdgeQueryContext_1.ApiEdgeQueryContext(lastSegment.id)));
+                var _segment_1 = lastSegment;
+                query.unshift(new ExtendContextLiveQueryStep(function (context) { return context.id = _segment_1.id; }));
             }
             else if (lastSegment instanceof ApiRequest_1.RelatedFieldPathSegment) {
                 query.unshift(new ProvideIdQueryStep(lastSegment.relation.relationId));
@@ -217,6 +280,7 @@ var ApiQueryBuilder = (function () {
         this.buildChangeQuery = function (request) {
             var query = new ApiQuery_1.ApiQuery();
             var segments = request.path.segments, lastSegment = segments[segments.length - 1], readMode = true;
+            _this.buildEmbedSteps(query, request);
             var baseQuery;
             if (lastSegment instanceof ApiRequest_1.RelatedFieldPathSegment) {
                 if (request.type === ApiRequest_1.ApiRequestType.Update) {
@@ -253,7 +317,8 @@ var ApiQueryBuilder = (function () {
             }
             query.unshift(new ExtendContextQueryStep(request.context));
             if (lastSegment instanceof ApiRequest_1.EntryPathSegment) {
-                query.unshift(new ExtendContextQueryStep(new ApiEdgeQueryContext_1.ApiEdgeQueryContext(lastSegment.id)));
+                var _segment_2 = lastSegment;
+                query.unshift(new ExtendContextLiveQueryStep(function (context) { return context.id = _segment_2.id; }));
             }
             else if (lastSegment instanceof ApiRequest_1.RelatedFieldPathSegment) {
                 if (request.type === ApiRequest_1.ApiRequestType.Update) {
@@ -372,7 +437,7 @@ var ApiQueryBuilder = (function () {
     };
     ApiQueryBuilder.buildProvideIdStep = function (query, currentSegment) {
         if (currentSegment instanceof ApiRequest_1.EntryPathSegment) {
-            query.unshift(new ExtendContextQueryStep(new ApiEdgeQueryContext_1.ApiEdgeQueryContext(currentSegment.id)));
+            query.unshift(new ExtendContextLiveQueryStep(function (context) { return context.id = currentSegment.id; }));
             return false;
         }
         else if (currentSegment instanceof ApiRequest_1.RelatedFieldPathSegment) {
@@ -405,6 +470,15 @@ var ApiQueryBuilder = (function () {
             this.addQueryStep(query, new QueryEdgeQueryStep(new ApiEdgeQuery_1.ApiEdgeQuery(currentSegment.edge, ApiEdgeQueryType_1.ApiEdgeQueryType.Get)));
         }
         return ApiQueryBuilder.buildProvideIdStep(query, currentSegment);
+    };
+    ApiQueryBuilder.prototype.buildEmbedSteps = function (query, request) {
+        for (var _i = 0, _a = request.context.populatedRelations; _i < _a.length; _i++) {
+            var relation = _a[_i];
+            var segment = new ApiRequest_1.EntryPathSegment(relation.to, 'TBD', null);
+            var embedRequest = new ApiRequest_1.ApiRequest(request.api);
+            embedRequest.path.add(segment);
+            query.unshift(new EmbedQueryQueryStep(this.build(embedRequest), segment));
+        }
     };
     return ApiQueryBuilder;
 }());

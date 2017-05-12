@@ -17,6 +17,52 @@ import {ApiEdgeAction, ApiEdgeActionTriggerKind, ApiEdgeActionTrigger} from "../
 import {ApiAction, ApiActionTriggerKind} from "./ApiAction";
 const parse = require('obj-parse');
 
+export class EmbedQueryQueryStep implements QueryStep {
+    query: ApiQuery;
+    segment: EntryPathSegment;
+    targetField: string;
+
+    constructor(query: ApiQuery, segment: EntryPathSegment) {
+        this.query = query;
+        this.segment = segment;
+
+        if(!this.segment.relation) throw new Error('Invalid relation provided.');
+        this.targetField = this.segment.relation.name;
+    }
+
+    private executeSingle = (scope: ApiQueryScope, target: any) => {
+        return new Promise((resolve, reject) => {
+            //Now we can replace TBD and provide a real id for the query.
+            this.segment.id = target[this.targetField];
+
+            this.query.execute(scope.identity).then((response) => {
+                target[this.targetField] = response;
+                resolve(scope)
+            }).catch(reject);
+        })
+    };
+
+    execute = (scope: ApiQueryScope) => {
+        return new Promise((resolve, reject) => {
+            if(scope.response) {
+                if(Array.isArray(scope.response.data)) {
+                    const p = Promise.resolve();
+                    for(let entry of scope.response.data) {
+                        p.then(() => this.executeSingle(scope, entry))
+                    }
+                    p.then(() => resolve(scope), reject)
+                }
+                else {
+                    this.executeSingle(scope, scope.response.data).then(resolve, reject)
+                }
+            }
+            else resolve(scope)
+        })
+    };
+
+    inspect = () => `EMBED QUERY /${this.targetField}`;
+}
+
 export class QueryEdgeQueryStep implements QueryStep {
     query: ApiEdgeQuery;
 
@@ -192,7 +238,7 @@ export class ExtendContextQueryStep implements QueryStep {
                 scope.context.pagination = this.context.pagination;
             }
             this.context.fields.forEach(f => scope.context.fields.push(f));
-            this.context.populatedFields.forEach(f => scope.context.populatedFields.push(f));
+            this.context.populatedRelations.forEach(f => scope.context.populatedRelations.push(f));
             this.context.filters.forEach(f => scope.context.filters.push(f));
             this.context.sortBy.forEach(f => scope.context.sortBy.push(f));
             resolve(scope)
@@ -206,6 +252,25 @@ export class ExtendContextQueryStep implements QueryStep {
         else {
             return `APPLY PARAMETERS`
         }
+    };
+}
+
+export class ExtendContextLiveQueryStep implements QueryStep {
+    apply: (context: ApiEdgeQueryContext) => void|any;
+
+    constructor(func: (context: ApiEdgeQueryContext) => void|any) {
+        this.apply = func
+    }
+
+    execute = (scope: ApiQueryScope) => {
+        return new Promise(resolve => {
+            this.apply(scope.context);
+            resolve(scope)
+        })
+    };
+
+    inspect = () => {
+        return `EXTEND CONTEXT LIVE`
     };
 }
 
@@ -293,7 +358,7 @@ export class ApiQueryBuilder {
 
     private static buildProvideIdStep(query: ApiQuery, currentSegment: PathSegment): boolean {
         if(currentSegment instanceof EntryPathSegment) {
-            query.unshift(new ExtendContextQueryStep(new ApiEdgeQueryContext(currentSegment.id)));
+            query.unshift(new ExtendContextLiveQueryStep(context => context.id = currentSegment.id));
             return false
         }
         else if(currentSegment instanceof RelatedFieldPathSegment) {
@@ -338,11 +403,30 @@ export class ApiQueryBuilder {
         return ApiQueryBuilder.buildProvideIdStep(query, currentSegment)
     }
 
+    private buildEmbedSteps(query: ApiQuery, request: ApiRequest) {
+        for(let relation of request.context.populatedRelations) {
+            // The id is literally TBD, it is going to be set one we have the data,
+            // what we build now is only an execution plan.
+            const segment = new EntryPathSegment(relation.to, 'TBD', null);
+
+            const embedRequest = new ApiRequest(request.api);
+            embedRequest.path.add(segment);
+
+            // We add the step directly directly, as pre- and post-actions are not
+            // supported on embed query steps. These actions will be executed as
+            // part of the sub-query.
+            query.unshift(new EmbedQueryQueryStep(this.build(embedRequest), segment));
+        }
+    }
+
     private buildReadQuery = (request: ApiRequest): ApiQuery => {
         let query = new ApiQuery();
 
         let segments = request.path.segments,
             lastSegment = segments[segments.length-1];
+
+        //STEP 0: Create embed queries
+        this.buildEmbedSteps(query, request);
 
         //STEP 1: Create the base query which will provide the final data.
         let baseQuery: ApiEdgeQuery;
@@ -369,7 +453,8 @@ export class ApiQueryBuilder {
 
         //STEP 3: Provide ID for the base query.
         if(lastSegment instanceof EntryPathSegment) {
-            query.unshift(new ExtendContextQueryStep(new ApiEdgeQueryContext(lastSegment.id)))
+            const _segment = lastSegment; //Add closure to make sure it won't be overridden later.
+            query.unshift(new ExtendContextLiveQueryStep(context => context.id = _segment.id))
         }
         else if(lastSegment instanceof RelatedFieldPathSegment) {
             query.unshift(new ProvideIdQueryStep(lastSegment.relation.relationId))
@@ -414,6 +499,9 @@ export class ApiQueryBuilder {
             lastSegment = segments[segments.length-1],
             readMode = true;
 
+        //STEP 0: Create embed queries
+        this.buildEmbedSteps(query, request);
+
         //STEP 1: Create the base query which will provide the final data.
         let baseQuery: ApiEdgeQuery;
         if(lastSegment instanceof RelatedFieldPathSegment) {
@@ -455,7 +543,8 @@ export class ApiQueryBuilder {
 
         //STEP 3: Provide ID for the base query.
         if(lastSegment instanceof EntryPathSegment) {
-            query.unshift(new ExtendContextQueryStep(new ApiEdgeQueryContext(lastSegment.id)))
+            const _segment = lastSegment; //Add closure to make sure it won't be overridden later.
+            query.unshift(new ExtendContextLiveQueryStep(context => context.id = _segment.id))
         }
         else if(lastSegment instanceof RelatedFieldPathSegment) {
             if(request.type === ApiRequestType.Update) {

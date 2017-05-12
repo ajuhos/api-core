@@ -2,10 +2,19 @@ import { QueryStep, ApiQueryScope, ApiQuery } from "./ApiQuery";
 import { ApiEdgeQuery } from "../edge/ApiEdgeQuery";
 import { ApiEdgeQueryContext } from "../edge/ApiEdgeQueryContext";
 import { ApiEdgeRelation } from "../relations/ApiEdgeRelation";
-import { ApiRequest } from "../request/ApiRequest";
+import { EntryPathSegment, ApiRequest } from "../request/ApiRequest";
 import { ApiEdgeQueryResponse } from "../edge/ApiEdgeQueryResponse";
 import { Api } from "../Api";
 import { ApiEdgeMethod } from "../edge/ApiEdgeMethod";
+export declare class EmbedQueryQueryStep implements QueryStep {
+    query: ApiQuery;
+    segment: EntryPathSegment;
+    targetField: string;
+    constructor(query: ApiQuery, segment: EntryPathSegment);
+    private executeSingle;
+    execute: (scope: ApiQueryScope) => Promise<{}>;
+    inspect: () => string;
+}
 export declare class QueryEdgeQueryStep implements QueryStep {
     query: ApiEdgeQuery;
     constructor(query: ApiEdgeQuery);
@@ -54,6 +63,12 @@ export declare class ExtendContextQueryStep implements QueryStep {
     execute: (scope: ApiQueryScope) => Promise<{}>;
     inspect: () => string;
 }
+export declare class ExtendContextLiveQueryStep implements QueryStep {
+    apply: (context: ApiEdgeQueryContext) => void | any;
+    constructor(func: (context: ApiEdgeQueryContext) => void | any);
+    execute: (scope: ApiQueryScope) => Promise<{}>;
+    inspect: () => string;
+}
 export declare class ApiQueryBuilder {
     api: Api;
     constructor(api: Api);
@@ -63,6 +78,7 @@ export declare class ApiQueryBuilder {
     private static buildProvideIdStep(query, currentSegment);
     private buildCheckStep(query, currentSegment);
     private buildReadStep(query, currentSegment);
+    private buildEmbedSteps(query, request);
     private buildReadQuery;
     private buildChangeQuery;
     private buildCreateQuery;
