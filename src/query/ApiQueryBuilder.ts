@@ -31,7 +31,7 @@ export class EmbedQueryQueryStep implements QueryStep {
 
         if(!this.segment.relation) throw new Error('Invalid relation provided.');
         this.targetField = this.segment.relation.name;
-        this.idField = this.segment.relation.to.idField||Api.defaultIdField;
+        this.idField = this.segment.relation.relatedId;
     }
 
     execute = (scope: ApiQueryScope) => {
@@ -45,9 +45,11 @@ export class EmbedQueryQueryStep implements QueryStep {
 
                     for(let entry of target) {
                         const id = entry[this.targetField];
-                        if(targetIndex[id]) targetIndex[id].push(entry);
-                        else targetIndex[id] = [entry];
-                        ids.push(id);
+                        if(id) {
+                            if (targetIndex[id]) targetIndex[id].push(entry);
+                            else targetIndex[id] = [entry];
+                            ids.push(id);
+                        }
                     }
 
                     this.request.context.filters = [
@@ -55,10 +57,14 @@ export class EmbedQueryQueryStep implements QueryStep {
                     ];
 
                     this.query.execute(scope.identity).then((response) => {
-                        for(let entry of response.data) {
-                            const id = entry[this.idField];
-                            for(let subEntry of targetIndex[id]) {
-                                subEntry[this.targetField] = entry;
+                        if(response.data && response.data.length) {
+                            for (let entry of response.data) {
+                                const id = entry[this.idField];
+                                if (targetIndex[id]) {
+                                    for (let subEntry of targetIndex[id]) {
+                                        subEntry[this.targetField] = entry;
+                                    }
+                                }
                             }
                         }
                         resolve(scope)

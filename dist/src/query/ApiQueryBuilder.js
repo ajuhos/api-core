@@ -24,22 +24,28 @@ var EmbedQueryQueryStep = (function () {
                         for (var _i = 0, target_2 = target_1; _i < target_2.length; _i++) {
                             var entry = target_2[_i];
                             var id = entry[_this.targetField];
-                            if (targetIndex_1[id])
-                                targetIndex_1[id].push(entry);
-                            else
-                                targetIndex_1[id] = [entry];
-                            ids.push(id);
+                            if (id) {
+                                if (targetIndex_1[id])
+                                    targetIndex_1[id].push(entry);
+                                else
+                                    targetIndex_1[id] = [entry];
+                                ids.push(id);
+                            }
                         }
                         _this.request.context.filters = [
                             new ApiEdgeQueryFilter_1.ApiEdgeQueryFilter(_this.idField, ApiEdgeQueryFilter_1.ApiEdgeQueryFilterType.In, ids)
                         ];
                         _this.query.execute(scope.identity).then(function (response) {
-                            for (var _i = 0, _a = response.data; _i < _a.length; _i++) {
-                                var entry = _a[_i];
-                                var id = entry[_this.idField];
-                                for (var _b = 0, _c = targetIndex_1[id]; _b < _c.length; _b++) {
-                                    var subEntry = _c[_b];
-                                    subEntry[_this.targetField] = entry;
+                            if (response.data && response.data.length) {
+                                for (var _i = 0, _a = response.data; _i < _a.length; _i++) {
+                                    var entry = _a[_i];
+                                    var id = entry[_this.idField];
+                                    if (targetIndex_1[id]) {
+                                        for (var _b = 0, _c = targetIndex_1[id]; _b < _c.length; _b++) {
+                                            var subEntry = _c[_b];
+                                            subEntry[_this.targetField] = entry;
+                                        }
+                                    }
                                 }
                             }
                             resolve(scope);
@@ -64,7 +70,7 @@ var EmbedQueryQueryStep = (function () {
         if (!this.segment.relation)
             throw new Error('Invalid relation provided.');
         this.targetField = this.segment.relation.name;
-        this.idField = this.segment.relation.to.idField || Api_1.Api.defaultIdField;
+        this.idField = this.segment.relation.relatedId;
     }
     return EmbedQueryQueryStep;
 }());
