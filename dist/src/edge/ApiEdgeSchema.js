@@ -20,6 +20,10 @@ var ApiEdgeSchema = (function () {
     function ApiEdgeSchema(schema) {
         var _this = this;
         this.fieldMatrix = {};
+        this.renameMatrix = {};
+        this.transformField = function (field) {
+            return _this.renameMatrix[field] || field;
+        };
         this.transformFields = function (fields) {
             var output = [];
             fields.forEach(function (field) {
@@ -40,13 +44,13 @@ var ApiEdgeSchema = (function () {
                 this.transformations.push(transform);
         }
     }
-    ApiEdgeSchema.createInputTransformer = function (schemaField, transform) {
+    ApiEdgeSchema.prototype.createInputTransformer = function (schemaField, transform) {
         if (transform === "=") {
             return function (schema, model) { return schemaField.assign(model, schemaField(schema)); };
         }
         else if (transform[0] === "=") {
             var fieldName = transform.substring(1), modelField_1 = parse(fieldName);
-            return function (model, schema) { return modelField_1.assign(model, schemaField(schema)); };
+            return function (schema, model) { return modelField_1.assign(model, schemaField(schema)); };
         }
         else
             throw "Not Supported Transform";
@@ -79,7 +83,8 @@ var ApiEdgeSchema = (function () {
             return transform;
         }
         else if (typeof transform === "string") {
-            return new ApiEdgeSchemaTransformation(ApiEdgeSchema.createInputTransformer(parsedSchemaField, transform), ApiEdgeSchema.createOutputTransformer(parsedSchemaField, transform), [schemaField], schemaField);
+            this.renameMatrix[schemaField] = transform.substring(1);
+            return new ApiEdgeSchemaTransformation(this.createInputTransformer(parsedSchemaField, transform), ApiEdgeSchema.createOutputTransformer(parsedSchemaField, transform), [schemaField], schemaField);
         }
     };
     ApiEdgeSchema.prototype.fixFields = function (fieldName) {

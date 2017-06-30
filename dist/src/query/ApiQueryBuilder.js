@@ -23,7 +23,7 @@ var EmbedQueryQueryStep = (function () {
                         var targetIndex_1 = {}, ids = [];
                         for (var _i = 0, target_2 = target_1; _i < target_2.length; _i++) {
                             var entry = target_2[_i];
-                            var id = entry[_this.targetField];
+                            var id = entry[_this.sourceField];
                             if (id) {
                                 if (targetIndex_1[id])
                                     targetIndex_1[id].push(entry);
@@ -52,7 +52,7 @@ var EmbedQueryQueryStep = (function () {
                         }).catch(reject);
                     }
                     else {
-                        _this.segment.id = target_1[_this.targetField];
+                        _this.segment.id = target_1[_this.sourceField];
                         _this.query.execute(scope.identity).then(function (response) {
                             target_1[_this.targetField] = response.data;
                             resolve(scope);
@@ -63,12 +63,13 @@ var EmbedQueryQueryStep = (function () {
                     resolve(scope);
             });
         };
-        this.inspect = function () { return ("EMBED QUERY /" + _this.targetField); };
+        this.inspect = function () { return ("EMBED QUERY /" + _this.sourceField + " -> " + _this.targetField); };
         this.query = query;
         this.query.request = this.request = request;
         this.segment = segment;
         if (!this.segment.relation)
             throw new Error('Invalid relation provided.');
+        this.sourceField = this.segment.relation.relationId;
         this.targetField = this.segment.relation.name;
         this.idField = this.segment.relation.relatedId;
     }
@@ -119,16 +120,33 @@ var RelateQueryStep = (function () {
             return new Promise(function (resolve, reject) {
                 if (!scope.response)
                     return reject(new ApiEdgeError_1.ApiEdgeError(404, "Missing Related Entry"));
-                scope.context.filter(_this.relation.relationId, ApiEdgeQueryFilter_1.ApiEdgeQueryFilterType.Equals, scope.response.data[_this.relation.from.idField || Api_1.Api.defaultIdField]);
+                scope.context.filter(_this.relation.relationId, ApiEdgeQueryFilter_1.ApiEdgeQueryFilterType.Equals, scope.response.data[_this.relation.relatedId]);
                 resolve(scope);
             });
         };
-        this.inspect = function () { return ("RELATE " + _this.relation.relationId); };
+        this.inspect = function () { return ("RELATE " + _this.relation.relationId + " = " + _this.relation.relatedId); };
         this.relation = relation;
     }
     return RelateQueryStep;
 }());
 exports.RelateQueryStep = RelateQueryStep;
+var RelateBackwardsQueryStep = (function () {
+    function RelateBackwardsQueryStep(relation) {
+        var _this = this;
+        this.execute = function (scope) {
+            return new Promise(function (resolve, reject) {
+                if (!scope.response)
+                    return reject(new ApiEdgeError_1.ApiEdgeError(404, "Missing Related Entry"));
+                scope.context.filter(_this.relation.relatedId, ApiEdgeQueryFilter_1.ApiEdgeQueryFilterType.Equals, scope.response.data[_this.relation.relationId]);
+                resolve(scope);
+            });
+        };
+        this.inspect = function () { return ("RELATE " + _this.relation.relatedId + " = " + _this.relation.relationId); };
+        this.relation = relation;
+    }
+    return RelateBackwardsQueryStep;
+}());
+exports.RelateBackwardsQueryStep = RelateBackwardsQueryStep;
 var RelateChangeQueryStep = (function () {
     function RelateChangeQueryStep(relation) {
         var _this = this;
@@ -138,7 +156,7 @@ var RelateChangeQueryStep = (function () {
                     return reject(new ApiEdgeError_1.ApiEdgeError(404, "Missing Body"));
                 if (!scope.response)
                     return reject(new ApiEdgeError_1.ApiEdgeError(404, "Missing Related Entry"));
-                parse(_this.relation.relationId).assign(scope.body, scope.response.data[_this.relation.from.idField || Api_1.Api.defaultIdField]);
+                parse(_this.relation.relationId).assign(scope.body, scope.response.data[_this.relation.relatedId]);
                 resolve(scope);
             });
         };
@@ -273,7 +291,12 @@ var ApiQueryBuilder = (function () {
                 query.unshift(new ExtendContextLiveQueryStep(function (context) { return context.id = _segment_1.id; }));
             }
             else if (lastSegment instanceof ApiRequest_1.RelatedFieldPathSegment) {
-                query.unshift(new ProvideIdQueryStep(lastSegment.relation.relationId));
+                if (lastSegment.relation.relatedId !== lastSegment.relation.to.idField) {
+                    query.unshift(new RelateBackwardsQueryStep(lastSegment.relation));
+                }
+                else {
+                    query.unshift(new ProvideIdQueryStep(lastSegment.relation.relationId));
+                }
             }
             else {
             }
@@ -379,7 +402,12 @@ var ApiQueryBuilder = (function () {
             var query = new ApiQuery_1.ApiQuery();
             var segments = request.path.segments, lastSegment = segments[segments.length - 1];
             _this.buildEmbedSteps(query, request, lastSegment);
-            _this.addQueryStep(query, new QueryEdgeQueryStep(new ApiEdgeQuery_1.ApiEdgeQuery(lastSegment.edge, ApiEdgeQueryType_1.ApiEdgeQueryType.Create)));
+            if (lastSegment instanceof ApiRequest_1.MethodPathSegment) {
+                ApiQueryBuilder.addMethodCallStep(request, query, lastSegment.method);
+            }
+            else {
+                _this.addQueryStep(query, new QueryEdgeQueryStep(new ApiEdgeQuery_1.ApiEdgeQuery(lastSegment.edge, ApiEdgeQueryType_1.ApiEdgeQueryType.Create)));
+            }
             for (var i = segments.length - 2; i >= 0; i--) {
                 var currentSegment = segments[i];
                 var relation = segments[i + 1].relation;

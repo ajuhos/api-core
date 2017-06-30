@@ -16,7 +16,7 @@ export class OneToManyRelation implements ApiEdgeRelation {
         this.from = from;
         this.to = to;
         this.name = options.name || to.pluralName;
-        this.relatedId = options.relatedId || to.name + Api.defaultIdPostfix;
+        this.relatedId = options.relatedId || to.idField;
         this.relationId = options.relationId || from.name + Api.defaultIdPostfix;
     }
 }

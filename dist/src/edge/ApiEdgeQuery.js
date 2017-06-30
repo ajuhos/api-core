@@ -53,6 +53,7 @@ var ApiEdgeQuery = (function () {
             if (_this.context.fields.length) {
                 _this.originalFields = _this.context.fields;
                 _this.context.fields = _this.edge.schema.transformFields(_this.context.fields);
+                _this.context.filters.forEach(function (filter) { return filter.field = _this.edge.schema.transformField(filter.field); });
             }
             if (_this.body) {
                 _this.body = _this.applyInputSchema(_this.body);

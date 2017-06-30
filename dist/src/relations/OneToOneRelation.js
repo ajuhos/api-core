@@ -6,8 +6,8 @@ var OneToOneRelation = (function () {
         this.from = from;
         this.to = to;
         this.name = options.name || to.name;
+        this.relatedId = options.relatedId || from.idField;
         this.relationId = options.relationId || to.name + Api_1.Api.defaultIdPostfix;
-        this.relatedId = options.relatedId || from.name + Api_1.Api.defaultIdPostfix;
     }
     return OneToOneRelation;
 }());

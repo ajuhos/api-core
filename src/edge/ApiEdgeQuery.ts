@@ -109,6 +109,8 @@ export class ApiEdgeQuery {
         if(this.context.fields.length) {
             this.originalFields = this.context.fields;
             this.context.fields = this.edge.schema.transformFields(this.context.fields);
+            this.context.filters.forEach(filter => filter.field = this.edge.schema.transformField(filter.field))
+            //TODO: Support sort-by on renamed fields
         }
 
         if(this.body) {

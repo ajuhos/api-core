@@ -10,6 +10,7 @@ export declare class EmbedQueryQueryStep implements QueryStep {
     query: ApiQuery;
     request: ApiRequest;
     segment: PathSegment;
+    sourceField: string;
     targetField: string;
     idField: string;
     constructor(query: ApiQuery, segment: PathSegment, request: ApiRequest);
@@ -29,6 +30,12 @@ export declare class CallMethodQueryStep implements QueryStep {
     inspect: () => string;
 }
 export declare class RelateQueryStep implements QueryStep {
+    relation: ApiEdgeRelation;
+    constructor(relation: ApiEdgeRelation);
+    execute: (scope: ApiQueryScope) => Promise<{}>;
+    inspect: () => string;
+}
+export declare class RelateBackwardsQueryStep implements QueryStep {
     relation: ApiEdgeRelation;
     constructor(relation: ApiEdgeRelation);
     execute: (scope: ApiQueryScope) => Promise<{}>;

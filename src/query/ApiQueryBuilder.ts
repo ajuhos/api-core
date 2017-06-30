@@ -21,6 +21,7 @@ export class EmbedQueryQueryStep implements QueryStep {
     query: ApiQuery;
     request: ApiRequest;
     segment: PathSegment;
+    sourceField: string;
     targetField: string;
     idField: string;
 
@@ -30,6 +31,7 @@ export class EmbedQueryQueryStep implements QueryStep {
         this.segment = segment;
 
         if(!this.segment.relation) throw new Error('Invalid relation provided.');
+        this.sourceField = this.segment.relation.relationId;
         this.targetField = this.segment.relation.name;
         this.idField = this.segment.relation.relatedId;
     }
@@ -44,7 +46,7 @@ export class EmbedQueryQueryStep implements QueryStep {
                         ids: string[] = [];
 
                     for(let entry of target) {
-                        const id = entry[this.targetField];
+                        const id = entry[this.sourceField];
                         if(id) {
                             if (targetIndex[id]) targetIndex[id].push(entry);
                             else targetIndex[id] = [entry];
@@ -73,7 +75,7 @@ export class EmbedQueryQueryStep implements QueryStep {
                 else {
 
                     //Now we can replace TBD and provide a real id for the query.
-                    (this.segment as EntryPathSegment).id = target[this.targetField];
+                    (this.segment as EntryPathSegment).id = target[this.sourceField];
 
                     this.query.execute(scope.identity).then((response) => {
                         target[this.targetField] = response.data;
@@ -85,7 +87,7 @@ export class EmbedQueryQueryStep implements QueryStep {
         })
     };
 
-    inspect = () => `EMBED QUERY /${this.targetField}`;
+    inspect = () => `EMBED QUERY /${this.sourceField} -> ${this.targetField}`;
 }
 
 export class QueryEdgeQueryStep implements QueryStep {
@@ -140,12 +142,30 @@ export class RelateQueryStep implements QueryStep {
     execute = (scope: ApiQueryScope) => {
         return new Promise((resolve, reject) => {
             if(!scope.response) return reject(new ApiEdgeError(404, "Missing Related Entry"));
-            scope.context.filter(this.relation.relationId, ApiEdgeQueryFilterType.Equals, scope.response.data[this.relation.from.idField||Api.defaultIdField]);
+            scope.context.filter(this.relation.relationId, ApiEdgeQueryFilterType.Equals, scope.response.data[this.relation.relatedId]);
             resolve(scope);
         })
     };
 
-    inspect = () => `RELATE ${this.relation.relationId}`;
+    inspect = () => `RELATE ${this.relation.relationId} = ${this.relation.relatedId}`;
+}
+
+export class RelateBackwardsQueryStep implements QueryStep {
+    relation: ApiEdgeRelation;
+
+    constructor(relation: ApiEdgeRelation) {
+        this.relation = relation;
+    }
+
+    execute = (scope: ApiQueryScope) => {
+        return new Promise((resolve, reject) => {
+            if(!scope.response) return reject(new ApiEdgeError(404, "Missing Related Entry"));
+            scope.context.filter(this.relation.relatedId, ApiEdgeQueryFilterType.Equals, scope.response.data[this.relation.relationId]);
+            resolve(scope);
+        })
+    };
+
+    inspect = () => `RELATE ${this.relation.relatedId} = ${this.relation.relationId}`;
 }
 
 export class RelateChangeQueryStep implements QueryStep {
@@ -161,7 +181,7 @@ export class RelateChangeQueryStep implements QueryStep {
             if(!scope.response) return reject(new ApiEdgeError(404, "Missing Related Entry"));
             parse(this.relation.relationId).assign(
                 scope.body,
-                scope.response.data[this.relation.from.idField||Api.defaultIdField]);
+                scope.response.data[this.relation.relatedId]);
             resolve(scope);
         })
     };
@@ -497,7 +517,12 @@ export class ApiQueryBuilder {
             query.unshift(new ExtendContextLiveQueryStep(context => context.id = _segment.id))
         }
         else if(lastSegment instanceof RelatedFieldPathSegment) {
-            query.unshift(new ProvideIdQueryStep(lastSegment.relation.relationId))
+            if(lastSegment.relation.relatedId !== lastSegment.relation.to.idField) {
+                query.unshift(new RelateBackwardsQueryStep(lastSegment.relation));
+            }
+            else {
+                query.unshift(new ProvideIdQueryStep(lastSegment.relation.relationId))
+            }
         }
         else {
             //TODO: Add support for method calls with parameters
@@ -644,7 +669,12 @@ export class ApiQueryBuilder {
         this.buildEmbedSteps(query, request, lastSegment);
 
         //STEP 1: Create the base query which will provide the final data.
-        this.addQueryStep(query, new QueryEdgeQueryStep(new ApiEdgeQuery(lastSegment.edge, ApiEdgeQueryType.Create)));
+        if(lastSegment instanceof MethodPathSegment) {
+            ApiQueryBuilder.addMethodCallStep(request, query, lastSegment.method);
+        }
+        else {
+            this.addQueryStep(query, new QueryEdgeQueryStep(new ApiEdgeQuery(lastSegment.edge, ApiEdgeQueryType.Create)));
+        }
 
         //STEP 2: Provide filters and validation for the base query.
         for(let i = segments.length-2; i >= 0; i--) {

@@ -11,8 +11,10 @@ export declare class ApiEdgeSchema {
     fields: string[];
     transformations: ApiEdgeSchemaTransformation[];
     private fieldMatrix;
+    private renameMatrix;
+    transformField: (field: string) => string;
     transformFields: (fields: string[]) => string[];
-    private static createInputTransformer(schemaField, transform);
+    private createInputTransformer(schemaField, transform);
     private static createOutputTransformer(schemaField, transform);
     private createTransformation(schemaField, schema);
     private fixFields(fieldName);

@@ -29,7 +29,12 @@ export class ApiEdgeSchema {
     fields: string[];
     transformations: ApiEdgeSchemaTransformation[];
 
-    private fieldMatrix: any = {};
+    private fieldMatrix: { [key: string]: string[] } = {};
+    private renameMatrix: { [key: string]: string } = {};
+    transformField = (field: string) => {
+        return this.renameMatrix[field] || field
+    };
+
     transformFields = (fields: string[]): string[] => {
         let output: string[] = [];
         fields.forEach((field: string) => {
@@ -42,7 +47,7 @@ export class ApiEdgeSchema {
         return output
     };
 
-    private static createInputTransformer(schemaField: any, transform: string): (schem: any, model: any) => void {
+    private createInputTransformer(schemaField: any, transform: string): (schema: any, model: any) => void {
         if(transform === "=") {
             return (schema: any, model: any) => schemaField.assign(model, schemaField(schema));
         }
@@ -50,7 +55,7 @@ export class ApiEdgeSchema {
             const fieldName = transform.substring(1),
                 modelField = parse(fieldName);
 
-            return (model: any, schema: any) => modelField.assign(model, schemaField(schema));
+            return (schema: any, model: any) => modelField.assign(model, schemaField(schema));
         }
         else throw "Not Supported Transform";
     }
@@ -91,8 +96,10 @@ export class ApiEdgeSchema {
             return transform;
         }
         else if(typeof transform === "string") {
+            this.renameMatrix[schemaField] = transform.substring(1);
+
             return new ApiEdgeSchemaTransformation(
-                ApiEdgeSchema.createInputTransformer(parsedSchemaField, transform),
+                this.createInputTransformer(parsedSchemaField, transform),
                 ApiEdgeSchema.createOutputTransformer(parsedSchemaField, transform),
                 [ schemaField ],
                 schemaField

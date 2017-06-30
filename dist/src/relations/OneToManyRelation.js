@@ -6,7 +6,7 @@ var OneToManyRelation = (function () {
         this.from = from;
         this.to = to;
         this.name = options.name || to.pluralName;
-        this.relatedId = options.relatedId || to.name + Api_1.Api.defaultIdPostfix;
+        this.relatedId = options.relatedId || to.idField;
         this.relationId = options.relationId || from.name + Api_1.Api.defaultIdPostfix;
     }
     return OneToManyRelation;
