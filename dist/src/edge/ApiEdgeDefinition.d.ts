@@ -40,7 +40,7 @@ export declare abstract class ApiEdge implements ApiEdgeDefinition {
     exists: (context: ApiEdgeQueryContext) => Promise<ApiEdgeQueryResponse>;
     use: (action: ApiEdgeAction) => this;
     action: (name: string, execute: (scope: ApiQueryScope) => Promise<ApiQueryScope>, targetTypes?: ApiEdgeQueryType, triggerKind?: ApiEdgeActionTriggerKind, triggers?: ApiEdgeActionTrigger, triggerNames?: string[]) => ApiEdge;
-    edgeMethod: (name: string, execute: (scope: ApiQueryScope) => Promise<ApiEdgeQueryResponse>, acceptedTypes?: ApiRequestType) => ApiEdge;
-    collectionMethod: (name: string, execute: (scope: ApiQueryScope) => Promise<ApiEdgeQueryResponse>, acceptedTypes?: ApiRequestType) => ApiEdge;
-    entryMethod: (name: string, execute: (scope: ApiQueryScope) => Promise<ApiEdgeQueryResponse>, acceptedTypes?: ApiRequestType) => ApiEdge;
+    edgeMethod: (name: string, execute: (scope: ApiQueryScope) => Promise<ApiEdgeQueryResponse>, acceptedTypes?: ApiRequestType, requiresData?: boolean) => ApiEdge;
+    collectionMethod: (name: string, execute: (scope: ApiQueryScope) => Promise<ApiEdgeQueryResponse>, acceptedTypes?: ApiRequestType, requiresData?: boolean) => ApiEdge;
+    entryMethod: (name: string, execute: (scope: ApiQueryScope) => Promise<ApiEdgeQueryResponse>, acceptedTypes?: ApiRequestType, requiresData?: boolean) => ApiEdge;
 }

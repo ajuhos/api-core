@@ -62,36 +62,39 @@ export abstract class ApiEdge implements ApiEdgeDefinition {
 
     edgeMethod = (name: string,
                   execute: (scope: ApiQueryScope) => Promise<ApiEdgeQueryResponse>,
-                  acceptedTypes: ApiRequestType = ApiRequestType.Any): ApiEdge => {
+                  acceptedTypes: ApiRequestType = ApiRequestType.Any,
+                  requiresData = true): ApiEdge => {
         if(this.methods.find((method: ApiEdgeMethod) =>
             method.name === name))
            throw "A method with the same name already exists.";
 
-        this.methods.push(new ApiEdgeMethod(name, execute, ApiEdgeMethodScope.Edge, acceptedTypes));
+        this.methods.push(new ApiEdgeMethod(name, execute, ApiEdgeMethodScope.Edge, acceptedTypes, requiresData));
         return this
     };
 
     collectionMethod = (name: string,
                         execute: (scope: ApiQueryScope) => Promise<ApiEdgeQueryResponse>,
-                        acceptedTypes: ApiRequestType = ApiRequestType.Any): ApiEdge => {
+                        acceptedTypes: ApiRequestType = ApiRequestType.Any,
+                        requiresData = true): ApiEdge => {
         if(this.methods.find((method: ApiEdgeMethod) =>
             method.name === name &&
             (method.scope == ApiEdgeMethodScope.Collection || method.scope == ApiEdgeMethodScope.Edge)))
             throw "A collection method with the same name already exists.";
 
-        this.methods.push(new ApiEdgeMethod(name, execute, ApiEdgeMethodScope.Collection, acceptedTypes));
+        this.methods.push(new ApiEdgeMethod(name, execute, ApiEdgeMethodScope.Collection, acceptedTypes, requiresData));
         return this
     };
 
     entryMethod = (name: string,
                    execute: (scope: ApiQueryScope) => Promise<ApiEdgeQueryResponse>,
-                   acceptedTypes: ApiRequestType = ApiRequestType.Any): ApiEdge => {
+                   acceptedTypes: ApiRequestType = ApiRequestType.Any,
+                   requiresData = true): ApiEdge => {
         if(this.methods.find((method: ApiEdgeMethod) =>
             method.name === name &&
             (method.scope == ApiEdgeMethodScope.Entry || method.scope == ApiEdgeMethodScope.Edge)))
             throw "An entry method with the same name already exists.";
 
-        this.methods.push(new ApiEdgeMethod(name, execute, ApiEdgeMethodScope.Entry, acceptedTypes));
+        this.methods.push(new ApiEdgeMethod(name, execute, ApiEdgeMethodScope.Entry, acceptedTypes, requiresData));
         return this
     };
 }

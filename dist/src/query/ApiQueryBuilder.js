@@ -9,8 +9,10 @@ var ApiEdgeQueryResponse_1 = require("../edge/ApiEdgeQueryResponse");
 var ApiEdgeQueryType_1 = require("../edge/ApiEdgeQueryType");
 var OneToOneRelation_1 = require("../relations/OneToOneRelation");
 var Api_1 = require("../Api");
+var ApiEdgeMethod_1 = require("../edge/ApiEdgeMethod");
 var ApiEdgeAction_1 = require("../edge/ApiEdgeAction");
 var ApiAction_1 = require("./ApiAction");
+var OneToManyRelation_1 = require("../relations/OneToManyRelation");
 var parse = require('obj-parse');
 var EmbedQueryQueryStep = (function () {
     function EmbedQueryQueryStep(query, segment, request) {
@@ -20,16 +22,29 @@ var EmbedQueryQueryStep = (function () {
                 if (scope.response) {
                     var target_1 = scope.response.data;
                     if (Array.isArray(target_1)) {
-                        var targetIndex_1 = {}, ids = [];
+                        var targetIndex_1 = {}, targetArrayIndex_1 = {}, ids = [];
                         for (var _i = 0, target_2 = target_1; _i < target_2.length; _i++) {
                             var entry = target_2[_i];
                             var id = entry[_this.sourceField];
                             if (id) {
-                                if (targetIndex_1[id])
-                                    targetIndex_1[id].push(entry);
-                                else
-                                    targetIndex_1[id] = [entry];
-                                ids.push(id);
+                                if (Array.isArray(id)) {
+                                    for (var _a = 0, id_1 = id; _a < id_1.length; _a++) {
+                                        var _id = id_1[_a];
+                                        if (targetArrayIndex_1[_id])
+                                            targetArrayIndex_1[_id].push(entry);
+                                        else
+                                            targetArrayIndex_1[_id] = [entry];
+                                        ids.push(_id);
+                                    }
+                                    entry[_this.sourceField] = [];
+                                }
+                                else {
+                                    if (targetIndex_1[id])
+                                        targetIndex_1[id].push(entry);
+                                    else
+                                        targetIndex_1[id] = [entry];
+                                    ids.push(id);
+                                }
                             }
                         }
                         _this.request.context.filters = [
@@ -46,13 +61,27 @@ var EmbedQueryQueryStep = (function () {
                                             subEntry[_this.targetField] = entry;
                                         }
                                     }
+                                    if (targetArrayIndex_1[id]) {
+                                        for (var _d = 0, _e = targetArrayIndex_1[id]; _d < _e.length; _d++) {
+                                            var subEntry = _e[_d];
+                                            subEntry[_this.targetField].push(entry);
+                                        }
+                                    }
                                 }
                             }
                             resolve(scope);
                         }).catch(reject);
                     }
                     else {
-                        _this.segment.id = target_1[_this.sourceField];
+                        var sourceId = target_1[_this.sourceField];
+                        if (Array.isArray(sourceId)) {
+                            _this.request.context.filters = [
+                                new ApiEdgeQueryFilter_1.ApiEdgeQueryFilter(_this.idField, ApiEdgeQueryFilter_1.ApiEdgeQueryFilterType.In, sourceId)
+                            ];
+                        }
+                        else {
+                            _this.segment.id = sourceId;
+                        }
                         _this.query.execute(scope.identity).then(function (response) {
                             target_1[_this.targetField] = response.data;
                             resolve(scope);
@@ -97,7 +126,7 @@ var QueryEdgeQueryStep = (function () {
 }());
 exports.QueryEdgeQueryStep = QueryEdgeQueryStep;
 var CallMethodQueryStep = (function () {
-    function CallMethodQueryStep(method) {
+    function CallMethodQueryStep(method, edge) {
         var _this = this;
         this.execute = function (scope) {
             return new Promise(function (resolve, reject) {
@@ -109,6 +138,7 @@ var CallMethodQueryStep = (function () {
         };
         this.inspect = function () { return ("call{" + _this.method.name + "}"); };
         this.method = method;
+        this.edge = edge;
     }
     return CallMethodQueryStep;
 }());
@@ -268,6 +298,7 @@ var ApiQueryBuilder = (function () {
             var query = new ApiQuery_1.ApiQuery();
             var segments = request.path.segments, lastSegment = segments[segments.length - 1];
             _this.buildEmbedSteps(query, request, lastSegment);
+            var readMode = true;
             var baseQuery;
             if (lastSegment instanceof ApiRequest_1.EdgePathSegment) {
                 baseQuery = new ApiEdgeQuery_1.ApiEdgeQuery(lastSegment.edge, ApiEdgeQueryType_1.ApiEdgeQueryType.List);
@@ -278,8 +309,11 @@ var ApiQueryBuilder = (function () {
                 _this.addQueryStep(query, new QueryEdgeQueryStep(baseQuery), lastSegment.relation, true);
             }
             else if (lastSegment instanceof ApiRequest_1.MethodPathSegment) {
-                ApiQueryBuilder.addMethodCallStep(request, query, lastSegment.method);
-                query.unshift(new ProvideIdQueryStep(lastSegment.edge.idField));
+                ApiQueryBuilder.addMethodCallStep(request, query, lastSegment.method, lastSegment.edge);
+                if (lastSegment.method.scope === ApiEdgeMethod_1.ApiEdgeMethodScope.Entry) {
+                    query.unshift(new ProvideIdQueryStep(lastSegment.edge.idField));
+                }
+                readMode = lastSegment.method.requiresData;
             }
             else {
                 baseQuery = new ApiEdgeQuery_1.ApiEdgeQuery(lastSegment.edge, ApiEdgeQueryType_1.ApiEdgeQueryType.Get);
@@ -300,7 +334,6 @@ var ApiQueryBuilder = (function () {
             }
             else {
             }
-            var readMode = true;
             for (var i = segments.length - 2; i >= 0; i--) {
                 var currentSegment = segments[i];
                 var relation = segments[i + 1].relation;
@@ -339,7 +372,7 @@ var ApiQueryBuilder = (function () {
                 }
             }
             else if (lastSegment instanceof ApiRequest_1.MethodPathSegment) {
-                ApiQueryBuilder.addMethodCallStep(request, query, lastSegment.method);
+                ApiQueryBuilder.addMethodCallStep(request, query, lastSegment.method, lastSegment.edge);
                 query.unshift(new ProvideIdQueryStep(lastSegment.edge.idField));
                 readMode = false;
             }
@@ -403,7 +436,7 @@ var ApiQueryBuilder = (function () {
             var segments = request.path.segments, lastSegment = segments[segments.length - 1];
             _this.buildEmbedSteps(query, request, lastSegment);
             if (lastSegment instanceof ApiRequest_1.MethodPathSegment) {
-                ApiQueryBuilder.addMethodCallStep(request, query, lastSegment.method);
+                ApiQueryBuilder.addMethodCallStep(request, query, lastSegment.method, lastSegment.edge);
             }
             else {
                 _this.addQueryStep(query, new QueryEdgeQueryStep(new ApiEdgeQuery_1.ApiEdgeQuery(lastSegment.edge, ApiEdgeQueryType_1.ApiEdgeQueryType.Create)));
@@ -468,9 +501,9 @@ var ApiQueryBuilder = (function () {
                 .forEach(function (action) { return query.unshift(action); });
         }
     };
-    ApiQueryBuilder.addMethodCallStep = function (request, query, method) {
+    ApiQueryBuilder.addMethodCallStep = function (request, query, method, edge) {
         if (method.acceptedTypes & request.type) {
-            query.unshift(new CallMethodQueryStep(method));
+            query.unshift(new CallMethodQueryStep(method, edge));
         }
         else {
             throw new ApiEdgeError_1.ApiEdgeError(405, "Method Not Allowed");
@@ -532,7 +565,13 @@ var ApiQueryBuilder = (function () {
         else {
             for (var _b = 0, _c = request.context.populatedRelations; _b < _c.length; _b++) {
                 var relation = _c[_b];
-                var segment = new ApiRequest_1.EntryPathSegment(relation.to, 'TBD', relation);
+                var segment = void 0;
+                if (relation instanceof OneToManyRelation_1.OneToManyRelation) {
+                    segment = new ApiRequest_1.EdgePathSegment(relation.to, relation);
+                }
+                else {
+                    segment = new ApiRequest_1.EntryPathSegment(relation.to, 'TBD', relation);
+                }
                 var embedRequest = new ApiRequest_1.ApiRequest(request.api);
                 embedRequest.path.add(segment);
                 query.unshift(new EmbedQueryQueryStep(this.build(embedRequest), segment, embedRequest));

@@ -23,6 +23,7 @@ export enum ApiEdgeMethodScope {
 
 export class ApiEdgeMethod {
     name: string;
+    requiresData: boolean;
     acceptedTypes: ApiRequestType = ApiRequestType.Any;
     scope: ApiEdgeMethodScope = ApiEdgeMethodScope.Edge;
     execute: (scope: ApiQueryScope) => Promise<ApiEdgeQueryResponse>;
@@ -30,10 +31,12 @@ export class ApiEdgeMethod {
     constructor(name: string,
                 execute: (scope: ApiQueryScope) => Promise<ApiEdgeQueryResponse>,
                 scope: ApiEdgeMethodScope = ApiEdgeMethodScope.Edge,
-                acceptedTypes: ApiRequestType = ApiRequestType.Any) {
+                acceptedTypes: ApiRequestType = ApiRequestType.Any,
+                requiresData = true) {
         this.name = name;
         this.scope = scope;
         this.execute = execute;
         this.acceptedTypes = acceptedTypes;
+        this.requiresData = requiresData;
     }
 }

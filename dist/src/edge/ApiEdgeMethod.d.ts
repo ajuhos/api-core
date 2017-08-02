@@ -8,8 +8,9 @@ export declare enum ApiEdgeMethodScope {
 }
 export declare class ApiEdgeMethod {
     name: string;
+    requiresData: boolean;
     acceptedTypes: ApiRequestType;
     scope: ApiEdgeMethodScope;
     execute: (scope: ApiQueryScope) => Promise<ApiEdgeQueryResponse>;
-    constructor(name: string, execute: (scope: ApiQueryScope) => Promise<ApiEdgeQueryResponse>, scope?: ApiEdgeMethodScope, acceptedTypes?: ApiRequestType);
+    constructor(name: string, execute: (scope: ApiQueryScope) => Promise<ApiEdgeQueryResponse>, scope?: ApiEdgeMethodScope, acceptedTypes?: ApiRequestType, requiresData?: boolean);
 }

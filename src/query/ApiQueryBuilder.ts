@@ -12,9 +12,11 @@ import {ApiEdgeQueryResponse} from "../edge/ApiEdgeQueryResponse";
 import {ApiEdgeQueryType} from "../edge/ApiEdgeQueryType";
 import {OneToOneRelation} from "../relations/OneToOneRelation";
 import {Api} from "../Api";
-import {ApiEdgeMethod} from "../edge/ApiEdgeMethod";
+import {ApiEdgeMethod, ApiEdgeMethodScope} from "../edge/ApiEdgeMethod";
 import {ApiEdgeAction, ApiEdgeActionTriggerKind, ApiEdgeActionTrigger} from "../edge/ApiEdgeAction";
 import {ApiAction, ApiActionTriggerKind} from "./ApiAction";
+import {ApiEdgeDefinition} from "../edge/ApiEdgeDefinition";
+import {OneToManyRelation} from "../relations/OneToManyRelation";
 const parse = require('obj-parse');
 
 export class EmbedQueryQueryStep implements QueryStep {
@@ -43,14 +45,25 @@ export class EmbedQueryQueryStep implements QueryStep {
 
                 if(Array.isArray(target)) {
                     const targetIndex: { [key: string]: any[] } = {},
+                          targetArrayIndex: { [key: string]: any[] } = {},
                         ids: string[] = [];
 
                     for(let entry of target) {
                         const id = entry[this.sourceField];
                         if(id) {
-                            if (targetIndex[id]) targetIndex[id].push(entry);
-                            else targetIndex[id] = [entry];
-                            ids.push(id);
+                            if(Array.isArray(id)) {
+                                for(let _id of id) {
+                                    if (targetArrayIndex[_id]) targetArrayIndex[_id].push(entry);
+                                    else targetArrayIndex[_id] = [entry];
+                                    ids.push(_id);
+                                }
+                                entry[this.sourceField] = [];
+                            }
+                            else {
+                                if (targetIndex[id]) targetIndex[id].push(entry);
+                                else targetIndex[id] = [entry];
+                                ids.push(id);
+                            }
                         }
                     }
 
@@ -67,15 +80,28 @@ export class EmbedQueryQueryStep implements QueryStep {
                                         subEntry[this.targetField] = entry;
                                     }
                                 }
+                                if(targetArrayIndex[id]) {
+                                    for (let subEntry of targetArrayIndex[id]) {
+                                        subEntry[this.targetField].push(entry);
+                                    }
+                                }
                             }
                         }
                         resolve(scope)
                     }).catch(reject);
                 }
                 else {
+                    const sourceId = target[this.sourceField];
 
-                    //Now we can replace TBD and provide a real id for the query.
-                    (this.segment as EntryPathSegment).id = target[this.sourceField];
+                    if(Array.isArray(sourceId)) {
+                        this.request.context.filters = [
+                            new ApiEdgeQueryFilter(this.idField, ApiEdgeQueryFilterType.In, sourceId)
+                        ];
+                    }
+                    else {
+                        //Now we can replace TBD and provide a real id for the query.
+                        (this.segment as EntryPathSegment).id = sourceId;
+                    }
 
                     this.query.execute(scope.identity).then((response) => {
                         target[this.targetField] = response.data;
@@ -115,9 +141,11 @@ export class QueryEdgeQueryStep implements QueryStep {
 
 export class CallMethodQueryStep implements QueryStep {
     method: ApiEdgeMethod;
+    edge: ApiEdgeDefinition;
 
-    constructor(method: ApiEdgeMethod) {
+    constructor(method: ApiEdgeMethod, edge: ApiEdgeDefinition) {
         this.method = method;
+        this.edge = edge;
     }
 
     execute = (scope: ApiQueryScope) => {
@@ -381,10 +409,10 @@ export class ApiQueryBuilder {
         }
     }
 
-    private static addMethodCallStep(request: ApiRequest, query: ApiQuery, method: ApiEdgeMethod) {
+    private static addMethodCallStep(request: ApiRequest, query: ApiQuery, method: ApiEdgeMethod, edge: ApiEdgeDefinition) {
         if(method.acceptedTypes & request.type) {
             //TODO: this.addPostMethodActions(request, query, method);
-            query.unshift(new CallMethodQueryStep(method));
+            query.unshift(new CallMethodQueryStep(method, edge));
             //TODO: this.addPreMethodActions(request, query, method);
         }
         else {
@@ -464,14 +492,22 @@ export class ApiQueryBuilder {
         }
         else {
             for (let relation of request.context.populatedRelations) {
-                // The id is literally TBD, it is going to be set one we have the data,
-                // what we build now is only an execution plan.
-                const segment = new EntryPathSegment(relation.to, 'TBD', relation);
+                let segment: EdgePathSegment|EntryPathSegment;
+
+                if(relation instanceof OneToManyRelation) {
+                    // TODO: Should we specify exactly array relations?
+                    segment = new EdgePathSegment(relation.to, relation);
+                }
+                else {
+                    // The id is literally TBD, it is going to be set once we have the data,
+                    // what we build now is only an execution plan.
+                    segment = new EntryPathSegment(relation.to, 'TBD', relation);
+                }
 
                 const embedRequest = new ApiRequest(request.api);
                 embedRequest.path.add(segment);
 
-                // We add the step directly directly, as pre- and post-actions are not
+                // We add the step directly, as pre- and post-actions are not
                 // supported on embed query steps. These actions will be executed as
                 // part of the sub-query.
                 query.unshift(new EmbedQueryQueryStep(this.build(embedRequest), segment, embedRequest));
@@ -489,6 +525,7 @@ export class ApiQueryBuilder {
         this.buildEmbedSteps(query, request, lastSegment);
 
         //STEP 1: Create the base query which will provide the final data.
+        let readMode = true;
         let baseQuery: ApiEdgeQuery;
         if(lastSegment instanceof EdgePathSegment) {
             baseQuery = new ApiEdgeQuery(lastSegment.edge, ApiEdgeQueryType.List);
@@ -500,8 +537,12 @@ export class ApiQueryBuilder {
 
         }
         else if(lastSegment instanceof MethodPathSegment) {
-            ApiQueryBuilder.addMethodCallStep(request, query, lastSegment.method);
-            query.unshift(new ProvideIdQueryStep(lastSegment.edge.idField));
+            ApiQueryBuilder.addMethodCallStep(request, query, lastSegment.method, lastSegment.edge);
+            if(lastSegment.method.scope === ApiEdgeMethodScope.Entry) {
+                //TODO: Add support for providing id for Edge methods.
+                query.unshift(new ProvideIdQueryStep(lastSegment.edge.idField));
+            }
+            readMode = lastSegment.method.requiresData;
         }
         else {
             baseQuery = new ApiEdgeQuery(lastSegment.edge, ApiEdgeQueryType.Get);
@@ -529,7 +570,6 @@ export class ApiQueryBuilder {
         }
 
         //STEP 4: Provide filters and validation for the base query.
-        let readMode = true;
         for(let i = segments.length-2; i >= 0; i--) {
             let currentSegment = segments[i];
 
@@ -584,7 +624,7 @@ export class ApiQueryBuilder {
             }
         }
         else if(lastSegment instanceof MethodPathSegment) {
-            ApiQueryBuilder.addMethodCallStep(request, query, lastSegment.method);
+            ApiQueryBuilder.addMethodCallStep(request, query, lastSegment.method, lastSegment.edge);
             query.unshift(new ProvideIdQueryStep(lastSegment.edge.idField));
             readMode = false;
         }
@@ -670,7 +710,7 @@ export class ApiQueryBuilder {
 
         //STEP 1: Create the base query which will provide the final data.
         if(lastSegment instanceof MethodPathSegment) {
-            ApiQueryBuilder.addMethodCallStep(request, query, lastSegment.method);
+            ApiQueryBuilder.addMethodCallStep(request, query, lastSegment.method, lastSegment.edge);
         }
         else {
             this.addQueryStep(query, new QueryEdgeQueryStep(new ApiEdgeQuery(lastSegment.edge, ApiEdgeQueryType.Create)));

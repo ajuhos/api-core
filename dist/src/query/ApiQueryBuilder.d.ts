@@ -6,6 +6,7 @@ import { PathSegment, ApiRequest } from "../request/ApiRequest";
 import { ApiEdgeQueryResponse } from "../edge/ApiEdgeQueryResponse";
 import { Api } from "../Api";
 import { ApiEdgeMethod } from "../edge/ApiEdgeMethod";
+import { ApiEdgeDefinition } from "../edge/ApiEdgeDefinition";
 export declare class EmbedQueryQueryStep implements QueryStep {
     query: ApiQuery;
     request: ApiRequest;
@@ -25,7 +26,8 @@ export declare class QueryEdgeQueryStep implements QueryStep {
 }
 export declare class CallMethodQueryStep implements QueryStep {
     method: ApiEdgeMethod;
-    constructor(method: ApiEdgeMethod);
+    edge: ApiEdgeDefinition;
+    constructor(method: ApiEdgeMethod, edge: ApiEdgeDefinition);
     execute: (scope: ApiQueryScope) => Promise<{}>;
     inspect: () => string;
 }
@@ -81,7 +83,7 @@ export declare class ApiQueryBuilder {
     api: Api;
     constructor(api: Api);
     private addQueryActions(triggerKind, query, edgeQuery, relation, output?);
-    private static addMethodCallStep(request, query, method);
+    private static addMethodCallStep(request, query, method, edge);
     private addQueryStep(query, step, relation?, output?);
     private static buildProvideIdStep(query, currentSegment);
     private buildCheckStep(query, currentSegment);

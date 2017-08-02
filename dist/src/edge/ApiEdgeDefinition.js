@@ -21,33 +21,36 @@ var ApiEdge = (function () {
             _this.actions.unshift(new ApiEdgeAction_1.ApiEdgeAction(name, execute, targetTypes, triggerKind, triggers, triggerNames));
             return _this;
         };
-        this.edgeMethod = function (name, execute, acceptedTypes) {
+        this.edgeMethod = function (name, execute, acceptedTypes, requiresData) {
             if (acceptedTypes === void 0) { acceptedTypes = ApiRequest_1.ApiRequestType.Any; }
+            if (requiresData === void 0) { requiresData = true; }
             if (_this.methods.find(function (method) {
                 return method.name === name;
             }))
                 throw "A method with the same name already exists.";
-            _this.methods.push(new ApiEdgeMethod_1.ApiEdgeMethod(name, execute, ApiEdgeMethod_1.ApiEdgeMethodScope.Edge, acceptedTypes));
+            _this.methods.push(new ApiEdgeMethod_1.ApiEdgeMethod(name, execute, ApiEdgeMethod_1.ApiEdgeMethodScope.Edge, acceptedTypes, requiresData));
             return _this;
         };
-        this.collectionMethod = function (name, execute, acceptedTypes) {
+        this.collectionMethod = function (name, execute, acceptedTypes, requiresData) {
             if (acceptedTypes === void 0) { acceptedTypes = ApiRequest_1.ApiRequestType.Any; }
+            if (requiresData === void 0) { requiresData = true; }
             if (_this.methods.find(function (method) {
                 return method.name === name &&
                     (method.scope == ApiEdgeMethod_1.ApiEdgeMethodScope.Collection || method.scope == ApiEdgeMethod_1.ApiEdgeMethodScope.Edge);
             }))
                 throw "A collection method with the same name already exists.";
-            _this.methods.push(new ApiEdgeMethod_1.ApiEdgeMethod(name, execute, ApiEdgeMethod_1.ApiEdgeMethodScope.Collection, acceptedTypes));
+            _this.methods.push(new ApiEdgeMethod_1.ApiEdgeMethod(name, execute, ApiEdgeMethod_1.ApiEdgeMethodScope.Collection, acceptedTypes, requiresData));
             return _this;
         };
-        this.entryMethod = function (name, execute, acceptedTypes) {
+        this.entryMethod = function (name, execute, acceptedTypes, requiresData) {
             if (acceptedTypes === void 0) { acceptedTypes = ApiRequest_1.ApiRequestType.Any; }
+            if (requiresData === void 0) { requiresData = true; }
             if (_this.methods.find(function (method) {
                 return method.name === name &&
                     (method.scope == ApiEdgeMethod_1.ApiEdgeMethodScope.Entry || method.scope == ApiEdgeMethod_1.ApiEdgeMethodScope.Edge);
             }))
                 throw "An entry method with the same name already exists.";
-            _this.methods.push(new ApiEdgeMethod_1.ApiEdgeMethod(name, execute, ApiEdgeMethod_1.ApiEdgeMethodScope.Entry, acceptedTypes));
+            _this.methods.push(new ApiEdgeMethod_1.ApiEdgeMethod(name, execute, ApiEdgeMethod_1.ApiEdgeMethodScope.Entry, acceptedTypes, requiresData));
             return _this;
         };
     }
