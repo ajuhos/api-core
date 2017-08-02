@@ -7,6 +7,7 @@ var ApiEdgeQueryContext_1 = require("./src/edge/ApiEdgeQueryContext");
 exports.ApiEdgeQueryContext = ApiEdgeQueryContext_1.ApiEdgeQueryContext;
 var ApiEdgeQueryResponse_1 = require("./src/edge/ApiEdgeQueryResponse");
 exports.ApiEdgeQueryResponse = ApiEdgeQueryResponse_1.ApiEdgeQueryResponse;
+exports.ApiEdgeQueryStreamResponse = ApiEdgeQueryResponse_1.ApiEdgeQueryStreamResponse;
 var ApiEdgeQueryFilter_1 = require("./src/edge/ApiEdgeQueryFilter");
 exports.ApiEdgeQueryFilter = ApiEdgeQueryFilter_1.ApiEdgeQueryFilter;
 exports.ApiEdgeQueryFilterType = ApiEdgeQueryFilter_1.ApiEdgeQueryFilterType;

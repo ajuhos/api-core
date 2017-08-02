@@ -99,6 +99,7 @@ var ApiRequestType = exports.ApiRequestType;
 var ApiRequest = (function () {
     function ApiRequest(api) {
         this.body = null;
+        this.stream = null;
         this.api = api;
         this.path = new ApiRequestPath();
         this.type = ApiRequestType.Read;

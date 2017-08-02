@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import { ApiEdgeDefinition } from "../edge/ApiEdgeDefinition";
 import { OneToManyRelation } from "../relations/OneToManyRelation";
 import { OneToOneRelation } from "../relations/OneToOneRelation";
@@ -54,6 +55,7 @@ export declare class ApiRequest {
     type: ApiRequestType;
     path: ApiRequestPath;
     body: any | null;
+    stream: NodeJS.WritableStream | null;
     context: ApiEdgeQueryContext;
     constructor(api: Api);
 }
