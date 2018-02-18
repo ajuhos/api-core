@@ -4,3 +4,5 @@ node_modules/
 .coveralls.yml
 .editorconfig
 .gitignore
+.nyc_output
+coverage
