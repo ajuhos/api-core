@@ -105,7 +105,7 @@ export class ApiRequest {
     type: ApiRequestType;
     path: ApiRequestPath;
     body: any|null = null; //Should be request context
-    stream: NodeJS.WritableStream|null = null;
+    stream: NodeJS.ReadableStream|null = null;
     context: ApiEdgeQueryContext; //Should be request context
 
     constructor(api: Api) {

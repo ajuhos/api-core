@@ -1,11 +1,12 @@
 {
   "name": "api-core",
-  "version": "0.6.34",
+  "version": "0.6.37",
   "description": "Model-based dynamic multi-level APIs for any provider, plus multiple consumption channels",
   "main": "dist/index.js",
   "scripts": {
     "test": "tap dist/test/*.js --cov",
-    "cover": "npm test -- --coverage-report=lcov"
+    "cover": "npm test -- --coverage-report=lcov",
+    "prepare": "tsc"
   },
   "repository": {
     "type": "git",
@@ -19,7 +20,8 @@
   "homepage": "https://github.com/ajuhos/api-core#readme",
   "devDependencies": {
     "coveralls": "^2.11.14",
-    "tap": "^8.0.0"
+    "tap": "^8.0.0",
+    "@types/node": "^9.4.6"
   },
   "keywords": [
     "acl",

@@ -2,16 +2,17 @@ const tap = require('tap');
 
 import * as request from "../src/request/ApiRequest";
 
+import {ApiEdgeQueryResponse} from "../src/edge/ApiEdgeQueryResponse";
 import {ApiEdgeMethod, ApiEdgeMethodScope} from "../src/edge/ApiEdgeMethod";
 import {ApiRequestPathParser, ApiRequestParser} from "../src/request/ApiRequestParser";
 import {OneToManyRelation} from "../src/relations/OneToManyRelation";
 import {OneToOneRelation} from "../src/relations/OneToOneRelation";
 import {Api} from "../src/Api";
 
-const entryMethod = () => { return new Promise((resolve, reject) => reject("entry")) };
-const relatedEntryMethod = () => { return new Promise((resolve, reject) => reject("entry")) };
-const collectionMethod = () => { return new Promise((resolve, reject) => reject("collection")) };
-const edgeMethod = () => { return new Promise((resolve, reject) => reject("edge")) };
+const entryMethod = (): Promise<ApiEdgeQueryResponse> => { return new Promise((resolve, reject) => reject("entry")) };
+const relatedEntryMethod = (): Promise<ApiEdgeQueryResponse> => { return new Promise((resolve, reject) => reject("entry")) };
+const collectionMethod = (): Promise<ApiEdgeQueryResponse> => { return new Promise((resolve, reject) => reject("collection")) };
+const edgeMethod = (): Promise<ApiEdgeQueryResponse> => { return new Promise((resolve, reject) => reject("edge")) };
 
 const edge1: any = function() {
     this.name = "entry";

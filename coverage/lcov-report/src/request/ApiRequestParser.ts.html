@@ -1,0 +1,437 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for src/request/ApiRequestParser.ts</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../prettify.css" />
+    <link rel="stylesheet" href="../../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../../index.html">All files</a> / <a href="index.html">src/request</a> ApiRequestParser.ts
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>67/67</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>28/28</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>13/13</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>63/63</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line high'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">72x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">132x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">40x</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">24x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">29x</span>
+<span class="cline-any cline-yes">52x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">32x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">32x</span>
+<span class="cline-any cline-yes">32x</span>
+<span class="cline-any cline-yes">32x</span>
+<span class="cline-any cline-yes">32x</span>
+<span class="cline-any cline-yes">80x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">80x</span>
+<span class="cline-any cline-yes">50x</span>
+<span class="cline-any cline-yes">50x</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">40x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">40x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">34x</span>
+<span class="cline-any cline-yes">28x</span>
+<span class="cline-any cline-yes">28x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">30x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">30x</span>
+<span class="cline-any cline-yes">29x</span>
+<span class="cline-any cline-yes">29x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">24x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">24x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import {ApiEdgeDefinition} from "../edge/ApiEdgeDefinition";
+import {ApiEdgeRelation} from "../relations/ApiEdgeRelation";
+import {
+    ApiRequestPath, RelatedFieldPathSegment, EntryPathSegment, EdgePathSegment, ApiRequest,
+    MethodPathSegment
+} from "./ApiRequest";
+import {OneToOneRelation} from "../relations/OneToOneRelation";
+import {OneToManyRelation} from "../relations/OneToManyRelation";
+import {ApiEdgeError} from "../query/ApiEdgeError";
+import {Api} from "../Api";
+import {ApiEdgeMethod, ApiEdgeMethodScope} from "../edge/ApiEdgeMethod";
+&nbsp;
+export class ApiRequestPathParser {
+    api: Api;
+&nbsp;
+    constructor(api: Api) {
+        this.api = api;
+    }
+&nbsp;
+    private findEdgeByName(name: string|null|undefined): ApiEdgeDefinition|undefined {
+        return this.api.edges.find((edge: ApiEdgeDefinition) =&gt; edge.pluralName === name);
+    }
+&nbsp;
+    private findRelationByName(edge: ApiEdgeDefinition, name: string|null|undefined): ApiEdgeRelation|undefined {
+        return edge.relations.find((rel: ApiEdgeRelation) =&gt; rel.name === name);
+    }
+&nbsp;
+    private findMethodByName(edge: ApiEdgeDefinition,
+                             name: string|null|undefined,
+                             forEntry: boolean): ApiEdgeMethod|undefined {
+        if(forEntry) {
+            return edge.methods.find((method: ApiEdgeMethod) =&gt;
+                method.name === name &amp;&amp;
+                (method.scope == ApiEdgeMethodScope.Entry || method.scope == ApiEdgeMethodScope.Edge));
+        }
+        else {
+            return edge.methods.find((method: ApiEdgeMethod) =&gt;
+                method.name === name &amp;&amp;
+                (method.scope == ApiEdgeMethodScope.Collection || method.scope == ApiEdgeMethodScope.Edge));
+        }
+    }
+&nbsp;
+    parse(segments: string[]): ApiRequestPath {
+        let requestPath = new ApiRequestPath();
+&nbsp;
+        let lastEdge: ApiEdgeDefinition|null = null,
+            lastRelation: ApiEdgeRelation|null = null,
+            wasEntry = false;
+        while(segments.length) {
+            let segment = segments.shift();
+&nbsp;
+            if(lastEdge) {
+                let relation: ApiEdgeRelation|undefined = this.findRelationByName(lastEdge, segment);
+                if(relation) {
+                    if(relation instanceof OneToOneRelation) {
+                        requestPath.add(new RelatedFieldPathSegment(lastEdge, relation));
+                        lastEdge = (relation as OneToOneRelation).to;
+                        lastRelation = relation;
+                        wasEntry = true;
+                    }
+                    else if(wasEntry &amp;&amp; relation instanceof OneToManyRelation) {
+                        lastEdge = (relation as OneToManyRelation).to;
+                        lastRelation = relation;
+                        wasEntry = false;
+                    }
+                    else {
+                        throw new ApiEdgeError(400, "Unsupported Relation: " + segment);
+                    }
+                }
+                else {
+                    let method: ApiEdgeMethod|undefined = this.findMethodByName(lastEdge, segment, wasEntry);
+&nbsp;
+                    if(method) {
+                        //TODO: Add support for method parameters
+                        requestPath.add(new MethodPathSegment(lastEdge, method));
+                        wasEntry = true;
+                    }
+                    else if (!wasEntry) {
+                        requestPath.add(new EntryPathSegment(lastEdge, "" + segment, lastRelation));
+                        wasEntry = true;
+                    }
+                    else {
+                        throw new ApiEdgeError(400, `Missing Relation/Method: ${lastEdge.name} -&gt; ${segment}`);
+                    }
+                }
+            }
+            else {
+                let edge = this.findEdgeByName(segment);
+&nbsp;
+                if(edge) {
+                    lastEdge = edge;
+                    wasEntry = false;
+                }
+                else {
+                    throw new ApiEdgeError(400,"Missing Edge: " + segment);
+                }
+            }
+        }
+&nbsp;
+        if(lastEdge &amp;&amp; !wasEntry) {
+            requestPath.add(new EdgePathSegment(lastEdge, lastRelation));
+            lastEdge = null;
+        }
+&nbsp;
+        return requestPath
+    }
+&nbsp;
+}
+&nbsp;
+export class ApiRequestParser {
+    api: Api;
+    private pathParser: ApiRequestPathParser;
+&nbsp;
+    constructor(api: Api) {
+        this.api = api;
+        this.pathParser = new ApiRequestPathParser(api);
+    }
+&nbsp;
+    parse(segments: string[]): ApiRequest {
+        let request = new ApiRequest();
+        request.path = this.pathParser.parse(segments);
+        return request;
+    }
+}
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Sat Nov 12 2016 11:23:07 GMT+0100 (CET)
+</div>
+</div>
+<script src="../../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../../sorter.js"></script>
+</body>
+</html>

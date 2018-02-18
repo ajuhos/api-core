@@ -38,7 +38,7 @@ export class EmbedQueryQueryStep implements QueryStep {
         this.idField = this.segment.relation.relatedId;
     }
 
-    execute = (scope: ApiQueryScope) => {
+    execute = (scope: ApiQueryScope): Promise<ApiQueryScope> => {
         return new Promise((resolve, reject) => {
             if(scope.response) {
                 const target = scope.response.data;
@@ -123,7 +123,7 @@ export class QueryEdgeQueryStep implements QueryStep {
         this.query = query;
     }
 
-    execute = (scope: ApiQueryScope) => {
+    execute = (scope: ApiQueryScope): Promise<ApiQueryScope> => {
         return new Promise((resolve, reject) => {
             this.query.body = scope.body;
             this.query.context = scope.context;
@@ -148,7 +148,7 @@ export class CallMethodQueryStep implements QueryStep {
         this.edge = edge;
     }
 
-    execute = (scope: ApiQueryScope) => {
+    execute = (scope: ApiQueryScope): Promise<ApiQueryScope> => {
         return new Promise((resolve, reject) => {
             this.method.execute(scope).then((response) => {
                 scope.response = response;
@@ -167,7 +167,7 @@ export class RelateQueryStep implements QueryStep {
         this.relation = relation;
     }
 
-    execute = (scope: ApiQueryScope) => {
+    execute = (scope: ApiQueryScope): Promise<ApiQueryScope> => {
         return new Promise((resolve, reject) => {
             if(!scope.response) return reject(new ApiEdgeError(404, "Missing Related Entry"));
             scope.context.filter(this.relation.relationId, ApiEdgeQueryFilterType.Equals, scope.response.data[this.relation.relatedId]);
@@ -185,7 +185,7 @@ export class RelateBackwardsQueryStep implements QueryStep {
         this.relation = relation;
     }
 
-    execute = (scope: ApiQueryScope) => {
+    execute = (scope: ApiQueryScope): Promise<ApiQueryScope> => {
         return new Promise((resolve, reject) => {
             if(!scope.response) return reject(new ApiEdgeError(404, "Missing Related Entry"));
             scope.context.filter(this.relation.relatedId, ApiEdgeQueryFilterType.Equals, scope.response.data[this.relation.relationId]);
@@ -203,7 +203,7 @@ export class RelateChangeQueryStep implements QueryStep {
         this.relation = relation;
     }
 
-    execute = (scope: ApiQueryScope) => {
+    execute = (scope: ApiQueryScope): Promise<ApiQueryScope> => {
         return new Promise((resolve, reject) => {
             if(!scope.body) return reject(new ApiEdgeError(404, "Missing Body"));
             if(!scope.response) return reject(new ApiEdgeError(404, "Missing Related Entry"));
@@ -251,7 +251,7 @@ export class SetResponseQueryStep implements QueryStep {
         this.response = response;
     }
 
-    execute = (scope: ApiQueryScope) => {
+    execute = (scope: ApiQueryScope): Promise<ApiQueryScope> => {
         return new Promise(resolve => {
             scope.response = this.response;
             scope.context = new ApiEdgeQueryContext();
@@ -264,14 +264,17 @@ export class SetResponseQueryStep implements QueryStep {
 
 export class SetBodyQueryStep implements QueryStep {
     body: any;
+    stream: NodeJS.ReadableStream|null;
 
-    constructor(body: any) {
+    constructor(body: any, stream: NodeJS.ReadableStream|null = null) {
         this.body = body;
+        this.stream = stream
     }
 
-    execute = (scope: ApiQueryScope) => {
+    execute = (scope: ApiQueryScope): Promise<ApiQueryScope> => {
         return new Promise(resolve => {
             scope.body = this.body;
+            scope.stream = this.stream;
             resolve(scope);
         })
     };
@@ -286,7 +289,7 @@ export class ProvideIdQueryStep implements QueryStep {
         this.fieldName = fieldName;
     }
 
-    execute = (scope: ApiQueryScope) => {
+    execute = (scope: ApiQueryScope): Promise<ApiQueryScope> => {
         return new Promise((resolve, reject) => {
             if(!scope.response) return reject(new ApiEdgeError(404, "Missing Entry"));
             scope.context.id = scope.response.data[this.fieldName];
@@ -304,7 +307,7 @@ export class ExtendContextQueryStep implements QueryStep {
         this.context = context
     }
 
-    execute = (scope: ApiQueryScope) => {
+    execute = (scope: ApiQueryScope): Promise<ApiQueryScope> => {
         return new Promise(resolve => {
             scope.context.id = this.context.id || scope.context.id;
             if(this.context.pagination) {
@@ -335,7 +338,7 @@ export class ExtendContextLiveQueryStep implements QueryStep {
         this.apply = func
     }
 
-    execute = (scope: ApiQueryScope) => {
+    execute = (scope: ApiQueryScope): Promise<ApiQueryScope> => {
         return new Promise(resolve => {
             this.apply(scope.context);
             resolve(scope)
@@ -688,7 +691,8 @@ export class ApiQueryBuilder {
         }
 
         //STEP 5: Provide body for the query
-        if(request.body) query.unshift(new SetBodyQueryStep(request.body));
+        if(request.body || request.stream)
+            query.unshift(new SetBodyQueryStep(request.body, request.stream));
 
         //STEP 6: Add OnInput actions
         this.api.actions
@@ -731,7 +735,7 @@ export class ApiQueryBuilder {
         }
 
         //STEP 3: Provide context for the base query.
-        query.unshift(new SetBodyQueryStep(request.body));
+        query.unshift(new SetBodyQueryStep(request.body, request.stream));
 
         //STEP 4: Add OnInput actions
         this.api.actions

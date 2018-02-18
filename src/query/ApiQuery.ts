@@ -6,6 +6,7 @@ import {ApiRequest} from "../request/ApiRequest";
 export interface ApiQueryScope {
     context: ApiEdgeQueryContext,
     body: any|null,
+    stream?: NodeJS.ReadableStream|null,
     identity: any|null,
     response: ApiEdgeQueryResponse|null,
     query: ApiQuery,

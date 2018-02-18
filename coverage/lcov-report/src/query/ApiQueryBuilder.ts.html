@@ -1,0 +1,1631 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for src/query/ApiQueryBuilder.ts</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../prettify.css" />
+    <link rel="stylesheet" href="../../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../../index.html">All files</a> / <a href="index.html">src/query</a> ApiQueryBuilder.ts
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">80.54% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>207/257</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">64.81% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>70/108</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">65.63% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>42/64</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">84.26% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>198/235</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line high'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260
+261
+262
+263
+264
+265
+266
+267
+268
+269
+270
+271
+272
+273
+274
+275
+276
+277
+278
+279
+280
+281
+282
+283
+284
+285
+286
+287
+288
+289
+290
+291
+292
+293
+294
+295
+296
+297
+298
+299
+300
+301
+302
+303
+304
+305
+306
+307
+308
+309
+310
+311
+312
+313
+314
+315
+316
+317
+318
+319
+320
+321
+322
+323
+324
+325
+326
+327
+328
+329
+330
+331
+332
+333
+334
+335
+336
+337
+338
+339
+340
+341
+342
+343
+344
+345
+346
+347
+348
+349
+350
+351
+352
+353
+354
+355
+356
+357
+358
+359
+360
+361
+362
+363
+364
+365
+366
+367
+368
+369
+370
+371
+372
+373
+374
+375
+376
+377
+378
+379
+380
+381
+382
+383
+384
+385
+386
+387
+388
+389
+390
+391
+392
+393
+394
+395
+396
+397
+398
+399
+400
+401
+402
+403
+404
+405
+406
+407
+408
+409
+410
+411
+412
+413
+414
+415
+416
+417
+418
+419
+420
+421
+422
+423
+424
+425
+426
+427
+428
+429
+430
+431
+432
+433
+434
+435
+436
+437
+438
+439
+440
+441
+442
+443
+444
+445
+446
+447
+448
+449
+450
+451
+452
+453
+454
+455
+456
+457
+458
+459
+460
+461
+462
+463
+464
+465
+466
+467
+468
+469
+470
+471
+472
+473
+474
+475
+476
+477
+478
+479
+480
+481
+482
+483
+484
+485
+486
+487
+488
+489
+490
+491
+492
+493
+494
+495
+496
+497
+498
+499
+500
+501
+502
+503
+504
+505
+506
+507
+508
+509
+510
+511
+512
+513
+514
+515
+516
+517
+518
+519
+520
+521
+522
+523</td><td class="line-coverage quiet"><span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">18x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-yes">14x</span>
+<span class="cline-any cline-yes">14x</span>
+<span class="cline-any cline-yes">14x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">26x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">24x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">24x</span>
+<span class="cline-any cline-yes">24x</span>
+<span class="cline-any cline-yes">24x</span>
+<span class="cline-any cline-yes">24x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">24x</span>
+<span class="cline-any cline-yes">24x</span>
+<span class="cline-any cline-yes">24x</span>
+<span class="cline-any cline-yes">24x</span>
+<span class="cline-any cline-yes">24x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">24x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">32x</span>
+<span class="cline-any cline-yes">32x</span>
+<span class="cline-any cline-yes">32x</span>
+<span class="cline-any cline-yes">32x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">32x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">30x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">32x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">32x</span>
+<span class="cline-any cline-yes">20x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">20x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">22x</span>
+<span class="cline-any cline-yes">22x</span>
+<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">17x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import {QueryStep, ApiQueryScope, ApiQuery} from "./ApiQuery";
+import {ApiEdgeQuery} from "../edge/ApiEdgeQuery";
+import {ApiEdgeQueryContext} from "../edge/ApiEdgeQueryContext";
+import {ApiEdgeRelation} from "../relations/ApiEdgeRelation";
+import {ApiEdgeError} from "./ApiEdgeError";
+import {ApiEdgeQueryFilterType} from "../edge/ApiEdgeQueryFilter";
+import {
+    PathSegment, EntryPathSegment, RelatedFieldPathSegment, ApiRequest,
+    EdgePathSegment, ApiRequestType, MethodPathSegment
+} from "../request/ApiRequest";
+import {ApiEdgeQueryResponse} from "../edge/ApiEdgeQueryResponse";
+import {ApiEdgeQueryType} from "../edge/ApiEdgeQueryType";
+import {OneToOneRelation} from "../relations/OneToOneRelation";
+import {Api} from "../Api";
+import {ApiEdgeMethod} from "../edge/ApiEdgeMethod";
+import {ApiEdgeAction, ApiEdgeActionTriggerKind, ApiEdgeActionTrigger} from "../edge/ApiEdgeAction";
+import {ApiAction, ApiActionTriggerKind} from "./ApiAction";
+&nbsp;
+export class QueryEdgeQueryStep implements QueryStep {
+    query: ApiEdgeQuery;
+&nbsp;
+    constructor(query: ApiEdgeQuery) {
+        this.query = query;
+    }
+&nbsp;
+    execute = (scope: ApiQueryScope) =&gt; {
+        return new Promise((resolve, reject) =&gt; {
+            this.query.body = scope.body;
+            this.query.context = scope.context;
+&nbsp;
+            this.query.execute().then((response) =&gt; {
+                scope.context = new ApiEdgeQueryContext();
+                scope.response = response;
+                resolve(scope)
+            }).catch(reject);
+        })
+    };
+&nbsp;
+    inspect = <span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" ></span>`QUERY /${this.query.edge.pluralName}`;</span>
+}
+&nbsp;
+export class CallMethodQueryStep implements QueryStep {
+    method: ApiEdgeMethod;
+&nbsp;
+    constructor(method: ApiEdgeMethod) {
+        this.method = method;
+    }
+&nbsp;
+    execute = (scope: ApiQueryScope) =&gt; {
+        return new Promise((resolve, reject) =&gt; {
+            this.method.execute(scope).then((response) =&gt; {
+                scope.response = response;
+                resolve(scope)
+            }).catch(reject);
+        })
+    };
+&nbsp;
+    inspect = <span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" ></span>`call{${this.method.name}}`;</span>
+}
+&nbsp;
+export class RelateQueryStep implements QueryStep {
+    relation: ApiEdgeRelation;
+&nbsp;
+    constructor(relation: ApiEdgeRelation) {
+        this.relation = relation;
+    }
+&nbsp;
+    execute = (scope: ApiQueryScope) =&gt; {
+        return new Promise((resolve, reject) =&gt; {
+            <span class="missing-if-branch" title="if path not taken" >I</span>if(!scope.response) <span class="cstat-no" title="statement not covered" >return reject(new ApiEdgeError(404, "Missing Related Entry"));</span>
+            scope.context.filter(this.relation.relationId, ApiEdgeQueryFilterType.Equals, scope.response.data[this.relation.from.idField||<span class="branch-1 cbranch-no" title="branch not covered" >Api.defaultIdField]</span>);
+            resolve(scope);
+        })
+    };
+&nbsp;
+    inspect = <span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" ></span>`RELATE ${this.relation.relationId}`;</span>
+}
+&nbsp;
+/*export class CheckResponseQueryStep implements QueryStep {
+    execute = (scope: QueryScope) =&gt; {
+        return new Promise((resolve, reject) =&gt; {
+            if(!scope.response) return reject(new ApiEdgeError(404, "Missing Related Entry"));
+            resolve(scope);
+        })
+    };
+&nbsp;
+    inspect = () =&gt; `CHECK`;
+}
+&nbsp;
+export class NotImplementedQueryStep implements QueryStep {
+    description: string;
+&nbsp;
+    constructor(description: string) {
+        this.description = description;
+    }
+&nbsp;
+    execute = (scope: QueryScope) =&gt; {
+        return new Promise(resolve =&gt; {
+            resolve(scope);
+        })
+    };
+&nbsp;
+    inspect = () =&gt; `NOT IMPLEMENTED: ${this.description}`;
+}*/
+&nbsp;
+export class SetResponseQueryStep implements QueryStep {
+    response: ApiEdgeQueryResponse;
+&nbsp;
+    constructor(response: ApiEdgeQueryResponse) {
+        this.response = response;
+    }
+&nbsp;
+    execute = (scope: ApiQueryScope) =&gt; {
+        return new Promise(resolve =&gt; {
+            scope.response = this.response;
+            scope.context = new ApiEdgeQueryContext();
+            resolve(scope);
+        })
+    };
+&nbsp;
+    inspect = <span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" ></span>`SET RESPONSE`;</span>
+}
+&nbsp;
+export class SetBodyQueryStep implements QueryStep {
+    body: any;
+&nbsp;
+    constructor(body: any) {
+        this.body = body;
+    }
+&nbsp;
+    execute = (scope: ApiQueryScope) =&gt; {
+        return new Promise(resolve =&gt; {
+            scope.body = this.body;
+            resolve(scope);
+        })
+    };
+&nbsp;
+    inspect = <span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" ></span>`SET BODY`;</span>
+}
+&nbsp;
+export class ProvideIdQueryStep implements QueryStep {
+    fieldName: string;
+&nbsp;
+    constructor(<span class="missing-if-branch" title="if path not taken" >I</span>fieldName: string = Api.defaultIdField) {
+        this.fieldName = fieldName;
+    }
+&nbsp;
+    execute = (scope: ApiQueryScope) =&gt; {
+        return new Promise((resolve, reject) =&gt; {
+            <span class="missing-if-branch" title="if path not taken" >I</span>if(!scope.response) <span class="cstat-no" title="statement not covered" >return reject(new ApiEdgeError(404, "Missing Entry"));</span>
+            scope.context.id = scope.response.data[this.fieldName];
+            resolve(scope);
+        })
+    };
+&nbsp;
+    inspect = <span class="fstat-no" title="function not covered" >() =&gt; <span class="cstat-no" title="statement not covered" ></span>`PROVIDE ID: ${this.fieldName}`;</span>
+}
+&nbsp;
+export class ExtendContextQueryStep implements QueryStep {
+    context: ApiEdgeQueryContext;
+&nbsp;
+    constructor(context: ApiEdgeQueryContext) {
+        this.context = context
+    }
+&nbsp;
+    execute = (scope: ApiQueryScope) =&gt; {
+        return new Promise(resolve =&gt; {
+            scope.context.id = this.context.id || scope.context.id;
+            <span class="missing-if-branch" title="if path not taken" >I</span>if(this.context.pagination) {
+<span class="cstat-no" title="statement not covered" >                scope.context.pagination = this.context.pagination;</span>
+            }
+            this.context.fields.forEach(<span class="fstat-no" title="function not covered" ></span>f =&gt; <span class="cstat-no" title="statement not covered" >scope.context.fields.push(f))</span>;
+            this.context.populatedFields.forEach(<span class="fstat-no" title="function not covered" ></span>f =&gt; <span class="cstat-no" title="statement not covered" >scope.context.populatedFields.push(f))</span>;
+            this.context.filters.forEach(<span class="fstat-no" title="function not covered" ></span>f =&gt; <span class="cstat-no" title="statement not covered" >scope.context.filters.push(f))</span>;
+            this.context.sortBy.forEach(<span class="fstat-no" title="function not covered" ></span>f =&gt; <span class="cstat-no" title="statement not covered" >scope.context.sortBy.push(f))</span>;
+            resolve(scope)
+        })
+    };
+&nbsp;
+    inspect = <span class="fstat-no" title="function not covered" >() =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >        if(this.context.id) {</span>
+<span class="cstat-no" title="statement not covered" >            return `EXTEND CONTEXT (id=${this.context.id})`</span>
+        }
+        else {
+<span class="cstat-no" title="statement not covered" >            return `APPLY PARAMETERS`</span>
+        }
+    };
+}
+&nbsp;
+/*export class GenericQueryStep implements QueryStep {
+    description: string;
+    step: () =&gt; Promise&lt;QueryScope&gt;;
+    context: any;
+&nbsp;
+    constructor(description: string, step: () =&gt; Promise&lt;QueryScope&gt;, context: any) {
+        this.description = description;
+        this.step = step;
+        this.context = context;
+    }
+&nbsp;
+    execute = (scope: QueryScope) =&gt; {
+        return this.step.apply(this.context, [ scope ]);
+    };
+&nbsp;
+    inspect = () =&gt; this.description
+}*/
+&nbsp;
+export class ApiQueryBuilder {
+    api: Api;
+&nbsp;
+    constructor(api: Api) {
+        this.api = api;
+    }
+&nbsp;
+    private addQueryActions(triggerKind: ApiEdgeActionTriggerKind,
+                            query: ApiQuery,
+                            edgeQuery: ApiEdgeQuery,
+                            relation: ApiEdgeRelation|null,
+                            <span class="missing-if-branch" title="if path not taken" >I</span>output: boolean = false) {
+        const edge = edgeQuery.edge,
+            queryType = edgeQuery.type,
+            trigger = relation ?
+                ApiEdgeActionTrigger.Relation :
+                (output ? ApiEdgeActionTrigger.OutputQuery : ApiEdgeActionTrigger.SubQuery);
+&nbsp;
+        let actions: ApiEdgeAction[];
+        if(relation) {
+            actions = edge.actions.filter(<span class="fstat-no" title="function not covered" >(</span>action: ApiEdgeAction) =&gt;
+<span class="cstat-no" title="statement not covered" >                action.triggerKind == triggerKind &amp;&amp;</span>
+                (action.targetTypes &amp; queryType) &amp;&amp;
+                (action.triggers &amp; trigger) &amp;&amp;
+                (!action.triggerNames.length || action.triggerNames.indexOf(relation.name) == -1))
+        }
+        else {
+            actions = edge.actions.filter(<span class="fstat-no" title="function not covered" >(</span>action: ApiEdgeAction) =&gt;
+<span class="cstat-no" title="statement not covered" >                action.triggerKind == triggerKind &amp;&amp;</span>
+                (action.targetTypes &amp; queryType) &amp;&amp;
+                (action.triggers &amp; trigger))
+        }
+&nbsp;
+        actions.forEach(<span class="fstat-no" title="function not covered" >(</span>action: ApiEdgeAction) =&gt; <span class="cstat-no" title="statement not covered" >query.unshift(action))</span>;
+&nbsp;
+        if(output) {
+            const apiTrigger = triggerKind == ApiEdgeActionTriggerKind.BeforeEvent ?
+                ApiActionTriggerKind.BeforeOutput : ApiActionTriggerKind.AfterOutput;
+            this.api.actions
+                .filter(<span class="fstat-no" title="function not covered" >(</span>action: ApiAction) =&gt; <span class="cstat-no" title="statement not covered" >action.triggerKind == apiTrigger)</span>
+                .forEach(<span class="fstat-no" title="function not covered" >(</span>action: ApiAction) =&gt; <span class="cstat-no" title="statement not covered" >query.unshift(action))</span>
+        }
+    }
+&nbsp;
+    private static addMethodCallStep(request: ApiRequest, query: ApiQuery, method: ApiEdgeMethod) {
+        if(method.acceptedTypes &amp; request.type) {
+            //TODO: this.addPostMethodActions(request, query, method);
+            query.unshift(new CallMethodQueryStep(method));
+            //TODO: this.addPreMethodActions(request, query, method);
+        }
+        else {
+            throw new ApiEdgeError(405, "Method Not Allowed");
+        }
+    }
+&nbsp;
+    private addQueryStep(query: ApiQuery,
+                         step: QueryEdgeQueryStep,
+                         relation: ApiEdgeRelation|null = null,
+                         output: boolean = false) {
+        this.addQueryActions(ApiEdgeActionTriggerKind.AfterEvent, query, step.query, relation, output);
+        query.unshift(step);
+        this.addQueryActions(ApiEdgeActionTriggerKind.BeforeEvent, query, step.query, relation, output);
+    }
+&nbsp;
+    private static buildProvideIdStep(query: ApiQuery, currentSegment: PathSegment): boolean {
+        <span class="missing-if-branch" title="else path not taken" >E</span>if(currentSegment instanceof EntryPathSegment) {
+            query.unshift(new ExtendContextQueryStep(new ApiEdgeQueryContext(currentSegment.id)));
+            return false
+        }
+        else <span class="cstat-no" title="statement not covered" >if(currentSegment instanceof RelatedFieldPathSegment) {</span>
+<span class="cstat-no" title="statement not covered" >            query.unshift(new ProvideIdQueryStep(currentSegment.relation.relationId));</span>
+<span class="cstat-no" title="statement not covered" >            return true</span>
+        }
+        else {
+            //TODO: Add support for method calls with parameters
+<span class="cstat-no" title="statement not covered" >            return false</span>
+        }
+    }
+&nbsp;
+    private buildCheckStep(query: ApiQuery, currentSegment: PathSegment): boolean {
+        //STEP 1: Create the check query.
+        //TODO: Check this code...
+        <span class="missing-if-branch" title="else path not taken" >E</span>if(currentSegment instanceof EntryPathSegment) {
+            query.unshift(new SetResponseQueryStep(new ApiEdgeQueryResponse({ [currentSegment.edge.idField||<span class="branch-1 cbranch-no" title="branch not covered" >Api.defaultIdField]</span>: currentSegment.id })));
+            return false
+        }
+        else <span class="cstat-no" title="statement not covered" >if(currentSegment instanceof RelatedFieldPathSegment) {</span>
+<span class="cstat-no" title="statement not covered" >            this.addQueryStep(query, new QueryEdgeQueryStep(new ApiEdgeQuery(currentSegment.relation.to, ApiEdgeQueryType.Get)), currentSegment.relation);</span>
+        }
+        else {
+            //TODO: Add support for method calls (non-base query case)
+<span class="cstat-no" title="statement not covered" >            throw new ApiEdgeError(500, "Not Implemented")</span>
+        }
+&nbsp;
+        //STEP 2: Provide ID for the check query.
+<span class="cstat-no" title="statement not covered" >        return ApiQueryBuilder.buildProvideIdStep(query, currentSegment)</span>
+    }
+&nbsp;
+    private buildReadStep(query: ApiQuery, currentSegment: PathSegment): boolean {
+        //STEP 1: Create the read query.
+        <span class="missing-if-branch" title="if path not taken" >I</span>if(currentSegment instanceof RelatedFieldPathSegment) {
+<span class="cstat-no" title="statement not covered" >            this.addQueryStep(query, new QueryEdgeQueryStep(new ApiEdgeQuery(currentSegment.relation.to, ApiEdgeQueryType.Get)), currentSegment.relation);</span>
+        }
+        else {
+            this.addQueryStep(query, new QueryEdgeQueryStep(new ApiEdgeQuery(currentSegment.edge, ApiEdgeQueryType.Get)));
+        }
+&nbsp;
+        //STEP 2: Provide ID for the read query.
+        return ApiQueryBuilder.buildProvideIdStep(query, currentSegment)
+    }
+&nbsp;
+    private buildReadQuery = (request: ApiRequest): ApiQuery =&gt; {
+        let query = new ApiQuery();
+&nbsp;
+        let segments = request.path.segments,
+            lastSegment = segments[segments.length-1];
+&nbsp;
+        //STEP 1: Create the base query which will provide the final data.
+        let baseQuery: ApiEdgeQuery;
+        if(lastSegment instanceof EdgePathSegment) {
+            baseQuery = new ApiEdgeQuery(lastSegment.edge, ApiEdgeQueryType.List);
+            this.addQueryStep(query, new QueryEdgeQueryStep(baseQuery), null, true);
+        }
+        else if(lastSegment instanceof RelatedFieldPathSegment) {
+            baseQuery = new ApiEdgeQuery(lastSegment.relation.to, ApiEdgeQueryType.Get);
+            this.addQueryStep(query, new QueryEdgeQueryStep(baseQuery), lastSegment.relation, true);
+&nbsp;
+        }
+        else if(lastSegment instanceof MethodPathSegment) {
+            ApiQueryBuilder.addMethodCallStep(request, query, lastSegment.method);
+            query.unshift(new ProvideIdQueryStep(lastSegment.edge.idField));
+        }
+        else {
+            baseQuery = new ApiEdgeQuery(lastSegment.edge, ApiEdgeQueryType.Get);
+            this.addQueryStep(query, new QueryEdgeQueryStep(baseQuery), null, true);
+        }
+&nbsp;
+        //STEP 2: Provide context for the base query.
+        query.unshift(new ExtendContextQueryStep(request.context));
+&nbsp;
+        //STEP 3: Provide ID for the base query.
+        if(lastSegment instanceof EntryPathSegment) {
+            query.unshift(new ExtendContextQueryStep(new ApiEdgeQueryContext(lastSegment.id)))
+        }
+        else if(lastSegment instanceof RelatedFieldPathSegment) {
+            query.unshift(new ProvideIdQueryStep(lastSegment.relation.relationId))
+        }
+        else {
+            //TODO: Add support for method calls with parameters
+        }
+&nbsp;
+        //STEP 4: Provide filters and validation for the base query.
+        let readMode = true;
+        for(let i = segments.length-2; i &gt;= 0; i--) {
+            let currentSegment = segments[i];
+&nbsp;
+            //STEP 1: Relate to the current query.
+            let relation = segments[i+1].relation;
+            if(relation &amp;&amp; !(relation instanceof OneToOneRelation)) {
+                query.unshift(new RelateQueryStep(relation));
+            }
+&nbsp;
+            //STEP 2: Read or Check
+            <span class="missing-if-branch" title="else path not taken" >E</span>if(readMode) {
+                readMode = this.buildReadStep(query, currentSegment)
+            }
+            else {
+<span class="cstat-no" title="statement not covered" >                readMode = this.buildCheckStep(query, currentSegment)</span>
+            }
+        }
+&nbsp;
+        //STEP 5: Add OnInput actions
+        this.api.actions
+            .filter(<span class="fstat-no" title="function not covered" >(</span>action: ApiAction) =&gt; <span class="cstat-no" title="statement not covered" >action.triggerKind == ApiActionTriggerKind.OnInput)</span>
+            .forEach(<span class="fstat-no" title="function not covered" >(</span>action: ApiAction) =&gt; <span class="cstat-no" title="statement not covered" >query.unshift(action))</span>;
+&nbsp;
+        //STEP 6: Return the completed query.
+        return query
+    };
+&nbsp;
+    private buildChangeQuery = (request: ApiRequest): ApiQuery =&gt; {
+        let query = new ApiQuery();
+&nbsp;
+        let segments = request.path.segments,
+            lastSegment = segments[segments.length-1],
+            readMode = true;
+&nbsp;
+        //STEP 1: Create the base query which will provide the final data.
+        let baseQuery: ApiEdgeQuery;
+        if(lastSegment instanceof RelatedFieldPathSegment) {
+            <span class="missing-if-branch" title="if path not taken" >I</span>if(request.type === ApiRequestType.Update) {
+<span class="cstat-no" title="statement not covered" >                baseQuery = new ApiEdgeQuery(lastSegment.edge, ApiEdgeQueryType.Patch);</span>
+<span class="cstat-no" title="statement not covered" >                request.body = { [lastSegment.relation.relationId]: request.body.id||request.body._id };</span>
+<span class="cstat-no" title="statement not covered" >                this.addQueryStep(query, new QueryEdgeQueryStep(baseQuery), null, true);</span>
+            }
+            else <span class="missing-if-branch" title="if path not taken" >I</span>if(request.type === ApiRequestType.Patch) {
+<span class="cstat-no" title="statement not covered" >                baseQuery = new ApiEdgeQuery(lastSegment.relation.to, ApiEdgeQueryType.Patch);</span>
+<span class="cstat-no" title="statement not covered" >                this.addQueryStep(query, new QueryEdgeQueryStep(baseQuery), null, true);</span>
+            }
+            else {
+                throw new ApiEdgeError(400, "Invalid Delete Query");
+            }
+        }
+        else if(lastSegment instanceof MethodPathSegment) {
+            ApiQueryBuilder.addMethodCallStep(request, query, lastSegment.method);
+            query.unshift(new ProvideIdQueryStep(lastSegment.edge.idField));
+            readMode = false;
+        }
+        else {
+            if(request.type === ApiRequestType.Update) {
+                baseQuery = new ApiEdgeQuery(lastSegment.edge, ApiEdgeQueryType.Update);
+                this.addQueryStep(query, new QueryEdgeQueryStep(baseQuery), null, true);
+            }
+            else if(request.type === ApiRequestType.Patch) {
+                baseQuery = new ApiEdgeQuery(lastSegment.edge, ApiEdgeQueryType.Patch);
+                this.addQueryStep(query, new QueryEdgeQueryStep(baseQuery), null, true);
+            }
+            else {
+                baseQuery = new ApiEdgeQuery(lastSegment.edge, ApiEdgeQueryType.Delete);
+                this.addQueryStep(query, new QueryEdgeQueryStep(baseQuery), null, true);
+            }
+        }
+&nbsp;
+        //STEP 2: Provide context for the base query.
+        if(request.body) query.unshift(new SetBodyQueryStep(request.body));
+        query.unshift(new ExtendContextQueryStep(request.context));
+&nbsp;
+        //STEP 3: Provide ID for the base query.
+        if(lastSegment instanceof EntryPathSegment) {
+            query.unshift(new ExtendContextQueryStep(new ApiEdgeQueryContext(lastSegment.id)))
+        }
+        else <span class="missing-if-branch" title="if path not taken" >I</span>if(lastSegment instanceof RelatedFieldPathSegment) {
+<span class="cstat-no" title="statement not covered" >            if(request.type === ApiRequestType.Update) {</span>
+                let previousSegment = <span class="cstat-no" title="statement not covered" >segments[segments.length-2];</span>
+<span class="cstat-no" title="statement not covered" >                query.unshift(new ProvideIdQueryStep(previousSegment.edge.idField||Api.defaultIdField));</span>
+<span class="cstat-no" title="statement not covered" >                readMode = false; </span>//Provide ID from the previous segment without querying the database.
+            }
+            else {
+<span class="cstat-no" title="statement not covered" >                query.unshift(new ProvideIdQueryStep(lastSegment.relation.relationId))</span>
+            }
+        }
+        else {
+            //TODO: Add support for method calls with parameters
+        }
+&nbsp;
+        //STEP 4: Provide filters and validation for the base query.
+        for(let i = segments.length-2; i &gt;= 0; i--) {
+            let currentSegment = segments[i];
+&nbsp;
+            //STEP 1: Relate to the current query.
+            let relation = segments[i+1].relation;
+            <span class="missing-if-branch" title="if path not taken" >I</span>if(relation &amp;&amp; <span class="branch-1 cbranch-no" title="branch not covered" >!(relation instanceof OneToOneRelation))</span> {
+<span class="cstat-no" title="statement not covered" >                query.unshift(new RelateQueryStep(relation));</span>
+            }
+&nbsp;
+            //STEP 2: Read or Check
+            <span class="missing-if-branch" title="if path not taken" >I</span>if(readMode) {
+<span class="cstat-no" title="statement not covered" >                readMode = this.buildReadStep(query, currentSegment)</span>
+            }
+            else {
+                readMode = this.buildCheckStep(query, currentSegment)
+            }
+        }
+&nbsp;
+        //STEP 5: Add OnInput actions
+        this.api.actions
+            .filter(<span class="fstat-no" title="function not covered" >(</span>action: ApiAction) =&gt; <span class="cstat-no" title="statement not covered" >action.triggerKind == ApiActionTriggerKind.OnInput)</span>
+            .forEach(<span class="fstat-no" title="function not covered" >(</span>action: ApiAction) =&gt; <span class="cstat-no" title="statement not covered" >query.unshift(action))</span>;
+&nbsp;
+        //STEP 6: Return the completed query.
+        return query
+    };
+&nbsp;
+    private buildCreateQuery = (request: ApiRequest): ApiQuery =&gt; {
+        let query = new ApiQuery();
+&nbsp;
+        let segments = request.path.segments,
+            lastSegment = segments[segments.length-1];
+&nbsp;
+        //STEP 1: Validate query
+        <span class="missing-if-branch" title="if path not taken" >I</span>if(segments.length != 1 || !(lastSegment instanceof EdgePathSegment)) {
+<span class="cstat-no" title="statement not covered" >            throw new ApiEdgeError(400, "Invalid Create Query")</span>
+        }
+&nbsp;
+        //STEP 2: Create the base query which will provide the final data.
+        this.addQueryStep(query, new QueryEdgeQueryStep(new ApiEdgeQuery(lastSegment.edge, ApiEdgeQueryType.Create)));
+&nbsp;
+        //STEP 3: Provide context for the base query.
+        query.unshift(new SetBodyQueryStep(request.body));
+&nbsp;
+        //STEP 4: Add OnInput actions
+        this.api.actions
+            .filter(<span class="fstat-no" title="function not covered" >(</span>action: ApiAction) =&gt; <span class="cstat-no" title="statement not covered" >action.triggerKind == ApiActionTriggerKind.OnInput)</span>
+            .forEach(<span class="fstat-no" title="function not covered" >(</span>action: ApiAction) =&gt; <span class="cstat-no" title="statement not covered" >query.unshift(action))</span>;
+&nbsp;
+        //STEP 5: Return the completed query.
+        return query
+    };
+&nbsp;
+&nbsp;
+    build = (request: ApiRequest): ApiQuery =&gt; {
+        switch(request.type) {
+            case ApiRequestType.Read:
+                return this.buildReadQuery(request);
+            case ApiRequestType.Update:
+            case ApiRequestType.Patch:
+            case ApiRequestType.Delete:
+                return this.buildChangeQuery(request);
+            case ApiRequestType.Create:
+                return this.buildCreateQuery(request);
+            default:
+                throw new ApiEdgeError(400, "Unsupported Query Type")
+        }
+    }
+}
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Sat Nov 12 2016 11:23:07 GMT+0100 (CET)
+</div>
+</div>
+<script src="../../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../../sorter.js"></script>
+</body>
+</html>
