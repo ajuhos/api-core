@@ -1,8 +1,25 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# JetBrains
 .idea/
+
+# NPM, Yarn
+.npm
 node_modules/
+.yarn-integrity
+
+# TS
+dist/
+
+# Coverage
+.nyc_output
+coverage
+
+# Files not required on usage
 .travis.yml
 .coveralls.yml
 .editorconfig
 .gitignore
-.nyc_output
-coverage

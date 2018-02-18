@@ -1,5 +1,19 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# JetBrains
 .idea/
+
+# NPM, Yarn
+.npm
 node_modules/
+.yarn-integrity
+
+# TS
 dist/
+
+# Coverage
 .nyc_output
 coverage
