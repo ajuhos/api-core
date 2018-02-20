@@ -1,60 +1,61 @@
 {
-    "name": "api-core",
-    "version": "0.6.39",
-    "description": "Model-based dynamic multi-level APIs for any provider, plus multiple consumption channels",
-    "main": "dist/index.js",
-    "scripts": {
-        "test": "tap dist/test/*.js --cov",
-        "cover": "npm test -- --coverage-report=lcov",
-        "prepublish": "tsc"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/ajuhos/api-core.git"
-    },
-    "author": "We Are Break <ajuhos@we-are-break.com>",
-    "license": "MIT",
-    "bugs": {
-        "url": "https://github.com/ajuhos/api-core/issues"
-    },
-    "homepage": "https://github.com/ajuhos/api-core#readme",
-    "devDependencies": {
-        "@types/node": "^9.4.6",
-        "coveralls": "^2.11.14",
-        "tap": "^8.0.0"
-    },
-    "keywords": [
-        "acl",
-        "api",
-        "auth",
-        "basic",
-        "channel",
-        "data",
-        "dynamic",
-        "easy",
-        "express",
-        "generate",
-        "http",
-        "json",
-        "koa",
-        "light",
-        "model",
-        "mongo",
-        "postgres",
-        "provider",
-        "rest",
-        "restful",
-        "restify",
-        "security",
-        "soap",
-        "socket",
-        "socketio",
-        "sql",
-        "transform",
-        "web"
-    ],
-    "dependencies": {
-        "deep-keys": "^0.3.0",
-        "obj-parse": "^0.3.0"
-    }
+  "name": "api-core",
+  "version": "0.6.41",
+  "description": "Model-based dynamic multi-level APIs for any provider, plus multiple consumption channels",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "test": "tap dist/test/*.js --cov",
+    "cover": "npm test -- --coverage-report=lcov",
+    "prepublish": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ajuhos/api-core.git"
+  },
+  "author": "We Are Break <ajuhos@we-are-break.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ajuhos/api-core/issues"
+  },
+  "homepage": "https://github.com/ajuhos/api-core#readme",
+  "devDependencies": {
+    "@types/node": "^9.4.6",
+    "coveralls": "^2.11.14",
+    "tap": "^8.0.0"
+  },
+  "keywords": [
+    "acl",
+    "api",
+    "auth",
+    "basic",
+    "channel",
+    "data",
+    "dynamic",
+    "easy",
+    "express",
+    "generate",
+    "http",
+    "json",
+    "koa",
+    "light",
+    "model",
+    "mongo",
+    "postgres",
+    "provider",
+    "rest",
+    "restful",
+    "restify",
+    "security",
+    "soap",
+    "socket",
+    "socketio",
+    "sql",
+    "transform",
+    "web"
+  ],
+  "dependencies": {
+    "deep-keys": "^0.3.0",
+    "obj-parse": "^0.3.0"
+  }
 }
