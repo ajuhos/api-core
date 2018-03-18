@@ -44,6 +44,46 @@ export class ApiEdgeQuery {
         this.type = type;
         this.context = context;
         this.body = body;
+
+        switch (this.type) {
+            case ApiEdgeQueryType.Get:
+                if(!this.edge.allowGet) {
+                    throw new ApiEdgeError(405, `Get queries not allowed on edge: ${this.edge.name}`)
+                }
+                break;
+            case ApiEdgeQueryType.Exists:
+                if(!this.edge.allowExists) {
+                    throw new ApiEdgeError(405, `Exists queries not allowed on edge: ${this.edge.name}`)
+                }
+                break;
+            case ApiEdgeQueryType.Create:
+                if(!this.edge.allowCreate) {
+                    throw new ApiEdgeError(405, `Create queries not allowed on edge: ${this.edge.name}`)
+                }
+                break;
+            case ApiEdgeQueryType.Delete:
+                if(!this.edge.allowRemove) {
+                    throw new ApiEdgeError(405, `Delete queries not allowed on edge: ${this.edge.name}`)
+                }
+                break;
+            case ApiEdgeQueryType.Update:
+                if(!this.edge.allowUpdate) {
+                    throw new ApiEdgeError(405, `Update queries not allowed on edge: ${this.edge.name}`)
+                }
+                break;
+            case ApiEdgeQueryType.Patch:
+                if(!this.edge.allowPatch) {
+                    throw new ApiEdgeError(405, `Patch queries not allowed on edge: ${this.edge.name}`)
+                }
+                break;
+            case ApiEdgeQueryType.List:
+                if(!this.edge.allowList) {
+                    throw new ApiEdgeError(405, `List queries not allowed on edge: ${this.edge.name}`)
+                }
+                break;
+            default:
+                throw new ApiEdgeError(405, "Unsupported Query Type")
+        }
     }
 
     private applySchemaOnInputItem = (item: any) => {
@@ -114,7 +154,23 @@ export class ApiEdgeQuery {
         }
 
         if(this.body) {
-            this.body = this.applyInputSchema(this.body)
+            if(!this.context.id) this.context.id = this.body.id;
+
+            if(this.edge.schema) {
+                const result = this.edge.schema.cleanAndValidateModel(
+                    this.body,
+                    this.type === ApiEdgeQueryType.Patch
+                );
+
+                if(!result.valid) {
+                    const errors = result.errors
+                        ? result.errors.join(', ')
+                        : '';
+                    throw new ApiEdgeError(422, "Schema Validation Failed: " + errors)
+                }
+            }
+
+            this.body = this.applyInputSchema(this.body);
         }
 
         switch (this.type) {

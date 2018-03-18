@@ -1,5 +1,6 @@
 const parse = require('obj-parse'),
-    deepKeys = require('deep-keys');
+    deepKeys = require('deep-keys'),
+    SimpleSchema = require('simpl-schema').default;
 
 export class ApiEdgeSchemaTransformation {
     applyToInput: (schema: any, model: any) => void;
@@ -26,7 +27,9 @@ export class ApiEdgeSchemaTransformation {
 }
 
 export class ApiEdgeSchema {
-    fields: string[];
+    fields: string[] = [];
+    schema: any|null = null;
+    originalSchema: any|null = null;
     transformations: ApiEdgeSchemaTransformation[];
 
     private fieldMatrix: { [key: string]: string[] } = {};
@@ -45,6 +48,36 @@ export class ApiEdgeSchema {
             else output.push(field)
         });
         return output
+    };
+
+    cleanAndValidateModel = (model: any, modifier: boolean = false): { valid: boolean, errors?: any[] } => {
+        if(this.schema) {
+            const context = this.schema.newContext();
+
+            context.clean(model, {
+                mutate: true,      //Update the original object
+                filter: true,      //Remove not allowed fields
+                autoConvert: true, //Converts values when possible
+                removeEmptyStrings: false,
+                trimStrings: false,
+                getAutoValues: false
+            });
+
+            model = modifier
+                ? { $set: model }
+                : model;
+
+            context.validate(model, { modifier });
+
+            return {
+                valid: context.isValid(),
+                errors: context.validationErrors().map(
+                    ({ name }: any) => context.keyErrorMessage(name)
+                )
+            }
+        }
+
+        return { valid: true }
     };
 
     private createInputTransformer(schemaField: any, transform: string): (schema: any, model: any) => void {
@@ -111,8 +144,13 @@ export class ApiEdgeSchema {
         this.fields = this.fields.filter((field: string) => field.indexOf(fieldName+".") == -1)
     }
 
-    constructor(schema: any) {
+    constructor(schema: any, typedSchema: any = null) {
         this.fields = deepKeys(schema, true);
+        this.originalSchema = typedSchema;
+        this.schema = typedSchema
+            ? new SimpleSchema(typedSchema)
+            : null;
+
         this.transformations = [];
         for(let i = 0; i < this.fields.length; ++i) {
             const transform = this.createTransformation(this.fields[i], schema);
