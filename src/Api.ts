@@ -7,6 +7,7 @@ import {ApiEdgeRelation, ExportedApiEdgeRelation} from "./relations/ApiEdgeRelat
 import {ApiAction, ApiActionTriggerKind} from "./query/ApiAction";
 import {ApiEdgeQueryResponse} from "./edge/ApiEdgeQueryResponse";
 import {ExternalApiEdge} from "./edge/ExternalApiEdge";
+const pkg = require('../../package.json');
 
 export interface ApiInfo {
     title: string
@@ -24,6 +25,7 @@ export interface ApiInfo {
 }
 
 export interface ApiMetadata {
+    'api-core': string
     info: ApiInfo
     version: string
     edges: ApiEdgeMetadata[]
@@ -89,6 +91,7 @@ export class Api {
 
     metadata = (): ApiMetadata => {
         return {
+            'api-core': pkg.version,
             info: this.info || { title: 'API' },
             version: this.version,
             edges: this.edges.map(edge => edge.metadata()),
