@@ -11,9 +11,6 @@ npm-debug.log*
 node_modules/
 .yarn-integrity
 
-# TS
-dist/
-
 # Coverage
 .nyc_output
 coverage
