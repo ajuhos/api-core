@@ -1,0 +1,90 @@
+import {ApiEdgeQueryContext} from "./ApiEdgeQueryContext";
+import {ApiEdgeQueryResponse} from "./ApiEdgeQueryResponse";
+import {ApiEdgeSchema} from "./ApiEdgeSchema";
+import {ApiEdge, ApiEdgeDefinition} from "./ApiEdgeDefinition";
+import {SchemaTypeMapper} from "./utils/SchemaTypeMapper";
+
+export abstract class ExternalApiProvider {
+    protected metadata: any;
+
+    constructor(metadata: any) {
+        this.metadata = metadata
+    }
+
+    abstract getEntry: (context: ApiEdgeQueryContext) => Promise<ApiEdgeQueryResponse>;
+    abstract listEntries: (context: ApiEdgeQueryContext) => Promise<ApiEdgeQueryResponse>;
+    abstract createEntry: (context: ApiEdgeQueryContext, entryFields: any) => Promise<ApiEdgeQueryResponse>;
+    abstract updateEntry: (context: ApiEdgeQueryContext, entryFields: any) => Promise<ApiEdgeQueryResponse>;
+    abstract patchEntry: (context: ApiEdgeQueryContext, entryFields: any) => Promise<ApiEdgeQueryResponse>;
+    abstract removeEntry: (context: ApiEdgeQueryContext, entryFields: any) => Promise<ApiEdgeQueryResponse>;
+    abstract exists: (context: ApiEdgeQueryContext) => Promise<ApiEdgeQueryResponse>;
+
+    protected abstract prepare(): Promise<void>;
+
+    async edge(): Promise<ApiEdgeDefinition> {
+        await this.prepare();
+        return new ExternalApiEdge(this.metadata, this)
+    }
+}
+
+export class ExternalApiEdge extends ApiEdge {
+    constructor(metadata: any, provider?: ExternalApiProvider) {
+        super();
+
+        this.name = metadata.name;
+        this.pluralName = metadata.pluralName;
+        this.idField = metadata.idField;
+
+        const publicSchema: { [key: string]: string } = {};
+        metadata.fields.forEach((field: string) => publicSchema[field] = '=');
+        this.schema = new ApiEdgeSchema(
+            publicSchema,
+            metadata.typings
+                ? SchemaTypeMapper.importSchema(metadata.typings)
+                : null
+        );
+
+        this.allowGet = metadata.allowGet;
+        this.allowList = metadata.allowList;
+        this.allowCreate = metadata.allowCreate;
+        this.allowUpdate = metadata.allowUpdate;
+        this.allowPatch = metadata.allowPatch;
+        this.allowRemove = metadata.allowRemove;
+        this.allowExists = false; //metadata.allowExists;
+        this.external = true;
+
+        this.url = metadata.url;
+        if(provider) this.provider = provider;
+    }
+
+    url: string;
+    provider: ExternalApiProvider;
+
+    getEntry = (context: ApiEdgeQueryContext): Promise<ApiEdgeQueryResponse> => {
+        return this.provider.getEntry(context)
+    };
+
+    listEntries = async (context: ApiEdgeQueryContext): Promise<ApiEdgeQueryResponse> => {
+        return this.provider.listEntries(context)
+    };
+
+    createEntry = async (context: ApiEdgeQueryContext, body: any): Promise<ApiEdgeQueryResponse> => {
+        return this.provider.createEntry(context, body)
+    };
+
+    updateEntry = async (context: ApiEdgeQueryContext, body: any): Promise<ApiEdgeQueryResponse> => {
+        return this.provider.updateEntry(context, body)
+    };
+
+    patchEntry = async (context: ApiEdgeQueryContext, body: any): Promise<ApiEdgeQueryResponse> => {
+        return this.provider.patchEntry(context, body)
+    };
+
+    removeEntry = async (context: ApiEdgeQueryContext, body: any): Promise<ApiEdgeQueryResponse> => {
+        return this.provider.removeEntry(context, body)
+    };
+
+    exists = async (context: ApiEdgeQueryContext): Promise<ApiEdgeQueryResponse> => {
+        return this.provider.exists(context)
+    };
+}

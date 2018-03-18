@@ -1,5 +1,5 @@
 export enum ApiEdgeQueryFilterType {
-    Equals,
+    Equals = 1,
     GreaterThanOrEquals,
     GreaterThan,
     LowerThanOrEquals,
@@ -7,6 +7,12 @@ export enum ApiEdgeQueryFilterType {
     NotEquals,
     Similar,
     In
+}
+
+export interface ExportedApiEdgeQueryFilter {
+    field: string
+    value: any
+    type: ApiEdgeQueryFilterType
 }
 
 export class ApiEdgeQueryFilter {

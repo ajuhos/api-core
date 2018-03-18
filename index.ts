@@ -1,4 +1,5 @@
-export {ApiEdgeDefinition, ApiEdge} from "./src/edge/ApiEdgeDefinition";
+export {ApiEdgeDefinition, ApiEdge, ApiEdgeMetadata} from "./src/edge/ApiEdgeDefinition";
+export {ExternalApiEdge, ExternalApiProvider} from "./src/edge/ExternalApiEdge";
 export {ApiEdgeQueryType} from "./src/edge/ApiEdgeQueryType";
 export {ApiEdgeQueryContext} from "./src/edge/ApiEdgeQueryContext";
 export {ApiEdgeQueryResponse, ApiEdgeQueryStreamResponse} from "./src/edge/ApiEdgeQueryResponse";
@@ -8,7 +9,7 @@ export {ApiEdgeQuery} from "./src/edge/ApiEdgeQuery";
 export {ApiEdgeMethod, ApiEdgeMethodScope} from "./src/edge/ApiEdgeMethod";
 export {ApiEdgeError} from "./src/query/ApiEdgeError";
 
-export {ApiEdgeRelation} from "./src/relations/ApiEdgeRelation";
+export {ApiEdgeRelation, ApiEdgeRelationConstructor, ApiEdgeRelationTypes} from "./src/relations/ApiEdgeRelation";
 export {OneToOneRelation} from "./src/relations/OneToOneRelation";
 export {OneToManyRelation} from "./src/relations/OneToManyRelation";
 
@@ -27,4 +28,4 @@ export {
 export {ApiEdgeAction, ApiEdgeActionTrigger, ApiEdgeActionTriggerKind} from "./src/edge/ApiEdgeAction";
 export {ApiAction, ApiActionTriggerKind} from "./src/query/ApiAction";
 
-export {Api} from "./src/Api";
+export {Api, ApiInfo} from "./src/Api";

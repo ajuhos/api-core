@@ -1,5 +1,18 @@
-import {ApiEdgeQueryFilter, ApiEdgeQueryFilterType} from "./ApiEdgeQueryFilter";
+import {ApiEdgeQueryFilter, ApiEdgeQueryFilterType, ExportedApiEdgeQueryFilter} from "./ApiEdgeQueryFilter";
 import {OneToOneRelation} from "../relations/OneToOneRelation";
+import {Api} from "../Api";
+
+export interface ExportedApiEdgeQueryContext {
+    id: string|null
+    fields: string[]
+    populatedRelations: string[]
+    pagination: {
+        skip: number,
+        limit: number
+    }
+    sortBy: [string, number][]
+    filters: ExportedApiEdgeQueryFilter[]
+}
 
 export class ApiEdgeQueryContext {
     id: string|null;
@@ -9,7 +22,7 @@ export class ApiEdgeQueryContext {
         skip: number,
         limit: number
     };
-    sortBy: any[] = [];
+    sortBy: [string, number][] = [];
     filters: ApiEdgeQueryFilter[] = [];
 
     clone = () => {
@@ -29,6 +42,32 @@ export class ApiEdgeQueryContext {
         }
 
         return temp;
+    };
+
+    toJSON = (): ExportedApiEdgeQueryContext => {
+        return {
+            id: this.id,
+            fields: this.fields,
+            populatedRelations: this.populatedRelations.map(relation => relation.name),
+            pagination: this.pagination,
+            sortBy: this.sortBy,
+            filters: this.filters
+        }
+    };
+
+    static fromJSON = (obj: ExportedApiEdgeQueryContext, api: Api) => {
+        const context = new ApiEdgeQueryContext();
+        context.id = obj.id;
+        context.fields = obj.fields;
+        context.populatedRelations = obj.populatedRelations.map(
+            name => api.relations.find(r => r.name === name) as OneToOneRelation
+        );
+        context.pagination = obj.pagination;
+        context.sortBy = obj.sortBy;
+        context.filters = obj.filters.map(
+            ({ field, type, value }) => new ApiEdgeQueryFilter(field, type, value)
+        );
+        return context
     };
 
     constructor(id: string|null = null, fields: string[] = []) {

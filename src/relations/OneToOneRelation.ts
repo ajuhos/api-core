@@ -1,8 +1,9 @@
 import {ApiEdgeDefinition} from "../edge/ApiEdgeDefinition";
-import {ApiEdgeRelation} from "./ApiEdgeRelation";
+import {ApiEdgeRelation, ApiEdgeRelationTypes} from "./ApiEdgeRelation";
 import {Api} from "../Api";
+import {OneToManyRelation} from "./OneToManyRelation";
 
-export class OneToOneRelation implements ApiEdgeRelation {
+export class OneToOneRelation extends ApiEdgeRelation {
     name: string;
     relationId: string;
     relatedId: string;
@@ -13,11 +14,13 @@ export class OneToOneRelation implements ApiEdgeRelation {
                 to: ApiEdgeDefinition,
                 options: { relationId: string|null, relatedId: string|null, name: string|null }
                     = { relationId: null, relatedId: null, name: null }) {
-
-        this.from = from;
-        this.to = to;
+        super(from, to);
         this.name = options.name || to.name;
         this.relatedId = options.relatedId || from.idField;
-        this.relationId = options.relationId || to.name + Api.defaultIdPostfix;
+        this.relationId = options.relationId || to.name + Api.defaultIdPostfix
     }
+
+    getType() { return 'one-to-one' }
 }
+
+ApiEdgeRelationTypes['one-to-one'] = OneToOneRelation;

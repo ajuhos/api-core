@@ -7,6 +7,24 @@ import {ApiRequestType} from "../request/ApiRequest";
 import {ApiEdgeAction, ApiEdgeActionTriggerKind, ApiEdgeActionTrigger} from "./ApiEdgeAction";
 import {ApiEdgeQueryType} from "./ApiEdgeQueryType";
 import {ApiEdgeSchema} from "./ApiEdgeSchema";
+import {SchemaTypeMapper} from "./utils/SchemaTypeMapper";
+
+export interface ApiEdgeMetadata {
+    name: string;
+    pluralName: string;
+    idField: string;
+    fields: string[];
+    methods: string[];
+    typings?: { [key: string]: any };
+    allowGet: boolean;
+    allowList: boolean;
+    allowCreate: boolean;
+    allowUpdate: boolean;
+    allowPatch: boolean;
+    allowRemove: boolean;
+    allowExists: boolean;
+    external: boolean;
+}
 
 export interface ApiEdgeDefinition {
     name: string;
@@ -18,6 +36,15 @@ export interface ApiEdgeDefinition {
     relations: ApiEdgeRelation[];
     actions: ApiEdgeAction[];
 
+    allowGet: boolean;
+    allowList: boolean;
+    allowCreate: boolean;
+    allowUpdate: boolean;
+    allowPatch: boolean;
+    allowRemove: boolean;
+    allowExists: boolean;
+    external: boolean;
+
     getEntry: (context: ApiEdgeQueryContext) => Promise<ApiEdgeQueryResponse>;
     listEntries: (context: ApiEdgeQueryContext) => Promise<ApiEdgeQueryResponse>;
     createEntry: (context: ApiEdgeQueryContext, entryFields: any) => Promise<ApiEdgeQueryResponse>;
@@ -25,6 +52,7 @@ export interface ApiEdgeDefinition {
     patchEntry: (context: ApiEdgeQueryContext, entryFields: any) => Promise<ApiEdgeQueryResponse>;
     removeEntry: (context: ApiEdgeQueryContext, entryFields: any) => Promise<ApiEdgeQueryResponse>;
     exists: (context: ApiEdgeQueryContext) => Promise<ApiEdgeQueryResponse>;
+    metadata: () => ApiEdgeMetadata
 }
 
 export abstract class ApiEdge implements ApiEdgeDefinition {
@@ -37,6 +65,15 @@ export abstract class ApiEdge implements ApiEdgeDefinition {
     relations: ApiEdgeRelation[] = [];
     actions: ApiEdgeAction[] = [];
 
+    allowGet: boolean = true;
+    allowList: boolean = true;
+    allowCreate: boolean = true;
+    allowUpdate: boolean = true;
+    allowPatch: boolean = true;
+    allowRemove: boolean = true;
+    allowExists: boolean = true;
+    external: boolean = false;
+
     getEntry: (context: ApiEdgeQueryContext) => Promise<ApiEdgeQueryResponse>;
     listEntries: (context: ApiEdgeQueryContext) => Promise<ApiEdgeQueryResponse>;
     createEntry: (context: ApiEdgeQueryContext, entryFields: any) => Promise<ApiEdgeQueryResponse>;
@@ -44,6 +81,28 @@ export abstract class ApiEdge implements ApiEdgeDefinition {
     patchEntry: (context: ApiEdgeQueryContext, entryFields: any) => Promise<ApiEdgeQueryResponse>;
     removeEntry: (context: ApiEdgeQueryContext, entryFields: any) => Promise<ApiEdgeQueryResponse>;
     exists: (context: ApiEdgeQueryContext) => Promise<ApiEdgeQueryResponse>;
+
+    metadata = () => {
+        return {
+            name: this.name,
+            pluralName: this.pluralName,
+            idField: this.idField,
+            fields: this.schema.fields,
+            methods: this.methods.map(m => m.name),
+            //relatedFields,
+            typings: this.schema.originalSchema
+                ? SchemaTypeMapper.exportSchema(this.schema.originalSchema)
+                : undefined,
+            allowGet: this.allowGet,
+            allowList: this.allowList,
+            allowCreate: this.allowCreate,
+            allowUpdate: this.allowUpdate,
+            allowPatch: this.allowPatch,
+            allowRemove: this.allowRemove,
+            allowExists: this.allowExists,
+            external: this.external
+        }
+    };
 
     use = (action: ApiEdgeAction) => {
         this.actions.unshift(action);
