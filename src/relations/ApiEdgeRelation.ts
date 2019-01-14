@@ -8,6 +8,7 @@ export interface ExportedApiEdgeRelation {
     relatedId: string
     from: string
     to: string
+    hasPair: boolean;
 }
 
 export type ApiEdgeRelationConstructor = new (from: ApiEdgeDefinition, to: ApiEdgeDefinition) => ApiEdgeRelation;
@@ -26,6 +27,7 @@ export abstract class ApiEdgeRelation {
     relatedId: string;
     from: ApiEdgeDefinition;
     to: ApiEdgeDefinition;
+    hasPair: boolean;
 
     toJSON() {
         return {
@@ -34,7 +36,8 @@ export abstract class ApiEdgeRelation {
             relationId: this.relationId,
             relatedId: this.relatedId,
             from: this.from.name,
-            to: this.to.name
+            to: this.to.name,
+            hasPair: this.hasPair
         }
     }
 
@@ -47,6 +50,7 @@ export abstract class ApiEdgeRelation {
         relation.relationId = obj.relationId;
         relation.relatedId = obj.relatedId;
         relation.name = obj.name;
+        relation.hasPair = obj.hasPair;
         return relation
     }
 }

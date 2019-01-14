@@ -94,7 +94,7 @@ local in-memory model (master branch) and one with a Mongoose model (mongodb bra
 
 Working Demo: [api-demo](https://github.com/ajuhos/api-demo)
 
-**A complete API with 5 models and relations in 77 lines:**
+**A complete API with 5 models and relations in 67 lines:**
 ```typescript
 import {ApiEdgeError, OneToOneRelation, OneToManyRelation, ApiEdgeQueryResponse, Api} from "api-core";
 import {MongooseModelFactory} from "api-model-mongoose";
@@ -106,6 +106,7 @@ const Ellipse = require('ellipse'),
 
 mongoose.Promise = global.Promise;
 mongoose.connect("mongodb://localhost/api-demo");
+const ObjectId = mongoose.Schema.Types.ObjectId;
 
 const studentEdge =
           MongooseModelFactory.createModel("student", "students", {
@@ -114,8 +115,8 @@ const studentEdge =
               lastName: String,
               email: String,
               phone: String,
-              schoolId: mongoose.Schema.Types.ObjectId,
-              classId: mongoose.Schema.Types.ObjectId
+              school: { type: ObjectId, ref: 'school' },
+              classId: { type: ObjectId, ref: 'class' }
           }),
       classEdge =
           MongooseModelFactory.createModel("class", "classes", {
@@ -123,14 +124,14 @@ const studentEdge =
               name: String,
               semester: String,
               room: String,
-              schoolId: mongoose.Schema.Types.ObjectId
+              school: { type: ObjectId, ref: 'school' }
           }),
       courseEdge =
           MongooseModelFactory.createModel("course", "courses", {
               id: String,
               name: String,
-              classId: mongoose.Schema.Types.ObjectId,
-              courseTypeId: mongoose.Schema.Types.ObjectId
+              class: { type: ObjectId, ref: 'class' },
+              courseType: { type: ObjectId, ref: 'courseType' }
           }),
       courseTypeEdge =
           MongooseModelFactory.createModel("courseType", "courseTypes", {
@@ -155,18 +156,7 @@ const api11
         .edge(classEdge)
         .edge(courseEdge)
         .edge(courseTypeEdge)
-        .edge(schoolEdge)
-        .relation(new OneToOneRelation(courseEdge, courseTypeEdge))
-        .relation(new OneToManyRelation(courseTypeEdge, courseEdge))
-        .relation(new OneToManyRelation(studentEdge, courseEdge))
-        .relation(new OneToOneRelation(studentEdge, classEdge))
-        .relation(new OneToOneRelation(studentEdge, schoolEdge))
-        .relation(new OneToOneRelation(classEdge, schoolEdge))
-        .relation(new OneToOneRelation(courseEdge, classEdge))
-        .relation(new OneToManyRelation(classEdge, studentEdge))
-        .relation(new OneToManyRelation(classEdge, courseEdge))
-        .relation(new OneToManyRelation(schoolEdge, studentEdge))
-        .relation(new OneToManyRelation(schoolEdge, classEdge));
+        .edge(schoolEdge);
 
 app.use(require('body-parser').json());
 

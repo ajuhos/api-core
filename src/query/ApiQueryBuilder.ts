@@ -26,6 +26,8 @@ export class EmbedQueryQueryStep implements QueryStep {
     sourceField: string;
     targetField: string;
     idField: string;
+    forceArray: boolean;
+    isMultiMulti: boolean;
 
     constructor(query: ApiQuery, segment: PathSegment, request: ApiRequest) {
         this.query = query;
@@ -36,6 +38,8 @@ export class EmbedQueryQueryStep implements QueryStep {
         this.sourceField = this.segment.relation.relationId;
         this.targetField = this.segment.relation.name;
         this.idField = this.segment.relation.relatedId;
+        this.forceArray = this.segment.relation instanceof OneToManyRelation;
+        this.isMultiMulti = this.segment.relation.hasPair;
     }
 
     execute = (scope: ApiQueryScope): Promise<ApiQueryScope> => {
@@ -45,7 +49,7 @@ export class EmbedQueryQueryStep implements QueryStep {
 
                 if(Array.isArray(target)) {
                     const targetIndex: { [key: string]: any[] } = {},
-                          targetArrayIndex: { [key: string]: any[] } = {},
+                        targetArrayIndex: { [key: string]: any[] } = {},
                         ids: string[] = [];
 
                     for(let entry of target) {
@@ -58,6 +62,12 @@ export class EmbedQueryQueryStep implements QueryStep {
                                     ids.push(_id);
                                 }
                                 entry[this.sourceField] = [];
+                            }
+                            else if(this.forceArray) {
+                                if (targetArrayIndex[id]) targetArrayIndex[id].push(entry);
+                                else targetArrayIndex[id] = [entry];
+                                ids.push(id);
+                                entry[this.targetField] = [];
                             }
                             else {
                                 if (targetIndex[id]) targetIndex[id].push(entry);
@@ -74,15 +84,21 @@ export class EmbedQueryQueryStep implements QueryStep {
                     this.query.execute(scope.identity).then((response) => {
                         if(response.data && response.data.length) {
                             for (let entry of response.data) {
-                                const id = entry[this.idField];
-                                if (targetIndex[id]) {
-                                    for (let subEntry of targetIndex[id]) {
-                                        subEntry[this.targetField] = entry;
-                                    }
+                                let ids = entry[this.idField];
+                                if(!Array.isArray(ids)) {
+                                    ids = [ids];
                                 }
-                                if(targetArrayIndex[id]) {
-                                    for (let subEntry of targetArrayIndex[id]) {
-                                        subEntry[this.targetField].push(entry);
+
+                                for(let id of ids) {
+                                    if (targetIndex[id]) {
+                                        for (let subEntry of targetIndex[id]) {
+                                            subEntry[this.targetField] = entry;
+                                        }
+                                    }
+                                    if(targetArrayIndex[id]) {
+                                        for (let subEntry of targetArrayIndex[id]) {
+                                            subEntry[this.targetField].push(entry);
+                                        }
                                     }
                                 }
                             }
@@ -92,10 +108,18 @@ export class EmbedQueryQueryStep implements QueryStep {
                 }
                 else {
                     const sourceId = target[this.sourceField];
+                    let arrayRequest = false;
 
                     if(Array.isArray(sourceId)) {
+                        arrayRequest = true;
                         this.request.context.filters = [
                             new ApiEdgeQueryFilter(this.idField, ApiEdgeQueryFilterType.In, sourceId)
+                        ];
+                    }
+                    else if(this.forceArray) {
+                        arrayRequest = true;
+                        this.request.context.filters = [
+                            new ApiEdgeQueryFilter(this.idField, ApiEdgeQueryFilterType.Equals, sourceId)
                         ];
                     }
                     else {
@@ -578,8 +602,14 @@ export class ApiQueryBuilder {
 
             //STEP 1: Relate to the current query.
             let relation = segments[i+1].relation;
+            let edge = segments[i+1].edge;
             if(relation && !(relation instanceof OneToOneRelation)) {
-                query.unshift(new RelateQueryStep(relation));
+                if(edge === relation.to) {
+                    query.unshift(new RelateBackwardsQueryStep(relation));
+                }
+                else {
+                    query.unshift(new RelateQueryStep(relation));
+                }
             }
 
             //STEP 2: Read or Check
@@ -674,8 +704,15 @@ export class ApiQueryBuilder {
 
             //STEP 1: Relate to the current query.
             let relation = segments[i+1].relation;
+            let edge = segments[i+1].edge;
             if(relation && !(relation instanceof OneToOneRelation)) {
-                query.unshift(new RelateQueryStep(relation));
+                if(edge === relation.to) {
+                    query.unshift(new RelateBackwardsQueryStep(relation));
+                }
+                else {
+                    query.unshift(new RelateQueryStep(relation));
+                }
+
                 if(request.type !== ApiRequestType.Delete) {
                     query.unshift(new RelateChangeQueryStep(relation));
                 }

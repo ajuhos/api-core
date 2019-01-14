@@ -4,7 +4,7 @@ export {ApiEdgeQueryType} from "./src/edge/ApiEdgeQueryType";
 export {ApiEdgeQueryContext} from "./src/edge/ApiEdgeQueryContext";
 export {ApiEdgeQueryResponse, ApiEdgeQueryStreamResponse} from "./src/edge/ApiEdgeQueryResponse";
 export {ApiEdgeQueryFilter, ApiEdgeQueryFilterType} from "./src/edge/ApiEdgeQueryFilter";
-export {ApiEdgeSchema, ApiEdgeSchemaTransformation} from "./src/edge/ApiEdgeSchema";
+export {ApiEdgeSchema, ApiEdgeSchemaTransformation, Mixed, SubSchema, SchemaReference, JSONDate} from "./src/edge/ApiEdgeSchema";
 export {ApiEdgeQuery} from "./src/edge/ApiEdgeQuery";
 export {ApiEdgeMethod, ApiEdgeMethodScope} from "./src/edge/ApiEdgeMethod";
 export {ApiEdgeError} from "./src/query/ApiEdgeError";

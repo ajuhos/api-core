@@ -9,11 +9,11 @@ export class OneToOneRelation extends ApiEdgeRelation {
     relatedId: string;
     from: ApiEdgeDefinition;
     to: ApiEdgeDefinition;
+    hasPair = false;
 
     constructor(from: ApiEdgeDefinition,
                 to: ApiEdgeDefinition,
-                options: { relationId: string|null, relatedId: string|null, name: string|null }
-                    = { relationId: null, relatedId: null, name: null }) {
+                options: { relationId?: string, relatedId?: string, name?: string } = {}) {
         super(from, to);
         this.name = options.name || to.name;
         this.relatedId = options.relatedId || from.idField;

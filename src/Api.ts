@@ -115,4 +115,10 @@ export class Api {
         return api
     }
 
+    async prepare() {
+        for(let edge of this.edges) {
+            await edge.prepare(this)
+        }
+    }
+
 }

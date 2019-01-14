@@ -8,13 +8,14 @@ import {ApiEdgeAction, ApiEdgeActionTriggerKind, ApiEdgeActionTrigger} from "./A
 import {ApiEdgeQueryType} from "./ApiEdgeQueryType";
 import {ApiEdgeSchema} from "./ApiEdgeSchema";
 import {SchemaTypeMapper} from "./utils/SchemaTypeMapper";
+import {Api} from "../Api";
 
 export interface ApiEdgeMetadata {
     name: string;
     pluralName: string;
     idField: string;
     fields: string[];
-    methods: string[];
+    methods: { name: string, type: ApiRequestType }[];
     typings?: { [key: string]: any };
     allowGet: boolean;
     allowList: boolean;
@@ -52,6 +53,8 @@ export interface ApiEdgeDefinition {
     patchEntry: (context: ApiEdgeQueryContext, entryFields: any) => Promise<ApiEdgeQueryResponse>;
     removeEntry: (context: ApiEdgeQueryContext, entryFields: any) => Promise<ApiEdgeQueryResponse>;
     exists: (context: ApiEdgeQueryContext) => Promise<ApiEdgeQueryResponse>;
+
+    prepare: (api: Api) => Promise<void>;
     metadata: () => ApiEdgeMetadata
 }
 
@@ -81,6 +84,7 @@ export abstract class ApiEdge implements ApiEdgeDefinition {
     patchEntry: (context: ApiEdgeQueryContext, entryFields: any) => Promise<ApiEdgeQueryResponse>;
     removeEntry: (context: ApiEdgeQueryContext, entryFields: any) => Promise<ApiEdgeQueryResponse>;
     exists: (context: ApiEdgeQueryContext) => Promise<ApiEdgeQueryResponse>;
+    prepare: (api: Api) => Promise<void>;
 
     metadata = () => {
         return {
@@ -88,7 +92,7 @@ export abstract class ApiEdge implements ApiEdgeDefinition {
             pluralName: this.pluralName,
             idField: this.idField,
             fields: this.schema.fields,
-            methods: this.methods.map(m => m.name),
+            methods: this.methods.map(m => ({ name: m.name, type: m.acceptedTypes })),
             //relatedFields,
             typings: this.schema.originalSchema
                 ? SchemaTypeMapper.exportSchema(this.schema.originalSchema)

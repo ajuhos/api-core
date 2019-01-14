@@ -2,6 +2,28 @@ const parse = require('obj-parse'),
     deepKeys = require('deep-keys'),
     SimpleSchema = require('simpl-schema').default;
 
+export class Mixed {
+    //for schemas
+}
+
+export const SchemaReference = SimpleSchema.oneOf(String, Mixed);
+export const JSONDate = SimpleSchema.oneOf(String, Number, Date);
+
+
+export class SubSchema extends SimpleSchema {
+    private readonly _apiCoreOriginal: any;
+
+    constructor(schema: any, options?: any, ...args: any[]) {
+        if(!options) options = { requiredByDefault: false };
+        super(schema, options, ...args);
+        this._apiCoreOriginal = schema;
+    }
+
+    get original() {
+        return this._apiCoreOriginal
+    }
+}
+
 export class ApiEdgeSchemaTransformation {
     applyToInput: (schema: any, model: any) => void;
     applyToOutput: (mode: any, schema: any) => void;
@@ -55,12 +77,12 @@ export class ApiEdgeSchema {
             const context = this.schema.newContext();
 
             context.clean(model, {
-                mutate: true,      //Update the original object
-                filter: true,      //Remove not allowed fields
-                autoConvert: true, //Converts values when possible
+                mutate: true,       //Update the original object
+                filter: true,       //Remove not allowed fields
+                autoConvert: true,  //Converts values when possible
                 removeEmptyStrings: false,
                 trimStrings: false,
-                getAutoValues: false
+                getAutoValues: true //Fill defaults
             });
 
             model = modifier
@@ -144,11 +166,11 @@ export class ApiEdgeSchema {
         this.fields = this.fields.filter((field: string) => field.indexOf(fieldName+".") == -1)
     }
 
-    constructor(schema: any, typedSchema: any = null) {
-        this.fields = deepKeys(schema, true);
+    constructor(schema: any, typedSchema: any = null, fields?: string[]) {
+        this.fields = fields || deepKeys(schema, true);
         this.originalSchema = typedSchema;
         this.schema = typedSchema
-            ? new SimpleSchema(typedSchema)
+            ? new SimpleSchema(typedSchema, { requiredByDefault: false })
             : null;
 
         this.transformations = [];

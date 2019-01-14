@@ -1,14 +1,20 @@
+import {SubSchema} from "../ApiEdgeSchema";
+
 export class SchemaTypeMapper {
     private static mapField(field: any, typeMapper: (type: any) => any): any {
         if(Array.isArray(field)) {
-            //TODO
-            throw new Error("Array mapping is not yet supported")
+            return [
+                SchemaTypeMapper.mapField(field[0], typeMapper)
+            ]
         }
         else if(field && typeof field == "object" && field.type) {
             return {
                 ...field,
                 type: typeMapper(field.type)
             }
+        }
+        else if(field instanceof SubSchema) {
+            return typeMapper(field.original)
         }
         else {
             return typeMapper(field)
@@ -25,8 +31,9 @@ export class SchemaTypeMapper {
                 return 'boolean';
             default:
                 if(Array.isArray(type)) {
-                    //TODO
-                    throw new Error("Array mapping is not yet supported")
+                    return [
+                        SchemaTypeMapper.mapSchemaFieldType(type[0])
+                    ]
                 }
                 else if(type && typeof type == "object") {
                     return SchemaTypeMapper.exportSchema(type)
@@ -44,8 +51,9 @@ export class SchemaTypeMapper {
                 return Boolean;
             default:
                 if(Array.isArray(type)) {
-                    //TODO
-                    throw new Error("Array mapping is not yet supported")
+                    return [
+                        SchemaTypeMapper.mapFieldTypeSchema(type[0])
+                    ]
                 }
                 else if(type && typeof type == "object") {
                     return SchemaTypeMapper.importSchema(type)
