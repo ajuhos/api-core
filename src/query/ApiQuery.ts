@@ -1,6 +1,7 @@
 import {ApiEdgeQueryContext} from "../edge/ApiEdgeQueryContext";
 import {ApiEdgeQueryResponse} from "../edge/ApiEdgeQueryResponse";
 import {ApiRequest} from "../request/ApiRequest";
+const uuid = require('uuid/v4');
 
 
 export interface ApiQueryScope {
@@ -19,8 +20,13 @@ export interface QueryStep {
 }
 
 export class ApiQuery {
+    readonly id: string;
     request: ApiRequest;
     steps: QueryStep[] = [];
+
+    constructor() {
+        this.id = uuid()
+    }
 
     unshift = (step: QueryStep): ApiQuery => {
         this.steps.unshift(step);

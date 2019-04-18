@@ -3,11 +3,13 @@ import {ApiEdgeQueryResponse} from "./ApiEdgeQueryResponse";
 import {ApiEdgeSchema} from "./ApiEdgeSchema";
 import {ApiEdge, ApiEdgeDefinition} from "./ApiEdgeDefinition";
 import {SchemaTypeMapper} from "./utils/SchemaTypeMapper";
+import {ApiEdgeMethod} from "./ApiEdgeMethod";
+import {ApiQueryScope} from "../query/ApiQuery";
 
 export abstract class ExternalApiProvider {
     protected metadata: any;
 
-    constructor(metadata: any) {
+    protected constructor(metadata: any) {
         this.metadata = metadata
     }
 
@@ -18,6 +20,7 @@ export abstract class ExternalApiProvider {
     abstract patchEntry: (context: ApiEdgeQueryContext, entryFields: any) => Promise<ApiEdgeQueryResponse>;
     abstract removeEntry: (context: ApiEdgeQueryContext, entryFields: any) => Promise<ApiEdgeQueryResponse>;
     abstract exists: (context: ApiEdgeQueryContext) => Promise<ApiEdgeQueryResponse>;
+    abstract callMethod: (scope: ApiQueryScope) => Promise<ApiEdgeQueryResponse>;
 
     protected abstract prepare(): Promise<void>;
 
@@ -43,6 +46,13 @@ export class ExternalApiEdge extends ApiEdge {
                 ? SchemaTypeMapper.importSchema(metadata.typings)
                 : null
         );
+
+        const callMethod = provider ? provider.callMethod : async () => new ApiEdgeQueryResponse(null);
+        for(let { name, scope, type, parameters } of metadata.methods) {
+            this.methods.push(
+                new ApiEdgeMethod(name, callMethod, scope, type, parameters, false)
+            )
+        }
 
         this.allowGet = metadata.allowGet;
         this.allowList = metadata.allowList;

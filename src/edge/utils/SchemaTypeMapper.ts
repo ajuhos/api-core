@@ -1,4 +1,4 @@
-import {SubSchema} from "../ApiEdgeSchema";
+import {Mixed, SchemaReference, SubSchema, JSONDate} from "../ApiEdgeSchema";
 
 export class SchemaTypeMapper {
     private static mapField(field: any, typeMapper: (type: any) => any): any {
@@ -29,6 +29,14 @@ export class SchemaTypeMapper {
                 return 'string';
             case Boolean:
                 return 'boolean';
+            case SchemaReference:
+                return 'reference';
+            case JSONDate:
+                return 'date';
+            case Mixed:
+                return 'any';
+            case Object:
+                return 'object';
             default:
                 if(Array.isArray(type)) {
                     return [
@@ -49,6 +57,14 @@ export class SchemaTypeMapper {
                 return String;
             case 'boolean':
                 return Boolean;
+            case 'reference':
+                return SchemaReference;
+            case 'date':
+                return JSONDate;
+            case 'any':
+                return Mixed;
+            case 'object':
+                return Object;
             default:
                 if(Array.isArray(type)) {
                     return [
@@ -56,7 +72,7 @@ export class SchemaTypeMapper {
                     ]
                 }
                 else if(type && typeof type == "object") {
-                    return SchemaTypeMapper.importSchema(type)
+                    return new SubSchema(SchemaTypeMapper.importSchema(type))
                 }
         }
     }

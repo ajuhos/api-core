@@ -82,7 +82,7 @@ export class ApiEdgeSchema {
                 autoConvert: true,  //Converts values when possible
                 removeEmptyStrings: false,
                 trimStrings: false,
-                getAutoValues: true //Fill defaults
+                getAutoValues: !modifier //Fill defaults
             });
 
             model = modifier

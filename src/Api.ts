@@ -1,11 +1,10 @@
 import {ApiEdgeDefinition, ApiEdgeMetadata} from "./edge/ApiEdgeDefinition";
 import {ApiRequestParser} from "./request/ApiRequestParser";
 import {ApiQueryBuilder} from "./query/ApiQueryBuilder";
-import {ApiRequest} from "./request/ApiRequest";
+import {ApiRequest, ApiRequestType} from "./request/ApiRequest";
 import {ApiQuery, ApiQueryScope} from "./query/ApiQuery";
 import {ApiEdgeRelation, ExportedApiEdgeRelation} from "./relations/ApiEdgeRelation";
 import {ApiAction, ApiActionTriggerKind} from "./query/ApiAction";
-import {ApiEdgeQueryResponse} from "./edge/ApiEdgeQueryResponse";
 import {ExternalApiEdge} from "./edge/ExternalApiEdge";
 const pkg = require('../../package.json');
 
@@ -57,16 +56,21 @@ export class Api {
         return this.edges.find((edge: ApiEdgeDefinition) => edge.pluralName == name)
     };
 
-    parseRequest = (requestParts: string[]) => {
-        return this.parser.parse(requestParts);
+    parseRequest = (requestParts: string[], type: ApiRequestType|null = null) => {
+        const result = this.parser.parse(requestParts);
+        if(type) result.type = type;
+        return result
     };
 
     buildQuery = (request: ApiRequest): ApiQuery => {
-        return this.queryBuilder.build(request);
+        const query = this.queryBuilder.build(request);
+        query.request = request;
+        return query
     };
 
     edge(edge: ApiEdgeDefinition) {
         this.edges.push(edge);
+        edge.api = this;
         return this
     };
 

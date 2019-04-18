@@ -4,18 +4,19 @@ import {ApiEdgeQueryResponse} from "./ApiEdgeQueryResponse";
 import {ApiQueryScope} from "../query/ApiQuery";
 import {ApiEdgeMethod, ApiEdgeMethodScope} from "./ApiEdgeMethod";
 import {ApiRequestType} from "../request/ApiRequest";
-import {ApiEdgeAction, ApiEdgeActionTriggerKind, ApiEdgeActionTrigger} from "./ApiEdgeAction";
+import {ApiEdgeAction, ApiEdgeActionTrigger, ApiEdgeActionTriggerKind} from "./ApiEdgeAction";
 import {ApiEdgeQueryType} from "./ApiEdgeQueryType";
 import {ApiEdgeSchema} from "./ApiEdgeSchema";
 import {SchemaTypeMapper} from "./utils/SchemaTypeMapper";
 import {Api} from "../Api";
+import {ApiEdgeQuery} from "./ApiEdgeQuery";
 
 export interface ApiEdgeMetadata {
     name: string;
     pluralName: string;
     idField: string;
     fields: string[];
-    methods: { name: string, type: ApiRequestType }[];
+    methods: { name: string, type: ApiRequestType, parameters: string[] }[];
     typings?: { [key: string]: any };
     allowGet: boolean;
     allowList: boolean;
@@ -31,6 +32,8 @@ export interface ApiEdgeDefinition {
     name: string;
     pluralName: string;
     idField: string;
+
+    api: Api;
 
     schema: ApiEdgeSchema;
     methods: ApiEdgeMethod[];
@@ -56,12 +59,18 @@ export interface ApiEdgeDefinition {
 
     prepare: (api: Api) => Promise<void>;
     metadata: () => ApiEdgeMetadata
+    relation: (name: string) => ApiEdgeRelation|null;
+
+    get(key: string): any;
+    set(key: string, value: any): any;
 }
 
 export abstract class ApiEdge implements ApiEdgeDefinition {
     name: string;
     pluralName: string;
     idField: string;
+
+    api: Api;
 
     schema: ApiEdgeSchema;
     methods: ApiEdgeMethod[] = [];
@@ -92,7 +101,12 @@ export abstract class ApiEdge implements ApiEdgeDefinition {
             pluralName: this.pluralName,
             idField: this.idField,
             fields: this.schema.fields,
-            methods: this.methods.map(m => ({ name: m.name, type: m.acceptedTypes })),
+            methods: this.methods.map(m => ({
+                name: m.name,
+                type: m.acceptedTypes,
+                scope: m.scope,
+                parameters: m.parameters
+            })),
             //relatedFields,
             typings: this.schema.originalSchema
                 ? SchemaTypeMapper.exportSchema(this.schema.originalSchema)
@@ -123,41 +137,83 @@ export abstract class ApiEdge implements ApiEdgeDefinition {
         return this
     };
 
-    edgeMethod = (name: string,
-                  execute: (scope: ApiQueryScope) => Promise<ApiEdgeQueryResponse>,
-                  acceptedTypes: ApiRequestType = ApiRequestType.Any,
-                  requiresData = true): ApiEdge => {
+    relation = (name: string) => {
+        return this.relations.find(r => r.name === name) || null
+    };
+
+    edgeMethod(name: string,
+               execute: (scope: ApiQueryScope) => Promise<ApiEdgeQueryResponse>,
+               acceptedTypes?: ApiRequestType,
+               requiresData?: boolean): ApiEdge;
+    edgeMethod(name: string,
+               execute: (scope: ApiQueryScope) => Promise<ApiEdgeQueryResponse>,
+               acceptedTypes?: ApiRequestType,
+               parameters?: string[],
+               requiresData?: boolean): ApiEdge;
+    edgeMethod(name: string,
+               execute: (scope: ApiQueryScope) => Promise<ApiEdgeQueryResponse>,
+               acceptedTypes: ApiRequestType = ApiRequestType.Any,
+               parametersOrData: string[]|boolean = [],
+               requiresData = true): ApiEdge {
         if(this.methods.find((method: ApiEdgeMethod) =>
             method.name === name))
            throw "A method with the same name already exists.";
 
-        this.methods.push(new ApiEdgeMethod(name, execute, ApiEdgeMethodScope.Edge, acceptedTypes, requiresData));
+        this.methods.push(new ApiEdgeMethod(name, execute, ApiEdgeMethodScope.Edge, acceptedTypes, parametersOrData, requiresData));
         return this
     };
 
-    collectionMethod = (name: string,
-                        execute: (scope: ApiQueryScope) => Promise<ApiEdgeQueryResponse>,
-                        acceptedTypes: ApiRequestType = ApiRequestType.Any,
-                        requiresData = true): ApiEdge => {
+    collectionMethod(name: string,
+                     execute: (scope: ApiQueryScope) => Promise<ApiEdgeQueryResponse>,
+                     acceptedTypes?: ApiRequestType,
+                     requiresData?: boolean): ApiEdge;
+    collectionMethod(name: string,
+                     execute: (scope: ApiQueryScope) => Promise<ApiEdgeQueryResponse>,
+                     acceptedTypes?: ApiRequestType,
+                     parameters?: string[],
+                     requiresData?: boolean): ApiEdge;
+    collectionMethod(name: string,
+                     execute: (scope: ApiQueryScope) => Promise<ApiEdgeQueryResponse>,
+                     acceptedTypes: ApiRequestType = ApiRequestType.Any,
+                     parametersOrData: string[]|boolean = [],
+                     requiresData = true): ApiEdge {
         if(this.methods.find((method: ApiEdgeMethod) =>
             method.name === name &&
             (method.scope == ApiEdgeMethodScope.Collection || method.scope == ApiEdgeMethodScope.Edge)))
             throw "A collection method with the same name already exists.";
 
-        this.methods.push(new ApiEdgeMethod(name, execute, ApiEdgeMethodScope.Collection, acceptedTypes, requiresData));
+        this.methods.push(new ApiEdgeMethod(name, execute, ApiEdgeMethodScope.Collection, acceptedTypes, parametersOrData, requiresData));
         return this
     };
 
-    entryMethod = (name: string,
-                   execute: (scope: ApiQueryScope) => Promise<ApiEdgeQueryResponse>,
-                   acceptedTypes: ApiRequestType = ApiRequestType.Any,
-                   requiresData = true): ApiEdge => {
+    entryMethod(name: string,
+                execute: (scope: ApiQueryScope) => Promise<ApiEdgeQueryResponse>,
+                acceptedTypes?: ApiRequestType,
+                requiresData?: boolean): ApiEdge;
+    entryMethod(name: string,
+                execute: (scope: ApiQueryScope) => Promise<ApiEdgeQueryResponse>,
+                acceptedTypes?: ApiRequestType,
+                parameters?: string[],
+                requiresData?: boolean): ApiEdge;
+    entryMethod(name: string,
+                execute: (scope: ApiQueryScope) => Promise<ApiEdgeQueryResponse>,
+                acceptedTypes: ApiRequestType = ApiRequestType.Any,
+                parametersOrData: string[]|boolean = [],
+                requiresData = true): ApiEdge {
         if(this.methods.find((method: ApiEdgeMethod) =>
             method.name === name &&
             (method.scope == ApiEdgeMethodScope.Entry || method.scope == ApiEdgeMethodScope.Edge)))
             throw "An entry method with the same name already exists.";
 
-        this.methods.push(new ApiEdgeMethod(name, execute, ApiEdgeMethodScope.Entry, acceptedTypes, requiresData));
+        this.methods.push(new ApiEdgeMethod(name, execute, ApiEdgeMethodScope.Entry, acceptedTypes, parametersOrData, requiresData));
         return this
     };
+
+    private extension: { [key: string]: any } = {};
+    get = (key: string) => this.extension[key];
+    set = (key: string, value: any) => this.extension[key] = value;
+
+    buildQuery(type: ApiEdgeQueryType = ApiEdgeQueryType.Get, body: any = null) {
+        return new ApiEdgeQuery(this, type, new ApiEdgeQueryContext(), body)
+    }
 }
