@@ -59,7 +59,7 @@ export interface ApiEdgeDefinition {
 
     prepare: (api: Api) => Promise<void>;
     metadata: () => ApiEdgeMetadata
-    relation: (name: string) => ApiEdgeRelation|null;
+    relation: (name: string) => Promise<ApiEdgeRelation|undefined>;
 
     get(key: string): any;
     set(key: string, value: any): any;
@@ -137,9 +137,7 @@ export abstract class ApiEdge implements ApiEdgeDefinition {
         return this
     };
 
-    relation = (name: string) => {
-        return this.relations.find(r => r.name === name) || null
-    };
+    relation = (name: string) => this.api.findRelationOfEdge(this.pluralName, name);
 
     edgeMethod(name: string,
                execute: (scope: ApiQueryScope) => Promise<ApiEdgeQueryResponse>,

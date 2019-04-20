@@ -72,8 +72,8 @@ tap.test('Change type queries should fail', (t: any) => {
     t.end()
 });
 
-tap.test('/schools', (t: any) => {
-    const request = api.parseRequest([ 'schools' ]),
+tap.test('/schools', async (t: any) => {
+    const request = await api.parseRequest([ 'schools' ]),
         query = api.buildQuery(request);
 
     t.equal(query.steps.length, 2, 'should build a 2 step query');
@@ -106,8 +106,8 @@ tap.test('/schools', (t: any) => {
         });
 });
 
-tap.test('/schools/s2', (t: any) => {
-    const request = api.parseRequest([ 'schools', 's2' ]),
+tap.test('/schools/s2', async (t: any) => {
+    const request = await api.parseRequest([ 'schools', 's2' ]),
         query = api.buildQuery(request);
 
     t.equal(query.steps.length, 3, 'should build a 3 step query');
@@ -133,8 +133,8 @@ tap.test('/schools/s2', (t: any) => {
         });
 });
 
-tap.test('/schools/s5', (t: any) => {
-    const request = api.parseRequest([ 'schools', 's5' ]),
+tap.test('/schools/s5', async (t: any) => {
+    const request = await api.parseRequest([ 'schools', 's5' ]),
         query = api.buildQuery(request);
 
     query.execute()
@@ -150,8 +150,8 @@ tap.test('/schools/s5', (t: any) => {
         });
 });
 
-tap.test('/schools/s1/classes', (t: any) => {
-    const request = api.parseRequest([ 'schools', 's1', 'classes' ]),
+tap.test('/schools/s1/classes', async (t: any) => {
+    const request = await api.parseRequest([ 'schools', 's1', 'classes' ]),
         query = api.buildQuery(request);
 
     t.equal(query.steps.length, 5, 'should build a 5 step query');
@@ -182,8 +182,8 @@ tap.test('/schools/s1/classes', (t: any) => {
         });
 });
 
-tap.test('/schools/s1/classes/c1', (t: any) => {
-    const request = api.parseRequest([ 'schools', 's1', 'classes', 'c1' ]),
+tap.test('/schools/s1/classes/c1', async (t: any) => {
+    const request = await api.parseRequest([ 'schools', 's1', 'classes', 'c1' ]),
         query = api.buildQuery(request);
 
     t.equal(query.steps.length, 6, 'should build a 6 step query');
@@ -213,8 +213,8 @@ tap.test('/schools/s1/classes/c1', (t: any) => {
         });
 });
 
-tap.test('/students/s2/class', (t: any) => {
-    const request = api.parseRequest([ 'students', 's2', 'class' ]),
+tap.test('/students/s2/class', async (t: any) => {
+    const request = await api.parseRequest([ 'students', 's2', 'class' ]),
         query = api.buildQuery(request);
 
     t.equal(query.steps.length, 5, 'should build a 5 step query');
@@ -242,8 +242,8 @@ tap.test('/students/s2/class', (t: any) => {
         });
 });
 
-tap.test('/schools/s1/classes/c2', (t: any) => {
-    const request = api.parseRequest([ 'schools', 's1', 'classes', 'c2' ]),
+tap.test('/schools/s1/classes/c2', async (t: any) => {
+    const request = await api.parseRequest([ 'schools', 's1', 'classes', 'c2' ]),
         query = api.buildQuery(request);
 
     query.execute()
@@ -259,8 +259,8 @@ tap.test('/schools/s1/classes/c2', (t: any) => {
         });
 });
 
-tap.test('POST /schools', (t: any) => {
-    const request = api.parseRequest([ 'schools' ]);
+tap.test('POST /schools', async (t: any) => {
+    const request = await api.parseRequest([ 'schools' ]);
     request.type = ApiRequestType.Create;
     const body = request.body = {
         address: "12, Test street, North Pole, HA23535",
@@ -286,8 +286,8 @@ tap.test('POST /schools', (t: any) => {
         });
 });
 
-tap.test('DELETE /schools/s3', (t: any) => {
-    const request = api.parseRequest([ 'schools', 's3' ]);
+tap.test('DELETE /schools/s3', async (t: any) => {
+    const request = await api.parseRequest([ 'schools', 's3' ]);
     request.type = ApiRequestType.Delete;
     const query = api.buildQuery(request);
 
@@ -307,8 +307,8 @@ tap.test('DELETE /schools/s3', (t: any) => {
         });
 });
 
-tap.test('DELETE /students/s2/class', (t: any) => {
-    const request = api.parseRequest([ 'students', 's2', 'class' ]);
+tap.test('DELETE /students/s2/class', async (t: any) => {
+    const request = await api.parseRequest([ 'students', 's2', 'class' ]);
     request.type = ApiRequestType.Delete;
 
     try {
@@ -324,8 +324,8 @@ tap.test('DELETE /students/s2/class', (t: any) => {
     }
 });
 
-tap.test('PATCH /schools/s2', (t: any) => {
-    const request = api.parseRequest([ 'schools', 's2' ]);
+tap.test('PATCH /schools/s2', async (t: any) => {
+    const request = await api.parseRequest([ 'schools', 's2' ]);
     request.type = ApiRequestType.Patch;
     request.body = {
         name: "Cool School"
@@ -356,8 +356,8 @@ tap.test('PATCH /schools/s2', (t: any) => {
         });
 });
 
-tap.test('PUT /schools/s2', (t: any) => {
-    const request = api.parseRequest([ 'schools', 's2' ]);
+tap.test('PUT /schools/s2', async (t: any) => {
+    const request = await api.parseRequest([ 'schools', 's2' ]);
     request.type = ApiRequestType.Update;
     request.body = {
         name: "Cool School"
@@ -388,8 +388,8 @@ tap.test('PUT /schools/s2', (t: any) => {
         });
 });
 
-tap.test('GET /students/s2/rename', (t: any) => {
-    const request = api.parseRequest([ 'students', 's2', 'rename' ]);
+tap.test('GET /students/s2/rename', async (t: any) => {
+    const request = await api.parseRequest([ 'students', 's2', 'rename' ]);
     request.type = ApiRequestType.Read;
 
     try {
@@ -404,8 +404,8 @@ tap.test('GET /students/s2/rename', (t: any) => {
     t.end()
 });
 
-tap.test('/students/s2/withHungarianName', (t: any) => {
-    const request = api.parseRequest([ 'students', 's2', 'withHungarianName' ]),
+tap.test('/students/s2/withHungarianName', async (t: any) => {
+    const request = await api.parseRequest([ 'students', 's2', 'withHungarianName' ]),
         query = api.buildQuery(request);
 
     t.equal(query.steps.length, 5, 'should build an 5 step query');
@@ -434,8 +434,8 @@ tap.test('/students/s2/withHungarianName', (t: any) => {
         });
 });
 
-tap.test('POST /students/s2/rename', (t: any) => {
-    const request = api.parseRequest([ 'students', 's2', 'rename' ]);
+tap.test('POST /students/s2/rename', async (t: any) => {
+    const request = await api.parseRequest([ 'students', 's2', 'rename' ]);
     request.type = ApiRequestType.Update;
     request.body = { name: "Test David" };
 

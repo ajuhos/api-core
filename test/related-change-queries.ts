@@ -41,8 +41,8 @@ tap.test('creating the API should work', (t: any) => {
     t.end()
 });
 
-tap.test('POST /schools/s2/students', (t: any) => {
-    const request = api.parseRequest([ 'schools', 's2', 'students' ]);
+tap.test('POST /schools/s2/students', async (t: any) => {
+    const request = await api.parseRequest([ 'schools', 's2', 'students' ]);
     request.type = ApiRequestType.Create;
     request.body = {
         id: "s7",
@@ -77,8 +77,8 @@ tap.test('POST /schools/s2/students', (t: any) => {
         });
 });
 
-tap.test('POST /schools/s2/classes/c1/students', (t: any) => {
-    const request = api.parseRequest([ 'schools', 's2', 'classes', 'c1', 'students' ]);
+tap.test('POST /schools/s2/classes/c1/students', async (t: any) => {
+    const request = await api.parseRequest([ 'schools', 's2', 'classes', 'c1', 'students' ]);
     request.type = ApiRequestType.Create;
     request.body = {
         id: "s8",
@@ -115,8 +115,8 @@ tap.test('POST /schools/s2/classes/c1/students', (t: any) => {
         });
 });
 
-tap.test('POST /schools/s2/students (invalid body)', (t: any) => {
-    const request = api.parseRequest([ 'schools', 's2', 'students' ]);
+tap.test('POST /schools/s2/students (invalid body)', async (t: any) => {
+    const request = await api.parseRequest([ 'schools', 's2', 'students' ]);
     request.type = ApiRequestType.Create;
     request.body = {
         id: "s7",
@@ -152,8 +152,8 @@ tap.test('POST /schools/s2/students (invalid body)', (t: any) => {
         });
 });
 
-tap.test('POST /schools/s2/classes/c1/students (invalid body)', (t: any) => {
-    const request = api.parseRequest([ 'schools', 's2', 'classes', 'c1', 'students' ]);
+tap.test('POST /schools/s2/classes/c1/students (invalid body)', async (t: any) => {
+    const request = await api.parseRequest([ 'schools', 's2', 'classes', 'c1', 'students' ]);
     request.type = ApiRequestType.Create;
     request.body = {
         id: "s8",
@@ -192,8 +192,8 @@ tap.test('POST /schools/s2/classes/c1/students (invalid body)', (t: any) => {
         });
 });
 
-tap.test('PATCH /schools/s2/students/s7', (t: any) => {
-    const request = api.parseRequest([ 'schools', 's2', 'students', 's7' ]);
+tap.test('PATCH /schools/s2/students/s7', async (t: any) => {
+    const request = await api.parseRequest([ 'schools', 's2', 'students', 's7' ]);
     request.type = ApiRequestType.Patch;
     request.body = {
         fullName: "Merry Test",
@@ -229,8 +229,8 @@ tap.test('PATCH /schools/s2/students/s7', (t: any) => {
         });
 });
 
-tap.test('PATCH /schools/s2/students/s7 (invalid body)', (t: any) => {
-    const request = api.parseRequest([ 'schools', 's2', 'students', 's7' ]);
+tap.test('PATCH /schools/s2/students/s7 (invalid body)', async (t: any) => {
+    const request = await api.parseRequest([ 'schools', 's2', 'students', 's7' ]);
     request.type = ApiRequestType.Patch;
     request.body = {
         fullName: "Merry Test",
@@ -267,8 +267,8 @@ tap.test('PATCH /schools/s2/students/s7 (invalid body)', (t: any) => {
         });
 });
 
-tap.test('PUT /schools/s2/students/s7', (t: any) => {
-    const request = api.parseRequest([ 'schools', 's2', 'students', 's7' ]);
+tap.test('PUT /schools/s2/students/s7', async (t: any) => {
+    const request = await api.parseRequest([ 'schools', 's2', 'students', 's7' ]);
     request.type = ApiRequestType.Update;
     request.body = {
         id: "s7",
@@ -308,8 +308,8 @@ tap.test('PUT /schools/s2/students/s7', (t: any) => {
         });
 });
 
-tap.test('PUT /schools/s2/students/s7 (invalid body)', (t: any) => {
-    const request = api.parseRequest([ 'schools', 's2', 'students', 's7' ]);
+tap.test('PUT /schools/s2/students/s7 (invalid body)', async (t: any) => {
+    const request = await api.parseRequest([ 'schools', 's2', 'students', 's7' ]);
     request.type = ApiRequestType.Update;
     request.body = {
         id: "s7",
@@ -349,8 +349,8 @@ tap.test('PUT /schools/s2/students/s7 (invalid body)', (t: any) => {
         });
 });
 
-tap.test('DELETE /schools/s2/students/s7', (t: any) => {
-    const request = api.parseRequest([ 'schools', 's2', 'students', 's7' ]);
+tap.test('DELETE /schools/s2/students/s7', async (t: any) => {
+    const request = await api.parseRequest([ 'schools', 's2', 'students', 's7' ]);
     request.type = ApiRequestType.Delete;
     const query = api.buildQuery(request);
 

@@ -31,6 +31,65 @@ export interface ApiMetadata {
     relations: ExportedApiEdgeRelation[]
 }
 
+export interface ApiResolver {
+    resolveEdge(name: string, plural: boolean): Promise<ApiEdgeDefinition|undefined>;
+    resolveRelation(name: string): Promise<ApiEdgeRelation|undefined>;
+    resolveRelationOfEdge(edge: string, name: string): Promise<ApiEdgeRelation|undefined>;
+    resolveRelationTo(edge: string, name: string): Promise<ApiEdgeRelation|undefined>;
+    resolveRelationFrom(edge: string, name: string): Promise<ApiEdgeRelation|undefined>;
+}
+
+export class LocalApiResolver implements ApiResolver {
+    private readonly api: Api;
+
+    constructor(api: Api) {
+        this.api = api
+    }
+
+    resolveEdge(name: string, plural: boolean) {
+        if(plural) {
+            return Promise.resolve(
+                this.api.edges.find(edge => edge.pluralName == name)
+            )
+        }
+        else {
+            return Promise.resolve(
+                this.api.edges.find(edge => edge.name == name)
+            )
+        }
+    }
+
+    resolveRelation(name: string) {
+        return Promise.resolve(
+            this.api.relations.find(relation => relation.name === name)
+        )
+    }
+
+    resolveRelationOfEdge(edge: string, name: string) {
+        return Promise.resolve(
+            this.api.relations.find(relation =>
+                relation.name === name && (relation.from.pluralName === edge || relation.to.pluralName === edge)
+            )
+        )
+    }
+
+    resolveRelationFrom(edge: string, name: string) {
+        return Promise.resolve(
+            this.api.relations.find(relation =>
+                relation.name === name && relation.from.pluralName === edge
+            )
+        )
+    }
+
+    resolveRelationTo(edge: string, name: string) {
+        return Promise.resolve(
+            this.api.relations.find(relation =>
+                relation.name === name && relation.to.pluralName === edge
+            )
+        )
+    }
+}
+
 export class Api {
     static defaultIdPostfix: string = "Id";
     static defaultIdField: string = "id";
@@ -44,20 +103,41 @@ export class Api {
     actions: ApiAction[] = [];
     private parser: ApiRequestParser;
     private queryBuilder: ApiQueryBuilder;
+    private resolver: ApiResolver;
 
     constructor(version: string, ...edges: ApiEdgeDefinition[]) {
         this.version = version;
         this.edges = edges;
         this.parser = new ApiRequestParser(this);
         this.queryBuilder = new ApiQueryBuilder(this);
+        this.resolver = new LocalApiResolver(this)
     }
 
-    findEdge = (name: string|null|undefined) => {
-        return this.edges.find((edge: ApiEdgeDefinition) => edge.pluralName == name)
+    findEdge = (name: string, plural = true) => {
+        return this.resolver.resolveEdge(name, plural)
     };
 
-    parseRequest = (requestParts: string[], type: ApiRequestType|null = null) => {
-        const result = this.parser.parse(requestParts);
+    findRelation(name: string) {
+        return this.resolver.resolveRelation(name)
+    }
+
+    findRelationOfEdge(edge: string|ApiEdgeDefinition, name: string) {
+        const edgeName = (edge as any).pluralName || edge;
+        return this.resolver.resolveRelationOfEdge(edgeName, name)
+    }
+
+    findRelationTo(edge: string|ApiEdgeDefinition, name: string) {
+        const edgeName = (edge as any).pluralName || edge;
+        return this.resolver.resolveRelationTo(edgeName, name)
+    }
+
+    findRelationFrom(edge: string|ApiEdgeDefinition, name: string) {
+        const edgeName = (edge as any).pluralName || edge;
+        return this.resolver.resolveRelationFrom(edgeName, name)
+    }
+
+    parseRequest = async (requestParts: string[], type: ApiRequestType|null = null) => {
+        const result = await this.parser.parse(requestParts);
         if(type) result.type = type;
         return result
     };
@@ -103,7 +183,7 @@ export class Api {
         }
     };
 
-    static fromMetadata(metadata: ApiMetadata): Api {
+    static async fromMetadata(metadata: ApiMetadata): Promise<Api> {
         const api = new Api(metadata.version);
         api.info = metadata.info;
 
@@ -113,7 +193,7 @@ export class Api {
         }
 
         for(let relation of metadata.relations) {
-            api.relation(ApiEdgeRelation.fromJSON(relation, api))
+            api.relation(await ApiEdgeRelation.fromJSON(relation, api))
         }
 
         return api

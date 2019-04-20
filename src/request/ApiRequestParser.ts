@@ -17,12 +17,12 @@ export class ApiRequestPathParser {
         this.api = api;
     }
 
-    private findEdgeByName(name: string|null|undefined): ApiEdgeDefinition|undefined {
+    private findEdgeByName(name: string) {
         return this.api.findEdge(name);
     }
 
-    private findRelationByName(edge: ApiEdgeDefinition, name: string|null|undefined): ApiEdgeRelation|undefined {
-        return edge.relations.find((rel: ApiEdgeRelation) => rel.name === name);
+    private findRelationByName(edge: ApiEdgeDefinition, name: string) {
+        return this.api.findRelationOfEdge(edge, name)
     }
 
     private findMethodByName(edge: ApiEdgeDefinition,
@@ -40,17 +40,17 @@ export class ApiRequestPathParser {
         }
     }
 
-    parse(segments: string[]): ApiRequestPath {
+    async parse(segments: string[]): Promise<ApiRequestPath> {
         let requestPath = new ApiRequestPath();
 
         let lastEdge: ApiEdgeDefinition|null = null,
             lastRelation: ApiEdgeRelation|null = null,
             wasEntry = false;
         while(segments.length) {
-            let segment = segments.shift();
+            let segment = segments.shift() || '';
 
             if(lastEdge) {
-                let relation: ApiEdgeRelation|undefined = this.findRelationByName(lastEdge, segment);
+                let relation: ApiEdgeRelation|undefined = await this.findRelationByName(lastEdge, segment);
                 if(relation) {
                     if(relation instanceof OneToOneRelation) {
                         requestPath.add(new RelatedFieldPathSegment(lastEdge, relation));
@@ -85,7 +85,7 @@ export class ApiRequestPathParser {
                 }
             }
             else {
-                let edge = this.findEdgeByName(segment);
+                let edge = await this.findEdgeByName(segment);
 
                 if(edge) {
                     lastEdge = edge;
@@ -116,9 +116,9 @@ export class ApiRequestParser {
         this.pathParser = new ApiRequestPathParser(api);
     }
 
-    parse(segments: string[]): ApiRequest {
+    async parse(segments: string[]): Promise<ApiRequest> {
         let request = new ApiRequest(this.api);
-        request.path = this.pathParser.parse(segments);
+        request.path = await this.pathParser.parse(segments);
         return request;
     }
 }

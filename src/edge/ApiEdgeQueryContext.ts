@@ -60,13 +60,14 @@ export class ApiEdgeQueryContext {
         }
     };
 
-    static fromJSON = (obj: ExportedApiEdgeQueryContext, api: Api) => {
+    static fromJSON = async (obj: ExportedApiEdgeQueryContext, api: Api) => {
         const context = new ApiEdgeQueryContext();
         context.id = obj.id;
         context.fields = obj.fields;
-        context.populatedRelations = obj.populatedRelations.map(
-            name => api.relations.find(r => r.name === name) as OneToOneRelation
-        );
+        context.populatedRelations = [];
+        for(let name of obj.populatedRelations) {
+            context.populatedRelations.push(await api.findRelation(name) as OneToOneRelation)
+        }
         context.pagination = obj.pagination;
         context.sortBy = obj.sortBy;
         context.filters = obj.filters.map(

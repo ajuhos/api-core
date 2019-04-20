@@ -41,11 +41,11 @@ export abstract class ApiEdgeRelation {
         }
     }
 
-    static fromJSON(obj: ExportedApiEdgeRelation, api: Api): ApiEdgeRelation {
+    static async fromJSON(obj: ExportedApiEdgeRelation, api: Api): Promise<ApiEdgeRelation> {
         const Relation = ApiEdgeRelationTypes[obj.type];
         const relation = new Relation(
-            api.edges.find(edge => edge.name == obj.from) as any,
-            api.edges.find(edge => edge.name == obj.to) as any
+            await api.findEdge(obj.from, false) as ApiEdgeDefinition,
+            await api.findEdge(obj.to, false) as ApiEdgeDefinition
         );
         relation.relationId = obj.relationId;
         relation.relatedId = obj.relatedId;
