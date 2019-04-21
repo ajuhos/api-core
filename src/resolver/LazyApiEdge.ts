@@ -31,12 +31,14 @@ export class LazyApiEdge implements ApiEdgeDefinition {
                 this.pluralName = realEdge.pluralName;
                 this.relations = realEdge.relations;
                 this.methods = realEdge.methods;
-                this.actions = realEdge.actions
+                this.actions = realEdge.actions;
+                return true
             }
-            else {
-                throw new Error('Failed to resolve')
-            }
+
+            return false
         }
+
+        return true
     }
 
     actions: ApiEdgeAction[] = [];

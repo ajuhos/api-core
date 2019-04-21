@@ -60,11 +60,16 @@ export abstract class ApiEdgeRelation {
     }
 
     async resolve() {
-        if(this.resolved) return;
+        if(this.resolved) return true;
 
-        this.resolved = true;
-        await this.from.resolve();
-        await this.to.resolve();
-        this.onResolve()
+        if(await this.from.resolve()) {
+            if(await this.to.resolve()) {
+                this.onResolve();
+                this.resolved = true;
+                return true
+            }
+        }
+
+        return false
     }
 }
