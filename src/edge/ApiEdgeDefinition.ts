@@ -58,6 +58,7 @@ export interface ApiEdgeDefinition {
     exists: (context: ApiEdgeQueryContext) => Promise<ApiEdgeQueryResponse>;
 
     prepare: (api: Api) => Promise<void>;
+    resolve: () => Promise<void>;
     metadata: () => ApiEdgeMetadata
     relation: (name: string) => Promise<ApiEdgeRelation|undefined>;
 
@@ -94,6 +95,8 @@ export abstract class ApiEdge implements ApiEdgeDefinition {
     removeEntry: (context: ApiEdgeQueryContext, entryFields: any) => Promise<ApiEdgeQueryResponse>;
     exists: (context: ApiEdgeQueryContext) => Promise<ApiEdgeQueryResponse>;
     prepare: (api: Api) => Promise<void>;
+
+    resolve = () => Promise.resolve();
 
     metadata = () => {
         return {

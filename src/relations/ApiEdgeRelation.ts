@@ -19,7 +19,8 @@ export abstract class ApiEdgeRelation {
 
     constructor(from: ApiEdgeDefinition, to: ApiEdgeDefinition) {
         this.from = from;
-        this.to = to
+        this.to = to;
+        this.external = from.external || to.external;
     }
 
     name: string;
@@ -28,6 +29,10 @@ export abstract class ApiEdgeRelation {
     from: ApiEdgeDefinition;
     to: ApiEdgeDefinition;
     hasPair: boolean;
+    readonly external: boolean;
+
+    private resolved = false;
+    onResolve: () => void = () => {};
 
     toJSON() {
         return {
@@ -52,5 +57,14 @@ export abstract class ApiEdgeRelation {
         relation.name = obj.name;
         relation.hasPair = obj.hasPair;
         return relation
+    }
+
+    async resolve() {
+        if(this.resolved) return;
+
+        this.resolved = true;
+        await this.from.resolve();
+        await this.to.resolve();
+        this.onResolve()
     }
 }

@@ -27,10 +27,12 @@ export class ApiEdgeQueryContext {
     sortBy: [string, number][] = [];
     filters: ApiEdgeQueryFilter[] = [];
     parameters: ApiEdgeQueryParameter[] = [];
+    identity: any;
 
     clone = () => {
         let temp = new ApiEdgeQueryContext();
         temp.id = this.id;
+        temp.identity = this.identity;
 
         this.fields.forEach(f => temp.fields.push(f));
         this.populatedRelations.forEach(f => temp.populatedRelations.push(f));
@@ -56,7 +58,7 @@ export class ApiEdgeQueryContext {
             pagination: this.pagination,
             sortBy: this.sortBy,
             filters: this.filters,
-            parameters: this.parameters,
+            parameters: this.parameters
         }
     };
 

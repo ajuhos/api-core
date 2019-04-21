@@ -6,6 +6,8 @@ import {ApiQuery, ApiQueryScope} from "./query/ApiQuery";
 import {ApiEdgeRelation, ExportedApiEdgeRelation} from "./relations/ApiEdgeRelation";
 import {ApiAction, ApiActionTriggerKind} from "./query/ApiAction";
 import {ExternalApiEdge} from "./edge/ExternalApiEdge";
+import {ApiResolver} from "./resolver/ApiResolver";
+import {LocalApiResolver} from "./resolver/LocalApiResolver";
 const pkg = require('../../package.json');
 
 export interface ApiInfo {
@@ -31,65 +33,6 @@ export interface ApiMetadata {
     relations: ExportedApiEdgeRelation[]
 }
 
-export interface ApiResolver {
-    resolveEdge(name: string, plural: boolean): Promise<ApiEdgeDefinition|undefined>;
-    resolveRelation(name: string): Promise<ApiEdgeRelation|undefined>;
-    resolveRelationOfEdge(edge: string, name: string): Promise<ApiEdgeRelation|undefined>;
-    resolveRelationTo(edge: string, name: string): Promise<ApiEdgeRelation|undefined>;
-    resolveRelationFrom(edge: string, name: string): Promise<ApiEdgeRelation|undefined>;
-}
-
-export class LocalApiResolver implements ApiResolver {
-    private readonly api: Api;
-
-    constructor(api: Api) {
-        this.api = api
-    }
-
-    resolveEdge(name: string, plural: boolean) {
-        if(plural) {
-            return Promise.resolve(
-                this.api.edges.find(edge => edge.pluralName == name)
-            )
-        }
-        else {
-            return Promise.resolve(
-                this.api.edges.find(edge => edge.name == name)
-            )
-        }
-    }
-
-    resolveRelation(name: string) {
-        return Promise.resolve(
-            this.api.relations.find(relation => relation.name === name)
-        )
-    }
-
-    resolveRelationOfEdge(edge: string, name: string) {
-        return Promise.resolve(
-            this.api.relations.find(relation =>
-                relation.name === name && (relation.from.pluralName === edge || relation.to.pluralName === edge)
-            )
-        )
-    }
-
-    resolveRelationFrom(edge: string, name: string) {
-        return Promise.resolve(
-            this.api.relations.find(relation =>
-                relation.name === name && relation.from.pluralName === edge
-            )
-        )
-    }
-
-    resolveRelationTo(edge: string, name: string) {
-        return Promise.resolve(
-            this.api.relations.find(relation =>
-                relation.name === name && relation.to.pluralName === edge
-            )
-        )
-    }
-}
-
 export class Api {
     static defaultIdPostfix: string = "Id";
     static defaultIdField: string = "id";
@@ -103,7 +46,7 @@ export class Api {
     actions: ApiAction[] = [];
     private parser: ApiRequestParser;
     private queryBuilder: ApiQueryBuilder;
-    private resolver: ApiResolver;
+    resolver: ApiResolver;
 
     constructor(version: string, ...edges: ApiEdgeDefinition[]) {
         this.version = version;
@@ -178,8 +121,11 @@ export class Api {
             'api-core': pkg.version,
             info: this.info || { title: 'API' },
             version: this.version,
-            edges: this.edges.map(edge => edge.metadata()),
-            relations: this.relations.map(relation => relation.toJSON())
+            edges: this.edges
+                .filter(edge => !edge.external)
+                .map(edge => edge.metadata()),
+            relations: this.relations
+                .map(relation => relation.toJSON())
         }
     };
 

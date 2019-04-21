@@ -164,6 +164,7 @@ export class QueryEdgeQueryStep implements QueryStep {
             }
 
             this.query.context = scope.context;
+            this.query.context.identity = scope.identity;
 
             this.query.execute().then((response) => {
                 scope.context = new ApiEdgeQueryContext();

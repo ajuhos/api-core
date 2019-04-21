@@ -28,4 +28,8 @@ export {
 export {ApiEdgeAction, ApiEdgeActionTrigger, ApiEdgeActionTriggerKind} from "./src/edge/ApiEdgeAction";
 export {ApiAction, ApiActionTriggerKind} from "./src/query/ApiAction";
 
-export {Api, ApiInfo, ApiMetadata, ApiResolver, LocalApiResolver} from "./src/Api";
+export {ApiResolver} from "./src/resolver/ApiResolver";
+export {LazyApiEdge} from "./src/resolver/LazyApiEdge";
+export {LocalApiResolver} from "./src/resolver/LocalApiResolver";
+
+export {Api, ApiInfo, ApiMetadata} from "./src/Api";
