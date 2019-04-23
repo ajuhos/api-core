@@ -140,7 +140,7 @@ export abstract class ApiEdge implements ApiEdgeDefinition {
         return this
     };
 
-    relation = (name: string) => this.api.findRelationOfEdge(this.pluralName, name);
+    relation = (name: string) => this.api.findRelationOfEdge(this.name, name);
 
     edgeMethod(name: string,
                execute: (scope: ApiQueryScope) => Promise<ApiEdgeQueryResponse>,

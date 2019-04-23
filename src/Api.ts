@@ -65,17 +65,17 @@ export class Api {
     }
 
     findRelationOfEdge(edge: string|ApiEdgeDefinition, name: string) {
-        const edgeName = (edge as any).pluralName || edge;
+        const edgeName = (edge as any).name || edge;
         return this.resolver.resolveRelationOfEdge(edgeName, name)
     }
 
     findRelationTo(edge: string|ApiEdgeDefinition, name: string) {
-        const edgeName = (edge as any).pluralName || edge;
+        const edgeName = (edge as any).name || edge;
         return this.resolver.resolveRelationTo(edgeName, name)
     }
 
     findRelationFrom(edge: string|ApiEdgeDefinition, name: string) {
-        const edgeName = (edge as any).pluralName || edge;
+        const edgeName = (edge as any).name || edge;
         return this.resolver.resolveRelationFrom(edgeName, name)
     }
 
