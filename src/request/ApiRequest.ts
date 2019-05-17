@@ -107,6 +107,7 @@ export class ApiRequest {
     body: any|null = null; //Should be request context
     stream: NodeJS.ReadableStream|null = null;
     context: ApiEdgeQueryContext; //Should be request context
+    metadata: any = {};
 
     constructor(api: Api) {
         this.api = api;

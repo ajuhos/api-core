@@ -33,7 +33,7 @@ export class LocalApiResolver implements ApiResolver {
 
     async resolveRelationOfEdge(edge: string, name: string) {
         const relation = this.api.relations.find(relation =>
-            relation.name === name && (relation.from.pluralName === edge || relation.to.pluralName === edge)
+            relation.name === name && (relation.from.name === edge || relation.to.name === edge)
         );
         if(relation && !(await relation.resolve())) return undefined;
         return relation
@@ -41,7 +41,7 @@ export class LocalApiResolver implements ApiResolver {
 
     async resolveRelationFrom(edge: string, name: string) {
         const relation = this.api.relations.find(relation =>
-            relation.name === name && relation.from.pluralName === edge
+            relation.name === name && relation.from.name === edge
         );
         if(relation && !(await relation.resolve())) return undefined;
         return relation
@@ -49,7 +49,7 @@ export class LocalApiResolver implements ApiResolver {
 
     async resolveRelationTo(edge: string, name: string) {
         const relation = this.api.relations.find(relation =>
-            relation.name === name && relation.to.pluralName === edge
+            relation.name === name && relation.to.name === edge
         );
         if(relation && !(await relation.resolve())) return undefined;
         return relation
