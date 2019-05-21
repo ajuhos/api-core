@@ -8,25 +8,25 @@ export enum ApiEdgeMethodScope {
     /**
      * Available for both entries and collections.
      */
-    Edge,
+    Edge = 1,
 
     /**
      * Available for single entries.
      */
-    Entry,
+    Entry = 2,
 
     /**
      * Available for collections.
      */
-    Collection
+    Collection = 3
 
 }
 
 export enum ApiEdgeMethodOutput {
 
-    List,
+    Entry = 1,
 
-    Entry
+    List = 2
 
 }
 
