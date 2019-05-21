@@ -17,7 +17,7 @@ import {ApiEdgeQueryResponse} from "../edge/ApiEdgeQueryResponse";
 import {ApiEdgeQueryType} from "../edge/ApiEdgeQueryType";
 import {OneToOneRelation} from "../relations/OneToOneRelation";
 import {Api} from "../Api";
-import {ApiEdgeMethod, ApiEdgeMethodScope} from "../edge/ApiEdgeMethod";
+import {ApiEdgeMethod, ApiEdgeMethodOutput, ApiEdgeMethodScope} from "../edge/ApiEdgeMethod";
 import {ApiEdgeAction, ApiEdgeActionTrigger, ApiEdgeActionTriggerKind} from "../edge/ApiEdgeAction";
 import {ApiAction, ApiActionTriggerKind} from "./ApiAction";
 import {ApiEdgeDefinition} from "../edge/ApiEdgeDefinition";
@@ -540,7 +540,9 @@ export class ApiQueryBuilder {
     }
 
     private buildEmbedSteps(query: ApiQuery, request: ApiRequest, lastSegment: PathSegment) {
-        if(request.type === ApiRequestType.Read && lastSegment instanceof EdgePathSegment) {
+        if(request.type === ApiRequestType.Read
+            && (lastSegment instanceof EdgePathSegment
+                || (lastSegment instanceof MethodPathSegment && lastSegment.method.output === ApiEdgeMethodOutput.List))) {
             for (let relation of request.context.populatedRelations) {
                 const segment = new EdgePathSegment(relation.to, relation);
 

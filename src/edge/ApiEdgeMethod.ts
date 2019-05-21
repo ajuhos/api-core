@@ -1,6 +1,7 @@
-import {QueryStep, ApiQueryScope} from "../query/ApiQuery";
+import {ApiQueryScope} from "../query/ApiQuery";
 import {ApiRequestType} from "../request/ApiRequest";
 import {ApiEdgeQueryResponse} from "./ApiEdgeQueryResponse";
+import {ApiEdgeError} from "../query/ApiEdgeError";
 
 export enum ApiEdgeMethodScope {
 
@@ -21,11 +22,30 @@ export enum ApiEdgeMethodScope {
 
 }
 
+export enum ApiEdgeMethodOutput {
+
+    List,
+
+    Entry
+
+}
+
+export type ApiEdgeMethodOptions = {
+    name: string;
+    requiresData?: boolean;
+    acceptedTypes?: ApiRequestType;
+    scope?: ApiEdgeMethodScope;
+    output?: ApiEdgeMethodOutput;
+    execute: (scope: ApiQueryScope) => Promise<ApiEdgeQueryResponse>;
+    parameters?: string[];
+}
+
 export class ApiEdgeMethod {
     name: string;
     requiresData: boolean;
     acceptedTypes: ApiRequestType = ApiRequestType.Any;
     scope: ApiEdgeMethodScope = ApiEdgeMethodScope.Edge;
+    output: ApiEdgeMethodOutput = ApiEdgeMethodOutput.Entry;
     execute: (scope: ApiQueryScope) => Promise<ApiEdgeQueryResponse>;
     parameters: string[];
 
@@ -46,21 +66,34 @@ export class ApiEdgeMethod {
                 acceptedTypes: ApiRequestType,
                 parametersOrData: string[]|boolean,
                 requiresData: boolean);
-    constructor(name: string,
-                execute: (scope: ApiQueryScope) => Promise<ApiEdgeQueryResponse>,
+    constructor(options: ApiEdgeMethodOptions);
+    constructor(nameOrOptions: string|ApiEdgeMethodOptions,
+                execute?: (scope: ApiQueryScope) => Promise<ApiEdgeQueryResponse>,
                 scope: ApiEdgeMethodScope = ApiEdgeMethodScope.Edge,
                 acceptedTypes: ApiRequestType = ApiRequestType.Any,
                 parametersOrData: string[]|boolean = [],
                 requiresData = true) {
-        let parameters: string[] = [];
-        if(typeof parametersOrData === 'boolean') requiresData = parametersOrData;
-        else parameters = parametersOrData;
 
-        this.name = name;
-        this.scope = scope;
-        this.execute = execute;
-        this.acceptedTypes = acceptedTypes;
-        this.requiresData = requiresData;
-        this.parameters = parameters;
+        if(typeof nameOrOptions === 'object') {
+            this.name = nameOrOptions.name;
+            this.requiresData = typeof nameOrOptions.requiresData === 'boolean' ? nameOrOptions.requiresData : true;
+            this.acceptedTypes = nameOrOptions.acceptedTypes || ApiRequestType.Any;
+            this.scope = nameOrOptions.scope || ApiEdgeMethodScope.Edge;
+            this.output = nameOrOptions.output || ApiEdgeMethodOutput.Entry;
+            this.execute = nameOrOptions.execute;
+            this.parameters = nameOrOptions.parameters || []
+        }
+        else {
+            let parameters: string[] = [];
+            if (typeof parametersOrData === 'boolean') requiresData = parametersOrData;
+            else parameters = parametersOrData;
+
+            this.name = nameOrOptions;
+            this.scope = scope;
+            this.execute = execute || (() => Promise.reject(new ApiEdgeError(400, 'Not Implemented')));
+            this.acceptedTypes = acceptedTypes;
+            this.requiresData = requiresData;
+            this.parameters = parameters;
+        }
     }
 }

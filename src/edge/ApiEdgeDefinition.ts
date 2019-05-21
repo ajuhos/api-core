@@ -2,7 +2,7 @@ import {ApiEdgeRelation} from "../relations/ApiEdgeRelation";
 import {ApiEdgeQueryContext} from "./ApiEdgeQueryContext";
 import {ApiEdgeQueryResponse} from "./ApiEdgeQueryResponse";
 import {ApiQueryScope} from "../query/ApiQuery";
-import {ApiEdgeMethod, ApiEdgeMethodScope} from "./ApiEdgeMethod";
+import {ApiEdgeMethod, ApiEdgeMethodOptions, ApiEdgeMethodScope} from "./ApiEdgeMethod";
 import {ApiRequestType} from "../request/ApiRequest";
 import {ApiEdgeAction, ApiEdgeActionTrigger, ApiEdgeActionTriggerKind} from "./ApiEdgeAction";
 import {ApiEdgeQueryType} from "./ApiEdgeQueryType";
@@ -209,6 +209,15 @@ export abstract class ApiEdge implements ApiEdgeDefinition {
         this.methods.push(new ApiEdgeMethod(name, execute, ApiEdgeMethodScope.Entry, acceptedTypes, parametersOrData, requiresData));
         return this
     };
+
+    method(options: ApiEdgeMethodOptions) {
+        if(this.methods.find((method: ApiEdgeMethod) => method.name === options.name)) {
+            throw "A method with the same name already exists.";
+        }
+
+        this.methods.push(new ApiEdgeMethod(options));
+        return this
+    }
 
     private extension: { [key: string]: any } = {};
     get = (key: string) => this.extension[key];
