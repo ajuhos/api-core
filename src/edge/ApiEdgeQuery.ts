@@ -153,7 +153,12 @@ export class ApiEdgeQuery {
             //TODO: Support sort-by on renamed fields
         }
 
-        if(this.body) {
+        if(this.body
+            && this.type !== ApiEdgeQueryType.Get
+            && this.type !== ApiEdgeQueryType.Exists
+            && this.type !== ApiEdgeQueryType.Delete
+            && this.type !== ApiEdgeQueryType.List)
+        {
             if(!this.context.id) this.context.id = this.body.id;
 
             if(this.edge.schema) {
