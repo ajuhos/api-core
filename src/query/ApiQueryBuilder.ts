@@ -57,25 +57,29 @@ export class EmbedQueryQueryStep implements QueryStep {
 
                 if(Array.isArray(target)) {
                     const targetIndex: { [key: string]: any[] } = {},
-                        targetArrayIndex: { [key: string]: any[] } = {},
+                        targetArrayIndex: { [key: string]: { entry: any, index: number }[] } = {},
                         ids: string[] = [];
 
+                    let forcedIndex = 0;
                     for(let entry of target) {
                         const id = entry[this.sourceField];
                         if(id) {
                             if(Array.isArray(id)) {
+                                let index = 0;
                                 for(let _id of id) {
-                                    if (targetArrayIndex[_id]) targetArrayIndex[_id].push(entry);
-                                    else targetArrayIndex[_id] = [entry];
+                                    if (targetArrayIndex[_id]) targetArrayIndex[_id].push({ entry, index });
+                                    else targetArrayIndex[_id] = [{entry, index}];
                                     ids.push(_id);
+                                    index++
                                 }
                                 entry[this.sourceField] = [];
                             }
                             else if(this.forceArray) {
-                                if (targetArrayIndex[id]) targetArrayIndex[id].push(entry);
-                                else targetArrayIndex[id] = [entry];
+                                if (targetArrayIndex[id]) targetArrayIndex[id].push({ entry, index: forcedIndex });
+                                else targetArrayIndex[id] = [{entry, index: forcedIndex }];
                                 ids.push(id);
                                 entry[this.targetField] = [];
+                                forcedIndex++
                             }
                             else {
                                 if (targetIndex[id]) targetIndex[id].push(entry);
@@ -104,8 +108,8 @@ export class EmbedQueryQueryStep implements QueryStep {
                                         }
                                     }
                                     if(targetArrayIndex[id]) {
-                                        for (let subEntry of targetArrayIndex[id]) {
-                                            subEntry[this.targetField].push(entry);
+                                        for (let { entry: subEntry, index } of targetArrayIndex[id]) {
+                                            subEntry[this.targetField][index] = entry;
                                         }
                                     }
                                 }
@@ -208,9 +212,9 @@ export class CallMethodQueryStep implements QueryStep {
                     scope.response = response;
                     resolve(scope)
                 }).catch((e) => {
-                    debug(`failed to execute ${this.method.name} method`, e);
-                    reject(e)
-                });
+                debug(`failed to execute ${this.method.name} method`, e);
+                reject(e)
+            });
         })
     };
 
