@@ -209,7 +209,7 @@ export abstract class ApiEdge implements ApiEdgeDefinition {
         this.methods.push(new ApiEdgeMethod(name, execute, ApiEdgeMethodScope.Entry, acceptedTypes, parametersOrData, requiresData));
         return this
     };
-
+    
     method(options: ApiEdgeMethodOptions) {
         if(this.methods.find((method: ApiEdgeMethod) => method.name === options.name)) {
             throw "A method with the same name already exists.";
