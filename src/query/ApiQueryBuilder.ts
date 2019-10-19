@@ -136,6 +136,19 @@ export class EmbedQueryQueryStep implements QueryStep {
                     }
 
                     this.query.execute(scope.identity).then((response) => {
+                        if (Array.isArray(sourceId)) {  // restore original order of array items
+                            const unordered_data = response.data;
+                            response.data = [];
+                            for (const id of sourceId) {
+                                const item = unordered_data.find((item:any) => {
+                                    return item.id.toString() == id.toString();
+                                });
+                                if (item)
+                                    response.data.push(item);
+                                else
+                                    console.log("WARNING: can\'t find in embed results this id: " + id);
+                            }
+                        }
                         target[this.targetField] = response.data;
                         resolve(scope)
                     }).catch(reject);
