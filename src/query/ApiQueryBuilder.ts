@@ -713,8 +713,11 @@ export class ApiQueryBuilder {
         }
         else if(lastSegment instanceof MethodPathSegment) {
             ApiQueryBuilder.addMethodCallStep(request, query, lastSegment.method, lastSegment.edge);
-            query.unshift(new ProvideIdQueryStep(lastSegment.edge.idField));
-            readMode = false;
+            if(lastSegment.method.scope === ApiEdgeMethodScope.Entry) {
+                //TODO: Add support for providing id for Edge methods.
+                query.unshift(new ProvideIdQueryStep(lastSegment.edge.idField));
+            }
+            readMode = lastSegment.method.requiresData;
         }
         else {
             if(request.type === ApiRequestType.Update) {
@@ -808,6 +811,10 @@ export class ApiQueryBuilder {
         //STEP 1: Create the base query which will provide the final data.
         if(lastSegment instanceof MethodPathSegment) {
             ApiQueryBuilder.addMethodCallStep(request, query, lastSegment.method, lastSegment.edge);
+            if(lastSegment.method.scope === ApiEdgeMethodScope.Entry) {
+                //TODO: Add support for providing id for Edge methods.
+                query.unshift(new ProvideIdQueryStep(lastSegment.edge.idField));
+            }
             readMode = lastSegment.method.requiresData;
         }
         else {
