@@ -799,7 +799,8 @@ export class ApiQueryBuilder {
         let query = new ApiQuery();
 
         let segments = request.path.segments,
-            lastSegment = segments[segments.length-1];
+            lastSegment = segments[segments.length-1],
+            readMode = true;
 
         //STEP 0: Create embed queries
         this.buildEmbedSteps(query, request, lastSegment);
@@ -807,6 +808,7 @@ export class ApiQueryBuilder {
         //STEP 1: Create the base query which will provide the final data.
         if(lastSegment instanceof MethodPathSegment) {
             ApiQueryBuilder.addMethodCallStep(request, query, lastSegment.method, lastSegment.edge);
+            readMode = lastSegment.method.requiresData;
         }
         else {
             this.addQueryStep(query, new QueryEdgeQueryStep(new ApiEdgeQuery(lastSegment.edge, ApiEdgeQueryType.Create)));
@@ -823,7 +825,12 @@ export class ApiQueryBuilder {
             }
 
             //STEP 2: Read or Check
-            this.buildReadStep(query, currentSegment)
+            if(readMode) {
+                readMode = this.buildReadStep(query, currentSegment)
+            }
+            else {
+                readMode = this.buildCheckStep(query, currentSegment)
+            }
         }
 
         //STEP 3: Provide context for the base query.
