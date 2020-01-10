@@ -60,7 +60,6 @@ export class EmbedQueryQueryStep implements QueryStep {
                         targetArrayIndex: { [key: string]: { entry: any, index: number }[] } = {},
                         ids: string[] = [];
 
-                    let forcedIndex = 0;
                     for(let entry of target) {
                         const id = entry[this.sourceField];
                         if(id) {
@@ -74,17 +73,12 @@ export class EmbedQueryQueryStep implements QueryStep {
                                 }
                                 entry[this.sourceField] = [];
                             }
-                            else if(this.forceArray) {
-                                if (targetArrayIndex[id]) targetArrayIndex[id].push({ entry, index: forcedIndex });
-                                else targetArrayIndex[id] = [{entry, index: forcedIndex }];
-                                ids.push(id);
-                                entry[this.targetField] = [];
-                                forcedIndex++
-                            }
                             else {
                                 if (targetIndex[id]) targetIndex[id].push(entry);
                                 else targetIndex[id] = [entry];
                                 ids.push(id);
+                                if (this.forceArray)
+                                    entry[this.targetField] = [];
                             }
                         }
                     }
@@ -104,7 +98,10 @@ export class EmbedQueryQueryStep implements QueryStep {
                                 for(let id of ids) {
                                     if (targetIndex[id]) {
                                         for (let subEntry of targetIndex[id]) {
-                                            subEntry[this.targetField] = entry;
+                                            if (this.forceArray)
+                                                subEntry[this.targetField].push(entry);
+                                            else
+                                                subEntry[this.targetField] = entry;
                                         }
                                     }
                                     if(targetArrayIndex[id]) {
