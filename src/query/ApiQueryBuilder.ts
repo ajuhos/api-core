@@ -273,12 +273,35 @@ export class RelateChangeQueryStep implements QueryStep {
             if(!scope.response) return reject(new ApiEdgeError(404, "Missing Related Entry"));
             parse(this.relation.relationId).assign(
                 scope.body,
-                scope.response.data[this.relation.relatedId]);
+                scope.response.data[this.relation.relatedId].toString());
             resolve(scope);
         })
     };
 
     inspect = () => `RELATE CHANGE ${this.relation.relationId}`;
+}
+
+export class RelateBackwardsChangeQueryStep implements QueryStep {
+    relation: ApiEdgeRelation;
+
+    constructor(relation: ApiEdgeRelation) {
+        this.relation = relation;
+    }
+
+    execute = (scope: ApiQueryScope): Promise<ApiQueryScope> => {
+        return new Promise((resolve, reject) => {
+            debug(`[${scope.query.id}]`, this.inspect());
+
+            if(!scope.body) return reject(new ApiEdgeError(404, "Missing Body"));
+            if(!scope.response) return reject(new ApiEdgeError(404, "Missing Related Entry"));
+            parse(this.relation.relatedId).assign(
+                scope.body,
+                scope.response.data[this.relation.relationId].toString());
+            resolve(scope);
+        })
+    };
+
+    inspect = () => `RELATE CHANGE BACKWARD ${this.relation.relatedId}`;
 }
 
 /*export class CheckResponseQueryStep implements QueryStep {
@@ -769,7 +792,12 @@ export class ApiQueryBuilder {
                 }
 
                 if(request.type !== ApiRequestType.Delete) {
-                    query.unshift(new RelateChangeQueryStep(relation));
+                    if(edge === relation.to) {
+                        query.unshift(new RelateBackwardsChangeQueryStep(relation))
+                    }
+                    else {
+                        query.unshift(new RelateChangeQueryStep(relation))
+                    }
                 }
             }
 
@@ -824,8 +852,14 @@ export class ApiQueryBuilder {
 
             //STEP 1: Relate to the current query.
             let relation = segments[i+1].relation;
+            let edge = segments[i+1].edge;
             if(relation && !(relation instanceof OneToOneRelation)) {
-                query.unshift(new RelateChangeQueryStep(relation));
+                if(edge === relation.to) {
+                    query.unshift(new RelateBackwardsChangeQueryStep(relation))
+                }
+                else {
+                    query.unshift(new RelateChangeQueryStep(relation))
+                }
             }
 
             //STEP 2: Read or Check
