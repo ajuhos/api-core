@@ -25,7 +25,8 @@ export class StudentEdge extends ModelEdge<Student> {
             (model: any, schema: any) => {
                 schema.fullName = [ model.firstName, model.lastName ].join(' ')
             },
-            [ "firstName", "lastName" ]
+            [ "firstName", "lastName" ],
+            String
         ),
         email: "=",
         schoolId: "=",

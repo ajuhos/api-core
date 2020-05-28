@@ -30,16 +30,19 @@ export class ApiEdgeSchemaTransformation {
     affectedSchemaField: string;
     affectedModelFields: string[];
     parsedField: any;
+    schemaType: any;
 
     constructor(input: (schema: any, model: any) => void,
                 output: (model: any, schema: any) => void,
                 modelFields: string[],
+                schemaType: any,
                 schemaField: string = "") {
         this.applyToInput = input;
         this.applyToOutput = output;
         this.affectedSchemaField = schemaField;
         this.affectedModelFields = modelFields;
         this.parsedField = parse(schemaField);
+        this.schemaType = schemaType
     }
 
     setSchemaField(field: string) {
@@ -130,7 +133,7 @@ export class ApiEdgeSchema {
         }
     }
 
-    private createTransformation(schemaField: string, schema: any): ApiEdgeSchemaTransformation|undefined {
+    private createTransformation(schemaField: string, schema: any, typedSchema: any): ApiEdgeSchemaTransformation|undefined {
         const parsedSchemaField = parse(schemaField),
             transform: string|ApiEdgeSchemaTransformation = parsedSchemaField(schema);
 
@@ -157,6 +160,7 @@ export class ApiEdgeSchema {
                 this.createInputTransformer(parsedSchemaField, transform),
                 ApiEdgeSchema.createOutputTransformer(parsedSchemaField, transform),
                 [ schemaField ],
+                typedSchema ? typedSchema[schemaField] : Mixed,
                 schemaField
             );
         }
@@ -175,7 +179,7 @@ export class ApiEdgeSchema {
 
         this.transformations = [];
         for(let i = 0; i < this.fields.length; ++i) {
-            const transform = this.createTransformation(this.fields[i], schema);
+            const transform = this.createTransformation(this.fields[i], schema, typedSchema);
             if(transform)
                 this.transformations.push(transform)
         }
