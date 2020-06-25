@@ -119,6 +119,11 @@ export class EmbedQueryQueryStep implements QueryStep {
                     const sourceId = target[this.sourceField];
                     let arrayRequest = false;
 
+                    if(!sourceId) {
+                        resolve(scope);
+                        return
+                    }
+
                     if(Array.isArray(sourceId)) {
                         arrayRequest = true;
                         this.request.context.filters = [
@@ -509,11 +514,53 @@ export class ApiQueryBuilder {
         }
     }
 
-    private static addMethodCallStep(request: ApiRequest, query: ApiQuery, method: ApiEdgeMethod, edge: ApiEdgeDefinition) {
+    private addMethodActions(triggerKind: ApiEdgeActionTriggerKind,
+                             query: ApiQuery,
+                             method: ApiEdgeMethod,
+                             queryType: ApiEdgeQueryType,
+                             edge: ApiEdgeDefinition,
+                             output: boolean = false) {
+        const trigger = ApiEdgeActionTrigger.Method;
+
+        let actions = edge.actions.filter((action: ApiEdgeAction) =>
+            action.triggerKind == triggerKind &&
+            (action.targetTypes & queryType) &&
+            (action.triggers & trigger) &&
+            (!action.triggerNames.length || action.triggerNames.indexOf(method.name) == -1));
+
+        actions.forEach((action: ApiEdgeAction) => query.unshift(action));
+
+        if(output) {
+            const apiTrigger = triggerKind == ApiEdgeActionTriggerKind.BeforeEvent ?
+                ApiActionTriggerKind.BeforeOutput : ApiActionTriggerKind.AfterOutput;
+            this.api.actions
+                .filter((action: ApiAction) => action.triggerKind == apiTrigger)
+                .forEach((action: ApiAction) => query.unshift(action))
+        }
+    }
+
+    private addMethodCallStep(request: ApiRequest, query: ApiQuery, method: ApiEdgeMethod, edge: ApiEdgeDefinition, output: boolean) {
         if(method.acceptedTypes & request.type) {
-            //TODO: this.addPostMethodActions(request, query, method);
+            let queryType = ApiEdgeQueryType.Any;
+            if (request.type === ApiRequestType.Create) {
+                queryType = ApiEdgeQueryType.Create;
+            } else if (request.type === ApiRequestType.Read) {
+                queryType = ApiEdgeQueryType.Read;
+            } else if (request.type === ApiRequestType.Update) {
+                queryType = ApiEdgeQueryType.Update;
+            } else if (request.type === ApiRequestType.Patch) {
+                queryType = ApiEdgeQueryType.Patch;
+            } else if (request.type === ApiRequestType.Delete) {
+                queryType = ApiEdgeQueryType.Delete;
+            } else if (request.type === ApiRequestType.Exists) {
+                queryType = ApiEdgeQueryType.Exists;
+            } else if (request.type === ApiRequestType.Change) {
+                queryType = ApiEdgeQueryType.Change;
+            }
+
+            this.addMethodActions(ApiEdgeActionTriggerKind.AfterEvent, query, method, queryType, edge, output);
             query.unshift(new CallMethodQueryStep(method, edge));
-            //TODO: this.addPreMethodActions(request, query, method);
+            this.addMethodActions(ApiEdgeActionTriggerKind.BeforeEvent, query, method, queryType, edge, output)
         }
         else {
             throw new ApiEdgeError(405, "Method Not Allowed");
@@ -639,7 +686,7 @@ export class ApiQueryBuilder {
 
         }
         else if(lastSegment instanceof MethodPathSegment) {
-            ApiQueryBuilder.addMethodCallStep(request, query, lastSegment.method, lastSegment.edge);
+            this.addMethodCallStep(request, query, lastSegment.method, lastSegment.edge, true);
             if(lastSegment.method.scope === ApiEdgeMethodScope.Entry) {
                 //TODO: Add support for providing id for Edge methods.
                 query.unshift(new ProvideIdQueryStep(lastSegment.edge.idField));
@@ -732,7 +779,7 @@ export class ApiQueryBuilder {
             }
         }
         else if(lastSegment instanceof MethodPathSegment) {
-            ApiQueryBuilder.addMethodCallStep(request, query, lastSegment.method, lastSegment.edge);
+            this.addMethodCallStep(request, query, lastSegment.method, lastSegment.edge, true);
             if(lastSegment.method.scope === ApiEdgeMethodScope.Entry) {
                 //TODO: Add support for providing id for Edge methods.
                 query.unshift(new ProvideIdQueryStep(lastSegment.edge.idField));
@@ -835,7 +882,7 @@ export class ApiQueryBuilder {
 
         //STEP 1: Create the base query which will provide the final data.
         if(lastSegment instanceof MethodPathSegment) {
-            ApiQueryBuilder.addMethodCallStep(request, query, lastSegment.method, lastSegment.edge);
+            this.addMethodCallStep(request, query, lastSegment.method, lastSegment.edge, true);
             if(lastSegment.method.scope === ApiEdgeMethodScope.Entry) {
                 //TODO: Add support for providing id for Edge methods.
                 query.unshift(new ProvideIdQueryStep(lastSegment.edge.idField));
