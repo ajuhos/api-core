@@ -117,7 +117,6 @@ export class EmbedQueryQueryStep implements QueryStep {
                 }
                 else {
                     const sourceId = target[this.sourceField];
-                    let arrayRequest = false;
 
                     if(!sourceId) {
                         resolve(scope);
@@ -125,13 +124,11 @@ export class EmbedQueryQueryStep implements QueryStep {
                     }
 
                     if(Array.isArray(sourceId)) {
-                        arrayRequest = true;
                         this.request.context.filters = [
                             new ApiEdgeQueryFilter(this.idField, ApiEdgeQueryFilterType.In, sourceId)
                         ];
                     }
                     else if(this.forceArray) {
-                        arrayRequest = true;
                         this.request.context.filters = [
                             new ApiEdgeQueryFilter(this.idField, ApiEdgeQueryFilterType.Equals, sourceId)
                         ];
@@ -152,12 +149,15 @@ export class EmbedQueryQueryStep implements QueryStep {
                                 if (item)
                                     response.data.push(item);
                                 else
-                                    console.log("WARNING: can\'t find in embed results this id: " + id);
+                                    console.warn("WARNING: can\'t find in embed results this id: " + id);
                             }
                         }
                         target[this.targetField] = response.data;
                         resolve(scope)
-                    }).catch(reject);
+                    }).catch(e => {
+                        console.warn(e);
+                        resolve(scope)
+                    })
                 }
             }
             else resolve(scope)
