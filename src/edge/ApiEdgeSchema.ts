@@ -65,13 +65,18 @@ export class ApiEdgeSchema {
 
     transformFields = (fields: string[]): string[] => {
         let output: string[] = [];
-        fields.forEach((field: string) => {
+        for (const field of fields) {
             const transformedFields = this.fieldMatrix[field];
             if(transformedFields) {
                 transformedFields.forEach((f: string) => output.push(f))
             }
-            else output.push(field)
-        });
+            else {
+                if (this.renameMatrix[field])
+                    output.push(this.renameMatrix[field]);
+                else
+                    output.push(field);
+            }
+        }
         return output
     };
 
@@ -162,7 +167,7 @@ export class ApiEdgeSchema {
                 [ schemaField ],
                 typedSchema ? typedSchema[schemaField] : Mixed,
                 schemaField
-            );
+            )
         }
     }
 

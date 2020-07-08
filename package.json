@@ -1,6 +1,6 @@
 {
   "name": "api-core",
-  "version": "0.26.5",
+  "version": "0.26.6",
   "description": "Model-based dynamic multi-level APIs for any provider, plus multiple consumption channels",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
