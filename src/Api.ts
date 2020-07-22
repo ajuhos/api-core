@@ -135,7 +135,7 @@ export class Api {
 
         for(let edge of metadata.edges) {
             //if(edge.external) continue; -- TODO
-            api.edge(new ExternalApiEdge(edge))
+            api.edge(new ExternalApiEdge(edge, api))
         }
 
         for(let relation of metadata.relations) {

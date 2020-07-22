@@ -183,6 +183,7 @@ export class QueryEdgeQueryStep implements QueryStep {
             }
 
             this.query.context = scope.context;
+            this.query.context.populatedRelations = []; // prevent embed step to run on external query --- it shall only run at the original executor
             this.query.context.identity = scope.identity;
 
             this.query.execute().then((response) => {
@@ -515,11 +516,11 @@ export class ApiQueryBuilder {
     }
 
     private addMethodActions(triggerKind: ApiEdgeActionTriggerKind,
-                             query: ApiQuery,
-                             method: ApiEdgeMethod,
-                             queryType: ApiEdgeQueryType,
-                             edge: ApiEdgeDefinition,
-                             output: boolean = false) {
+                            query: ApiQuery,
+                            method: ApiEdgeMethod,
+                            queryType: ApiEdgeQueryType,
+                            edge: ApiEdgeDefinition,
+                            output: boolean = false) {
         const trigger = ApiEdgeActionTrigger.Method;
 
         let actions = edge.actions.filter((action: ApiEdgeAction) =>

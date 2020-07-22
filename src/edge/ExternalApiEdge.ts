@@ -5,12 +5,15 @@ import {ApiEdge, ApiEdgeDefinition} from "./ApiEdgeDefinition";
 import {SchemaTypeMapper} from "./utils/SchemaTypeMapper";
 import {ApiEdgeMethod} from "./ApiEdgeMethod";
 import {ApiQueryScope} from "../query/ApiQuery";
+import {Api} from "../Api";
 
 export abstract class ExternalApiProvider {
     protected metadata: any;
+    protected api: Api;
 
-    protected constructor(metadata: any) {
-        this.metadata = metadata
+    protected constructor(metadata: any, api: Api) {
+        this.metadata = metadata;
+        this.api = api;
     }
 
     abstract getEntry: (context: ApiEdgeQueryContext) => Promise<ApiEdgeQueryResponse>;
@@ -26,13 +29,15 @@ export abstract class ExternalApiProvider {
 
     async edge(): Promise<ApiEdgeDefinition> {
         await this.prepare();
-        return new ExternalApiEdge(this.metadata, this)
+        return new ExternalApiEdge(this.metadata, this.api, this)
     }
 }
 
 export class ExternalApiEdge extends ApiEdge {
-    constructor(metadata: any, provider?: ExternalApiProvider) {
+    constructor(metadata: any, api: Api, provider?: ExternalApiProvider) {
         super();
+
+        this.api = api;
 
         this.name = metadata.name;
         this.pluralName = metadata.pluralName;
@@ -64,11 +69,13 @@ export class ExternalApiEdge extends ApiEdge {
         this.external = true;
 
         this.url = metadata.url;
-        if(provider) this.provider = provider;
+        if(provider) 
+            this.provider = provider;
     }
 
     url: string;
     provider: ExternalApiProvider;
+    api: Api;
 
     getEntry = (context: ApiEdgeQueryContext): Promise<ApiEdgeQueryResponse> => {
         return this.provider.getEntry(context)
