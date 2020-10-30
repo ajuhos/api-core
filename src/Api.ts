@@ -1,4 +1,5 @@
-import {ApiEdgeDefinition, ApiEdgeMetadata} from "./edge/ApiEdgeDefinition";
+import {ApiEdgeDefinition} from "./edge/ApiEdgeDefinition";
+import {ApiEdgeMetadata} from "./edge/ApiEdgeMetadata";
 import {ApiRequestParser} from "./request/ApiRequestParser";
 import {ApiQueryBuilder} from "./query/ApiQueryBuilder";
 import {ApiRequest, ApiRequestType} from "./request/ApiRequest";
@@ -151,4 +152,7 @@ export class Api {
         }
     }
 
+    private extension: { [key: string]: any } = {};
+    get = (key: string) => this.extension[key];
+    set = (key: string, value: any) => this.extension[key] = value;
 }

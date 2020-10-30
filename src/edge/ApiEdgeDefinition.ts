@@ -10,23 +10,7 @@ import {ApiEdgeSchema} from "./ApiEdgeSchema";
 import {SchemaTypeMapper} from "./utils/SchemaTypeMapper";
 import {Api} from "../Api";
 import {ApiEdgeQuery} from "./ApiEdgeQuery";
-
-export interface ApiEdgeMetadata {
-    name: string;
-    pluralName: string;
-    idField: string;
-    fields: string[];
-    methods: { name: string, type: ApiRequestType, parameters: string[] }[];
-    typings?: { [key: string]: any };
-    allowGet: boolean;
-    allowList: boolean;
-    allowCreate: boolean;
-    allowUpdate: boolean;
-    allowPatch: boolean;
-    allowRemove: boolean;
-    allowExists: boolean;
-    external: boolean;
-}
+import {ApiEdgeMetadata} from "./ApiEdgeMetadata";
 
 export interface ApiEdgeDefinition {
     name: string;

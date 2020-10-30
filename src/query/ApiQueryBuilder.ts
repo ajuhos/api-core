@@ -209,6 +209,7 @@ export class CallMethodQueryStep implements QueryStep {
     execute = (scope: ApiQueryScope): Promise<ApiQueryScope> => {
         return new Promise((resolve, reject) => {
             debug(`[${scope.query.id}]`, this.inspect());
+            scope.context.method = this.method.name;
 
             this.method.execute(scope)
                 .then((response) => {

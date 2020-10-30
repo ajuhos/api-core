@@ -28,6 +28,7 @@ export class ApiEdgeQueryContext {
     filters: ApiEdgeQueryFilter[] = [];
     parameters: ApiEdgeQueryParameter[] = [];
     identity: any;
+    method: string;
 
     clone = () => {
         let temp = new ApiEdgeQueryContext();

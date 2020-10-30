@@ -1,4 +1,5 @@
-export {ApiEdgeDefinition, ApiEdge, ApiEdgeMetadata} from "./src/edge/ApiEdgeDefinition";
+export {ApiEdgeDefinition, ApiEdge} from "./src/edge/ApiEdgeDefinition";
+export {ApiEdgeMetadata} from "./src/edge/ApiEdgeMetadata";
 export {ExternalApiEdge, ExternalApiProvider} from "./src/edge/ExternalApiEdge";
 export {ApiEdgeQueryType} from "./src/edge/ApiEdgeQueryType";
 export {ApiEdgeQueryContext} from "./src/edge/ApiEdgeQueryContext";
@@ -6,7 +7,7 @@ export {ApiEdgeQueryResponse, ApiEdgeQueryStreamResponse} from "./src/edge/ApiEd
 export {ApiEdgeQueryFilter, ApiEdgeQueryFilterType} from "./src/edge/ApiEdgeQueryFilter";
 export {ApiEdgeSchema, ApiEdgeSchemaTransformation, Mixed, SubSchema, SchemaReference, JSONDate} from "./src/edge/ApiEdgeSchema";
 export {ApiEdgeQuery} from "./src/edge/ApiEdgeQuery";
-export {ApiEdgeMethod, ApiEdgeMethodScope} from "./src/edge/ApiEdgeMethod";
+export {ApiEdgeMethod, ApiEdgeMethodScope, ApiEdgeMethodOutput} from "./src/edge/ApiEdgeMethod";
 export {ApiEdgeError} from "./src/query/ApiEdgeError";
 
 export {ApiEdgeRelation, ApiEdgeRelationConstructor, ApiEdgeRelationTypes} from "./src/relations/ApiEdgeRelation";
