@@ -21,7 +21,7 @@ const studentEdge = new StudentEdge,
 let api: Api;
 
 tap.test('creating the API should work', (t: any) => {
-    api = new Api('1.0')
+    api = new Api({name: 'test-service', version: '1.0'})
         .edge(studentEdge)
         .edge(classEdge)
         .edge(courseEdge)

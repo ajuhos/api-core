@@ -54,7 +54,7 @@ const relation: any = new OneToOneRelation(edge, relatedEdge);
 const collectionRelation: any = new OneToManyRelation(edge, relatedCollectionEdge);
 
 const parser = new ApiRequestPathParser(
-    new Api('1.0')
+    new Api({name: 'test-service', version: '1.0'})
         .edge(edge)
         .edge(relatedEdge)
         .edge(relatedCollectionEdge)
@@ -193,8 +193,8 @@ tap.test('unsupported relation should cause error', (t: any) => {
     };
 
     const badParser = new ApiRequestPathParser(
-        new Api('1.0')
-            .edge(edge)
+        new Api({name: 'test-service', version: '1.0'})
+        .edge(edge)
             .edge(relatedEdge)
             .relation(new unsupportedRelation)
     );
@@ -204,7 +204,7 @@ tap.test('unsupported relation should cause error', (t: any) => {
 });
 
 tap.test('request parser should work too', async (t: any) => {
-    const requestParser = new ApiRequestParser(new Api('1.0'));
+    const requestParser = new ApiRequestParser(new Api({name: 'test-service', version: '1.0'}));
     const request = await requestParser.parse([]);
     t.equal(request.path.segments.length, 0);
     t.end()

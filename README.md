@@ -147,11 +147,11 @@ const studentEdge =
           });
 
 const api10
-    = new Api('1.0')
+    = new Api({name: 'test-service', version: '1.0'})
         .edge(studentEdge);
 
 const api11
-    = new Api('1.1')
+    = new Api({name: 'test-service', version: '1.1'})
         .edge(studentEdge)
         .edge(classEdge)
         .edge(courseEdge)

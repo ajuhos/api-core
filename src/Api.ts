@@ -27,11 +27,16 @@ export interface ApiInfo {
 }
 
 export interface ApiMetadata {
-    'api-core': string
     info: ApiInfo
     version: string
     edges: ApiEdgeMetadata[]
     relations: ExportedApiEdgeRelation[]
+    services: ApiService[]
+}
+
+export interface ApiService {
+    name: string
+    version: string
 }
 
 export class Api {
@@ -40,7 +45,7 @@ export class Api {
 
     url?: string;
     info?: ApiInfo;
-    version: string;
+    service: ApiService;
 
     edges: ApiEdgeDefinition[] = [];
     relations: ApiEdgeRelation[] = [];
@@ -49,8 +54,8 @@ export class Api {
     private queryBuilder: ApiQueryBuilder;
     resolver: ApiResolver;
 
-    constructor(version: string, ...edges: ApiEdgeDefinition[]) {
-        this.version = version;
+    constructor(service: ApiService, ...edges: ApiEdgeDefinition[]) {
+        this.service = service;
         this.edges = edges;
         this.parser = new ApiRequestParser(this);
         this.queryBuilder = new ApiQueryBuilder(this);
@@ -119,9 +124,9 @@ export class Api {
 
     metadata = (): ApiMetadata => {
         return {
-            'api-core': pkg.version,
             info: this.info || { title: 'API' },
-            version: this.version,
+            version: pkg.version,
+            services: [ this.service ],
             edges: this.edges
                 .filter(edge => !edge.external)
                 .map(edge => edge.metadata()),
@@ -131,7 +136,7 @@ export class Api {
     };
 
     static async fromMetadata(metadata: ApiMetadata): Promise<Api> {
-        const api = new Api(metadata.version);
+        const api = new Api(metadata.services[0] || {});
         api.info = metadata.info;
 
         for(let edge of metadata.edges) {
