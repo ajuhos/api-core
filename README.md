@@ -7,6 +7,7 @@ Lightweight framework for building dynamic multi-level APIs for any provider (Ex
 [![Build Status](https://travis-ci.org/ajuhos/api-core.svg?branch=master)](https://travis-ci.org/ajuhos/api-core)
 [![Coverage Status](https://coveralls.io/repos/github/ajuhos/api-core/badge.svg?branch=master)](https://coveralls.io/github/ajuhos/api-core?branch=master)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/4b1dd6ebe9eb4634aef02811c374efaf)](https://www.codacy.com/app/ajuhos/api-core?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ajuhos/api-core&amp;utm_campaign=Badge_Grade)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fajuhos%2Fapi-core.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fajuhos%2Fapi-core?ref=badge_shield)
 
 ## Features
 
@@ -181,3 +182,5 @@ $ npm test
 ## License
 
 The [MIT License](https://github.com/ajuhos/api-core/blob/master/LICENSE). Free forever. :)
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fajuhos%2Fapi-core.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fajuhos%2Fapi-core?ref=badge_large)
