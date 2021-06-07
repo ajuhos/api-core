@@ -15,4 +15,4 @@ export interface ApiEdgeMetadata {
     allowRemove: boolean;
     allowExists: boolean;
     external: boolean;
-};
+}
