@@ -22,8 +22,6 @@ Lightweight framework for building dynamic multi-level APIs for any provider (Ex
 
 ## Installation
 
-**API Core is in ``beta`` and NOT ready for production use.**
-
 To install the latest version, use NPM:
 
 ```bash
