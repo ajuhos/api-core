@@ -80,7 +80,7 @@ tap.test('/schools', async (t: any) => {
     t.ok(query.steps[0] instanceof builder.ExtendContextQueryStep);
     t.ok(query.steps[1] instanceof builder.QueryEdgeQueryStep);
 
-    query.execute()
+    return query.execute()
         .then(resp => {
             t.same(resp.data,
                 [
@@ -115,7 +115,7 @@ tap.test('/schools/s2', async (t: any) => {
     t.ok(query.steps[1] instanceof builder.ExtendContextQueryStep);
     t.ok(query.steps[2] instanceof builder.QueryEdgeQueryStep);
 
-    query.execute()
+    return query.execute()
         .then(resp => {
             t.same(resp.data,
                 {
@@ -137,7 +137,7 @@ tap.test('/schools/s5', async (t: any) => {
     const request = await api.parseRequest([ 'schools', 's5' ]),
         query = api.buildQuery(request);
 
-    query.execute()
+    return query.execute()
         .then(() => {
             t.ok(false, "an invalid query should not succeed");
             t.end()
@@ -161,7 +161,7 @@ tap.test('/schools/s1/classes', async (t: any) => {
     t.ok(query.steps[3] instanceof builder.ExtendContextQueryStep, 'APPLY PARAMS');
     t.ok(query.steps[4] instanceof builder.QueryEdgeQueryStep, 'QUERY /classes');
 
-    query.execute()
+    return query.execute()
         .then(resp => {
             t.same(resp.data,
                 [
@@ -194,7 +194,7 @@ tap.test('/schools/s1/classes/c1', async (t: any) => {
     t.ok(query.steps[4] instanceof builder.ExtendContextQueryStep, 'APPLY PARAMS');
     t.ok(query.steps[5] instanceof builder.QueryEdgeQueryStep, 'QUERY /classes');
 
-    query.execute()
+    return query.execute()
         .then(resp => {
             t.same(resp.data,
                 {
@@ -224,7 +224,7 @@ tap.test('/students/s2/class', async (t: any) => {
     t.ok(query.steps[3] instanceof builder.ExtendContextQueryStep, 'APPLY PARAMS');
     t.ok(query.steps[4] instanceof builder.QueryEdgeQueryStep, 'QUERY /classes');
 
-    query.execute()
+    return query.execute()
         .then(resp => {
             t.same(resp.data, {
                 id: "c1",
@@ -246,7 +246,7 @@ tap.test('/schools/s1/classes/c2', async (t: any) => {
     const request = await api.parseRequest([ 'schools', 's1', 'classes', 'c2' ]),
         query = api.buildQuery(request);
 
-    query.execute()
+    return query.execute()
         .then(() => {
             t.ok(false, "an invalid query should not succeed");
             t.end()
@@ -274,7 +274,7 @@ tap.test('POST /schools', async (t: any) => {
     t.ok(query.steps[0] instanceof builder.SetBodyQueryStep);
     t.ok(query.steps[1] instanceof builder.QueryEdgeQueryStep);
 
-    query.execute()
+    return query.execute()
         .then(resp => {
             t.same(resp.data, body);
             t.equal(resp.metadata, null);
@@ -296,7 +296,7 @@ tap.test('DELETE /schools/s3', async (t: any) => {
     t.ok(query.steps[1] instanceof builder.ExtendContextQueryStep);
     t.ok(query.steps[2] instanceof builder.QueryEdgeQueryStep);
 
-    query.execute()
+    return query.execute()
         .then(resp => {
             t.equal(resp.metadata, null);
             t.end()
@@ -338,7 +338,7 @@ tap.test('PATCH /schools/s2', async (t: any) => {
     t.ok(query.steps[2] instanceof builder.ExtendContextQueryStep, 'APPLY PARAMS');
     t.ok(query.steps[3] instanceof builder.QueryEdgeQueryStep, 'QUERY');
 
-    query.execute()
+    return query.execute()
         .then(resp => {
             t.same(resp.data,
                 {
@@ -370,7 +370,7 @@ tap.test('PUT /schools/s2', async (t: any) => {
     t.ok(query.steps[2] instanceof builder.ExtendContextQueryStep, 'APPLY PARAMS');
     t.ok(query.steps[3] instanceof builder.QueryEdgeQueryStep, 'QUERY');
 
-    query.execute()
+    return query.execute()
         .then(resp => {
             t.same(resp.data,
                 {
@@ -415,7 +415,7 @@ tap.test('/students/s2/withHungarianName', async (t: any) => {
     t.ok(query.steps[3] instanceof builder.ProvideIdQueryStep, 'PROVIDE ID');
     t.ok(query.steps[4] instanceof builder.CallMethodQueryStep, 'call{withHungarianName}');
 
-    query.execute()
+    return query.execute()
         .then(resp => {
             t.same(resp.data, {
                 id: "s2",
@@ -448,7 +448,7 @@ tap.test('POST /students/s2/rename', async (t: any) => {
     t.ok(query.steps[3] instanceof builder.ProvideIdQueryStep, 'PROVIDE ID');
     t.ok(query.steps[4] instanceof builder.CallMethodQueryStep, 'call{rename}');
 
-    query.execute()
+    return query.execute()
         .then(resp => {
             t.same(resp.data, {
                 id: "s2",

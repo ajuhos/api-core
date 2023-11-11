@@ -16,8 +16,8 @@ export class OneToManyRelation extends ApiEdgeRelation {
                     = { }) {
         super(from, to);
         this.name = options.name || to.pluralName;
-        this.relatedId = options.relatedId || to.idField;
-        this.relationId = options.relationId || from.name + Api.defaultIdPostfix;
+        this.relatedId = options.relatedId || from.name + Api.defaultIdPostfix;
+        this.relationId = options.relationId || to.idField;
         this.hasPair = options.hasPair || false
     }
 
